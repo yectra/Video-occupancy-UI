@@ -1,7 +1,9 @@
-import AttendanceDetailsView from "@/pages/Dashboard/views/AttendanceTracker/views/AttendanceDetailsView";
+import React from 'react';
 
-const UserTrackerView = () => {
-  return <AttendanceDetailsView />;
+const UserTrackerView: React.FC = () => {
+  return (
+    <div>UserTrackerView</div>
+  );
 };
 
 export default UserTrackerView;

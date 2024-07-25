@@ -32,7 +32,7 @@ const UtilizationGraph: React.FC = () => (
       <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid />
         <XAxis dataKey="time" />
-        <YAxis type="number" domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]} />
+        <YAxis type="number" domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]}  />
         <Tooltip content={<CustomTooltip />} />
         <Legend />
         <Line type="monotone" dataKey="value" stroke="#00D1A3" strokeWidth={3} dot />
