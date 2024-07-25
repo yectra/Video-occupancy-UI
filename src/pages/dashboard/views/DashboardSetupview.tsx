@@ -69,7 +69,7 @@ const DashboardSetupView: React.FC = () => {
           description="Monitor real-time occupancy data to ensure safety compliance and efficient space utilization."
         />
         <Card
-          to="/dashboard/attendance"
+          to="/dashboard/attendance"  
           onClick={handleGroupClick}
           icon={<GroupsRoundedIcon sx={{ color: "white", fontSize: 60 }} />}
           label="Attendance Tracker"
