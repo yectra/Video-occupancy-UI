@@ -48,7 +48,7 @@ const UserTrackerView = React.lazy(() => import("@/pages/users/views/UserTracker
 const route = [
   {
     path: "/",
-    element: <MainLayout />,
+    element: <Layout />,
     children: [
       {
         path: "dashboard",

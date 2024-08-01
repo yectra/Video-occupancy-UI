@@ -1,7 +1,5 @@
 import * as React from "react";
-import {
-  styled, Box, Typography, IconButton, InputAdornment, InputBase, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Paper, MenuItem, CircularProgress,
-} from "@mui/material";
+import {styled,Box,Typography,IconButton,InputAdornment,InputBase,Dialog,DialogTitle,DialogContent,DialogActions,TextField,Table,TableBody,TableCell,tableCellClasses,TableContainer,TableHead,TableRow,Paper,MenuItem,CircularProgress, Container,} from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import BaseButton from "@/components/controls/BaseButton";
 
@@ -37,7 +35,17 @@ const initialRows: Row[] = [
 ];
 
 const DialogTextField = ({ label, value, name, onChange, disabled = false, select = false, children }: any) => (
-  <TextField margin="dense" label={label} type="text" fullWidth name={name} value={value} onChange={onChange} disabled={disabled} select={select}>
+  <TextField
+    margin="dense"
+    label={label}
+    type="text"
+    fullWidth
+    name={name}
+    value={value}
+    onChange={onChange}
+    disabled={disabled}
+    select={select}
+  >
     {children}
   </TextField>
 );
@@ -78,18 +86,27 @@ const ManageEmployeeForm: React.FC = () => {
     setSelectedEmployee((prev) => (prev ? { ...prev, role: value } : prev));
   };
 
-  const filteredRows = rows.filter((row) => row.name.toLowerCase().includes(searchTerm.toLowerCase()) || row.id.toString().includes(searchTerm.trim()));
+  const filteredRows = rows.filter((row) =>
+    row.name.toLowerCase().includes(searchTerm.toLowerCase()) || row.id.toString().includes(searchTerm.trim())
+  );
 
   return (
-    <TableContainer component={Paper}>
+    <Container>
+    <Box sx={{ padding: 2 }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-        <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">Employee Registry</Typography>
+        <Typography sx={{ fontWeight: "bold", color: "#1C214F" }} variant="h5">
+          Employee Registry
+        </Typography>
         <Box sx={{ position: "relative", width: "350px" }}>
           <InputBase
             placeholder="Search"
             value={searchTerm}
             onChange={handleChange}
-            startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            }
             endAdornment={
               searchTerm && (
                 <InputAdornment position="end">
@@ -99,42 +116,54 @@ const ManageEmployeeForm: React.FC = () => {
                 </InputAdornment>
               )
             }
-            sx={{ borderRadius: "8px", border: "2px solid #ccc", padding: "6px 10px", width: "100%", "&:hover": { borderColor: "#888" } }}
+            sx={{
+              borderRadius: "8px",
+              border: "2px solid #ccc",
+              padding: "6px 10px",
+              width: "100%",
+              "&:hover": { borderColor: "#888" },
+            }}
           />
         </Box>
       </Box>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>Employee Id</StyledTableCell>
-            <StyledTableCell align="center">Name</StyledTableCell>
-            <StyledTableCell align="center">Date of Joining</StyledTableCell>
-            <StyledTableCell align="center">Role</StyledTableCell>
-            <StyledTableCell align="center">Mail Id</StyledTableCell>
-            <StyledTableCell align="center">Action</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {filteredRows.length === 0 ? (
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+          <TableHead>
             <TableRow>
-              <TableCell colSpan={6} align="center">No records found</TableCell>
+              <StyledTableCell>Employee Id</StyledTableCell>
+              <StyledTableCell align="center">Name</StyledTableCell>
+              <StyledTableCell align="center">Date of Joining</StyledTableCell>
+              <StyledTableCell align="center">Role</StyledTableCell>
+              <StyledTableCell align="center">Mail Id</StyledTableCell>
+              <StyledTableCell align="center">Action</StyledTableCell>
             </TableRow>
-          ) : (
-            filteredRows.map((row) => (
-              <StyledTableRow key={row.id}>
-                <StyledTableCell>{row.id}</StyledTableCell>
-                <StyledTableCell align="center">{row.name}</StyledTableCell>
-                <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
-                <StyledTableCell align="center">{row.role}</StyledTableCell>
-                <StyledTableCell align="center">{row.email}</StyledTableCell>
-                <StyledTableCell align="center">
-                  <BaseButton variant="text" color="primary" onClick={() => handleEditClick(row)}>EDIT</BaseButton>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {filteredRows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  No records found
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredRows.map((row) => (
+                <StyledTableRow key={row.id}>
+                  <StyledTableCell>{row.id}</StyledTableCell>
+                  <StyledTableCell align="center">{row.name}</StyledTableCell>
+                  <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
+                  <StyledTableCell align="center">{row.role}</StyledTableCell>
+                  <StyledTableCell align="center">{row.email}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <BaseButton variant="text" color="primary" onClick={() => handleEditClick(row)}>
+                      EDIT
+                    </BaseButton>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <Dialog open={editDialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Edit Employee</DialogTitle>
         <DialogContent>
@@ -152,13 +181,16 @@ const ManageEmployeeForm: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <BaseButton onClick={handleDialogClose} color="primary">Cancel</BaseButton>
+          <BaseButton onClick={handleDialogClose} color="primary">
+            Cancel
+          </BaseButton>
           <BaseButton onClick={handleSave} color="primary" disabled={loading}>
             {loading ? <CircularProgress size={24} color="inherit" /> : "Save"}
           </BaseButton>
         </DialogActions>
       </Dialog>
-    </TableContainer>
+    </Box>
+    </Container>
   );
 };
 

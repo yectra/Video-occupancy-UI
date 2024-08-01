@@ -1,9 +1,8 @@
 import React from "react";
-
-import Layout from "@/common/Layout";
+import { Outlet } from "react-router-dom";
 
 const Users: React.FC = () => {
-  return <Layout />;
+  return <Outlet />;
 };
 
 export default Users;

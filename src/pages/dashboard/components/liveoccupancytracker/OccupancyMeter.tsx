@@ -38,7 +38,7 @@ const OccupancyMeter = () => {
           width: "400px",
           justifyContent: "center",
           alignItems: "center",
-          p: 5,
+          p: 8,
         }}
       >
         <MeterComponent percentage={percentage} />

@@ -82,13 +82,13 @@ const TrackerSetupView: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'linear-gradient(to bottom, #C4C4C4, #FFFFFF)' }}>
-      <Box sx={{ display: 'flex', width: '70%', height: 'auto', borderRadius: '3px', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', backgroundColor: '#FFFFFF', opacity: 0.9 }}>
-        <Box sx={{ flex: '1 1 50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img src={setupImg} alt="Setup" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh',bgcolor: "#eaf2e6" }}>
+      <Box sx={{ display: 'flex', width: '70%', height: '90%', borderRadius: 2, backgroundColor: '#FFFFFF', opacity: 0.9,boxShadow:10 }}>
+        <Box sx={{ flex: 1 , display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <img src={setupImg} alt="Setup" style={{ width: '100%', height: '100%', objectFit: 'cover',borderRadius:10 }} />
         </Box>
-        <Box sx={{ flex: '1 1 50%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 4, gap: 6 }}>
-          <Typography variant="h4" gutterBottom sx={{ color: '#00D1A3' }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 4, gap: 6 }}>
+          <Typography variant="h4" gutterBottom sx={{ color: '#00D1A3',fontWeight:"bold" }}>
             LIVE OCCUPANCY TRACKER
           </Typography>
           {step === 3 ? (
@@ -117,7 +117,7 @@ const TrackerSetupView: React.FC = () => {
                       </IconButton>
                     )}
                     <Typography variant="body1" sx={{ color: '#1C214F', fontWeight: 'bold' }}>
-                      CAMERA {currentCameraIndex + 1}
+                      LOCATION {currentCameraIndex + 1}
                     </Typography>
                     {currentCameraIndex < cameraSetups.length - 1 && (
                       <IconButton onClick={() => handleCameraIndexChange(1)}>
@@ -184,12 +184,12 @@ const TrackerSetupView: React.FC = () => {
                         label="Camera Position"
                       >
                         <MenuItem value="INSIDE-OUT">
-                          <Tooltip title="Monitors activity and movement of people exiting the building." placement="right">
+                          <Tooltip title="Camera installed inside the entrance and facing the door. People entering are facing the camera, while those leaving are not" placement="right">
                             <span>INSIDE-OUT</span>
                           </Tooltip>
                         </MenuItem>
                         <MenuItem value="OUTSIDE-IN">
-                          <Tooltip title="Monitors activity and movement of people entering the building." placement="right">
+                          <Tooltip title="Camera installed outside the entrance and facing the door. People entering are not facing the camera, while those leaving are" placement="right">
                             <span>OUTSIDE-IN</span>
                           </Tooltip>
                         </MenuItem>
@@ -242,7 +242,7 @@ const TrackerSetupView: React.FC = () => {
           )}
         </Box>
       </Box>
-    </Box>
+    </Box>    
   );
 };
 

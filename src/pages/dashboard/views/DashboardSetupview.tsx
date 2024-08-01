@@ -1,34 +1,21 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useMsal } from "@azure/msal-react";
+import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { Box, Container, IconButton, Typography} from "@mui/material";
 import VideocamIcon from '@mui/icons-material/Videocam';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
+import { signInUser } from "@/common/services/AuthHelper";
+import BaseSpinner from "@/components/UI/BaseSpinner";
 
 const DashboardSetupView: React.FC = () => {
   const navigate = useNavigate();
-  const { instance, accounts } = useMsal();
+
+  const isAuthenticated = useIsAuthenticated();
+  const { instance, inProgress } = useMsal();
 
   useEffect(() => {
-    const login = async () => {
-      if (accounts.length === 0) {
-        try {
-          await instance.loginRedirect({
-            scopes: [
-              "https://roosYectraStore.onmicrosoft.com/2fdca491-6f4f-4019-b204-62d74dae646a/occupanytracker/tasks.write",
-              "openid",
-              "profile",
-              "offline_access",
-            ],
-          });
-        } catch (error) {
-          console.error("Login error: ", error);
-        }
-      }
-    };
-
-    login();
-  }, [instance, accounts]);
+    signInUser(instance, inProgress, isAuthenticated);
+  }, [isAuthenticated]);
 
   const handleVideocamClick = () => {
     navigate("/dashboard/occupancy-tracker");
@@ -51,6 +38,14 @@ const DashboardSetupView: React.FC = () => {
       <Typography sx={{ color: "#7D7D7D", textAlign: "center" }} variant="body2">{description}</Typography>
     </Box>
   );
+
+
+  if(!isAuthenticated)
+  {
+    return(
+      <BaseSpinner/>
+    )
+  }
 
   return (
     <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", mt: 10, gap: 12 }}>
