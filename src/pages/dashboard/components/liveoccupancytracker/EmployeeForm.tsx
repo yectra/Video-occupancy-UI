@@ -6,7 +6,6 @@ import {
   TextField,
   Typography,
   Autocomplete,
-  CircularProgress,
 } from "@mui/material";
 import BaseButton from "@/components/controls/BaseButton";
 
@@ -15,7 +14,6 @@ const EmployeeForm: React.FC = () => {
   const [employeeId, setEmployeeId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
   const [role, setRole] = useState<string | null>(null);
 
   const navigate = useNavigate();
@@ -41,11 +39,7 @@ const EmployeeForm: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/dashboard/occupancy-tracker/overview/emp-form?added=true");
-    }, 3000);
+    navigate("/dashboard/occupancy-tracker/overview/emp-form?added=true");
   };
 
   const isFormValid = (): boolean => {
@@ -150,13 +144,9 @@ const EmployeeForm: React.FC = () => {
           }}
           variant="contained"
           onClick={handleSubmit}
-          disabled={!isFormValid() || loading}
+          disabled={!isFormValid()}
         >
-          {loading ? (
-            <CircularProgress size={24} color="inherit" />
-          ) : (
-            "Add Employee"
-          )}
+          Add Employee
         </BaseButton>
       </Box>
     </Box>
