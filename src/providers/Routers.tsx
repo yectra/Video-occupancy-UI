@@ -18,6 +18,9 @@ const LiveOccupancyTrackerView = React.lazy(() =>import("@/pages/dashboard/views
 //Setup
 const TrackerSetupView = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/views/TrackerSetupView"));
 
+//Preview
+const TrackerVideoView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/views/TrackerVideoView"));
+
 //Overview
 const TrackerOverview = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/views/TrackerOverview"));
 
@@ -65,6 +68,11 @@ const route = [
               {
                 path:"",
                 element:<TrackerSetupView/>
+              },
+              {
+                path:"preview",
+                element:<TrackerVideoView/>
+                
               },
               {
                 path: "overview",
