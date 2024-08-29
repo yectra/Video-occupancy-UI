@@ -101,7 +101,7 @@ const EmployeeForm: React.FC = () => {
             onChange={(e) => setEmployeeId(e.target.value)}
           />
         </Box>
-        <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
+        <Box sx={{ display: "flex", gap: 5, width: "100%" }}> 
           <TextField
             id="email"
             label="Email ID"

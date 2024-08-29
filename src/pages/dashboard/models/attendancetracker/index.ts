@@ -7,22 +7,6 @@ export class AttendanceData {
   punchOut: string;
   break: string;
   overTime: string;
-
-  constructor(
-    employeeId: number,
-    date: string,
-    punchIn: string,
-    punchOut: string,
-    breakTime: string,
-    overTime: string
-  ) {
-    this.employeeId = employeeId;
-    this.date = date;
-    this.punchIn = punchIn;
-    this.punchOut = punchOut;
-    this.break = breakTime;
-    this.overTime = overTime;
-  }
 }
 
 export interface CircularProgressWithTextProps extends CircularProgressProps {
@@ -33,11 +17,6 @@ export interface CircularProgressWithTextProps extends CircularProgressProps {
 export class PunchStatus {
   message: string;
   time: string;
-
-  constructor(message: string, time: string) {
-    this.message = message;
-    this.time = time;
-  }
 }
 
 export interface TodayactivityProps {
@@ -58,11 +37,5 @@ export class PunchCardProps {
   label: string;
   time: string;
   isPunchIn: boolean;
-
-  constructor(label: string, time: string, isPunchIn: boolean) {
-    this.label = label;
-    this.time = time;
-    this.isPunchIn = isPunchIn;
-  }
 }
 

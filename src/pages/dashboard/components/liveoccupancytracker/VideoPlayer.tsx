@@ -9,12 +9,7 @@ interface IProps {
   onClick?: () => void;
 }
 
-interface Rectangle {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+
 
 const VideoPlayer: React.FC<IProps> = ({ source, fullscreen = false, settingCoordinates = false, onClick }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -34,7 +29,6 @@ const VideoPlayer: React.FC<IProps> = ({ source, fullscreen = false, settingCoor
       const handleSize = 10;
 
       if (rectangle) {
-        // Check if clicked inside the existing rectangle
         if (
           x >= rectangle.x &&
           x <= rectangle.x + rectangle.width &&
@@ -43,7 +37,7 @@ const VideoPlayer: React.FC<IProps> = ({ source, fullscreen = false, settingCoor
         ) {
           setInitialClick({ x, y });
 
-          // Check for resize handles
+
           if (
             x >= rectangle.x + rectangle.width - handleSize &&
             x <= rectangle.x + rectangle.width &&
@@ -135,7 +129,6 @@ const VideoPlayer: React.FC<IProps> = ({ source, fullscreen = false, settingCoor
 
         ctx.strokeRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 
-        // Draw resize handles
         ctx.fillStyle = 'red';
         ctx.fillRect(rectangle.x - 5, rectangle.y - 5, 10, 10);
         ctx.fillRect(rectangle.x + rectangle.width - 5, rectangle.y + rectangle.height - 5, 10, 10);

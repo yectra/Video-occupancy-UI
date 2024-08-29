@@ -26,14 +26,6 @@ import {
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import BaseButton from "@/components/controls/BaseButton";
 
-interface Row {
-  id: number;
-  dateOfJoining: string;
-  name: string;
-  role: string;
-  email: string;
-}
-
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: { backgroundColor: theme.palette.common.black, color: theme.palette.common.white },
   [`&.${tableCellClasses.body}`]: { fontSize: 14 },
