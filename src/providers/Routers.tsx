@@ -16,31 +16,31 @@ const Dashboard = React.lazy(() => import("@/pages/dashboard/index"));
 const LiveOccupancyTrackerView = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/LiveOccupancyTrackerView"));
 
 //Setup
-const TrackerSetupView = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/views/TrackerSetupView"));
+const TrackerSetupView = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/TrackerSetupView"));
 
 //Preview
-const TrackerVideoView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/views/TrackerVideoView"));
+const TrackerVideoView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/TrackerVideoView"));
 
 //Overview
-const TrackerOverview = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/views/TrackerOverview"));
+const TrackerOverview = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/TrackerOverview"));
 
 //EmployeeView
-const EmployeeView = React.lazy(() => import("@/pages/dashboard/components/liveoccupancytracker/EmployeeView"));
+const EmployeeView = React.lazy(() => import("@/pages/dashboard/components/attendancetracker/EmployeeView"));
 
 //Add Employee
-const EmployeeForm = React.lazy(() => import("@/pages/dashboard/components/liveoccupancytracker/EmployeeForm"));
+const EmployeeForm = React.lazy(() => import("@/pages/dashboard/components/attendancetracker/EmployeeForm"));
 
 //EmployeeForm
-const ManageEmployeeForm = React.lazy(() => import ("@/pages/dashboard/components/liveoccupancytracker/ManageEmployeeForm"));
+const ManageEmployeeForm = React.lazy(() => import ("@/pages/dashboard/components/attendancetracker/ManageEmployeeForm"));
 
 //Attendance
 const AttendanceView = React.lazy(() => import("@/pages/dashboard/views/attendancetracker/AttendanceView"));
 
 //AttendanceList
-const AttendanceListView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/views/AttendanceListView"));
+const AttendanceListView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/AttendanceListView"));
 
 //EmployeeDetails
-const EmployeeDetailsView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/views/EmployeeDetailsView"));
+const EmployeeDetailsView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/EmployeeDetailsView"));
 
 //users
 const UsersDetails = React.lazy(() => import("@/pages/users/index"));
