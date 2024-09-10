@@ -7,7 +7,7 @@ import {
   Typography,
   Autocomplete,
 } from "@mui/material";
-import BaseButton from "@/components/controls/BaseButton";
+import BaseButton from "@/common/components/controls/BaseButton";
 
 const EmployeeForm: React.FC = () => {
   const [name, setName] = useState<string>("");

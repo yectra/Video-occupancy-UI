@@ -5,7 +5,7 @@ import { Box, Container, IconButton, Typography} from "@mui/material";
 import VideocamIcon from '@mui/icons-material/Videocam';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 import { signInUser } from "@/common/services/AuthHelper";
-import BaseSpinner from "@/components/UI/BaseSpinner";
+import BaseSpinner from "@/common/components/UI/BaseSpinner";
 
 const DashboardSetupView: React.FC = () => {
   const navigate = useNavigate();

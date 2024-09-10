@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, IconButton, Divider, Avatar } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { styled } from '@mui/system';
 import avImg from '@/assets/avatar.png'
+import { AttendanceDetails } from '../../services/attendancetracker';
+import { IndividualTimesheet } from '../../models/attendancetracker';
 
 const GaugeChart = styled('div')<{
   angle: number;
@@ -23,10 +25,21 @@ const GaugeChart = styled('div')<{
 const EmployeeTimesheet: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const name = searchParams.get('name');
-  const id = searchParams.get('id');
 
+  const id = searchParams.get('id');
+const [getEmployeeTimesheet,setEmployeeTimesheet]=useState<IndividualTimesheet>()
+  const attendanceDetails=new AttendanceDetails();
+
+  useEffect(()=>{
+    attendanceDetails.getIndividualEmployeeDetails(id|| "").then((res)=>{
+      console.log(res)
+      setEmployeeTimesheet(res)
+    })
+  },[id])
+ 
   
+
+
   const time = 9;
   const angle = (time / 24) * 200; 
 
@@ -46,7 +59,7 @@ const EmployeeTimesheet: React.FC = () => {
         <Box sx={{ display: "flex", border: "2px solid  #7D7D7D", borderRadius: 3, mt: 4, padding: 4, gap: 3 }}>
           <Avatar alt="Employee Avatar" src={avImg} sx={{ width: 70, height: 70 }} />
           <Box sx={{ ml: 2, color: "#7D7D7D" }}>
-            <Typography sx={{ fontWeight: "bold" }} variant='h6'>{name}</Typography>
+            <Typography sx={{ fontWeight: "bold" }} variant='h6'>{getEmployeeTimesheet?.employee_Name}</Typography>
             <Typography variant='body2'>Employee Id {id}</Typography>
           </Box>
         </Box>
@@ -64,6 +77,7 @@ const EmployeeTimesheet: React.FC = () => {
           <Typography sx={{ fontWeight: "bold", color: "#7D7D7D" }}>Over Time</Typography>
           <Typography variant='body1'>3hrs</Typography>
         </Box>
+  
       </Box>
     </Box>
   );

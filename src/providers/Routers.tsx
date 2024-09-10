@@ -53,6 +53,7 @@ const route = [
     path: "/",
     element: <MainLayout />,
     children: [
+      
       {
         path: "dashboard",
         element: <Dashboard />,
@@ -75,11 +76,12 @@ const route = [
                 
               },
               {
-                path: "overview",
+                path: "",
                 element: <Layout />,
                 children: [
+
                   {
-                    path: "",
+                    path: "overview",
                     element: <TrackerOverview />,
                   },
                   {
@@ -115,15 +117,16 @@ const route = [
         ],
       },
       {
-        path: "user-details",
-        element: <UsersDetails />,
-        children: [
+        path:"user-details",
+        element:<UsersDetails/>,
+        children:[
           {
-            path: "",
-            element: <UserTrackerView />,
-          },
-        ],
-      },
+            path:"",
+            element:<UserTrackerView/>
+          }
+        ]
+      }
+    
     ],
   },
 ];

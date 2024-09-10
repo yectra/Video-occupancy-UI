@@ -6,7 +6,7 @@ import route from "@/providers/Routers";
 
 import { Box } from "@mui/material";
 
-import BaseSpinner from "@/components/UI/BaseSpinner";
+import BaseSpinner from "@/common/components/UI/BaseSpinner";
 
 const App = () => {
   const routes = useRoutes(route);

@@ -1,20 +1,29 @@
 import React from "react";
-import { Box, Toolbar } from "@mui/material";
-import Appbar from "@/components/layout/Appbar";
-import Sidebar from "@/components/layout/Sidebar";
+import { Box, Grid, Toolbar } from "@mui/material";
+import Appbar from "@/common/components/layout/Appbar";
+import Sidebar from "@/common/components/layout/Sidebar";
 import { Outlet } from "react-router-dom";
 
 const Layout: React.FC = () => {
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1 }}>
-        <Appbar />
-        <Toolbar />
-        <Box sx={{ mt: 2 }}>
-          <Outlet />
-        </Box>
-      </Box>
+    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+
+      <Appbar />
+      <Toolbar />
+
+
+      <Grid container >
+        <Grid item xs={0} md={2} lg={2}>
+          <Sidebar />
+        </Grid>
+
+    
+        <Grid item xs={12} md={10} lg={10}>
+          <Box >
+            <Outlet />
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   );
 };

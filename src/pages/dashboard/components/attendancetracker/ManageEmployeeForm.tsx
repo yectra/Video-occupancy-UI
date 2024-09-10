@@ -24,7 +24,7 @@ import {
   Container,
 } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
-import BaseButton from "@/components/controls/BaseButton";
+import BaseButton from "@/common/components/controls/BaseButton";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: { backgroundColor: theme.palette.common.black, color: theme.palette.common.white },

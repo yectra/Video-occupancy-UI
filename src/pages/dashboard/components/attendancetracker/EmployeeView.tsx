@@ -9,7 +9,7 @@ import empImg4 from "@/assets/red hair woman.png";
 import empImg5 from "@/assets/short hair man.png";
 import empImg6 from "@/assets/purple hair woman.png";
 
-import BaseButton from "@/components/controls/BaseButton";
+import BaseButton from "@/common/components/controls/BaseButton";
 
 const EmployeeView: React.FC = () => {
   const navigate = useNavigate();

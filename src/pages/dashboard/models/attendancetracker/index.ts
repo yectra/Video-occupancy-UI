@@ -39,3 +39,18 @@ export class PunchCardProps {
   isPunchIn: boolean;
 }
 
+export class Row {
+  id: number;
+  date: string;
+  name: string;
+  punchIn: string;
+  punchOut: string;
+  break: string;
+  overTime: string;
+}
+
+export class IndividualTimesheet{
+  email:string;
+  employee_Id:string;
+  employee_Name:string;
+}

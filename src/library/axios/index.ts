@@ -18,7 +18,7 @@ export interface IApiClient {
 }
 export default class ApiClient implements IApiClient {
   public axiosInstance: AxiosInstance;
-  private baseUrl: string = "https://softwaremarketplace.azure-api.net/marketplace-developer";
+  private baseUrl: string = "https://videooccupancy.azure-api.net";
   constructor() {
     this.axiosInstance = this.createAxiosInstance();
   }

@@ -15,7 +15,7 @@ import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutl
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import setupImg from '@/assets/setupcamera.png';
-import BaseButton from "@/components/controls/BaseButton";
+import BaseButton from "@/common/components/controls/BaseButton";
 
 
 
