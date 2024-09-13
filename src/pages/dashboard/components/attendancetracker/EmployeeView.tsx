@@ -15,7 +15,7 @@ const EmployeeView: React.FC = () => {
   const navigate = useNavigate();
 
   const handleAddsubadminClick = () => {
-    navigate("/dashboard/occupancy-tracker/overview/add-emp");
+    navigate("/dashboard/occupancy-tracker/add-emp");
   };
 
   return (

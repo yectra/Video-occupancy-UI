@@ -19,11 +19,11 @@ export class PunchStatus {
   time: string;
 }
 
-export interface TodayactivityProps {
+export class TodayactivityProps {
   punchStatuses: PunchStatus[];
 }
 
-export interface TimesheetProps {
+export class TimesheetProps {
   onPunchIn: () => void;
   onPunchOut: () => void;
 }
@@ -43,14 +43,18 @@ export class Row {
   id: number;
   date: string;
   name: string;
-  punchIn: string;
-  punchOut: string;
+  firstPunchIn: string;
+  lastPunchOut: string;
   break: string;
   overTime: string;
 }
 
 export class IndividualTimesheet{
   email:string;
-  employee_Id:string;
-  employee_Name:string;
+  employeeId:string;
+  employeeName:string;
+  break:string;
+  overTime:string;
+  punchIn:string;
+  punchOut:string;
 }

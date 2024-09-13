@@ -4,8 +4,8 @@ import { Box, Typography, IconButton, Divider, Avatar } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { styled } from '@mui/system';
 import avImg from '@/assets/avatar.png'
-import { AttendanceDetails } from '../../services/attendancetracker';
-import { IndividualTimesheet } from '../../models/attendancetracker';
+import { AttendanceDetails } from '@/pages/dashboard/services/attendancetracker';
+import { IndividualTimesheet } from '@/pages/dashboard/models/attendancetracker';
 
 const GaugeChart = styled('div')<{
   angle: number;
@@ -59,7 +59,7 @@ const [getEmployeeTimesheet,setEmployeeTimesheet]=useState<IndividualTimesheet>(
         <Box sx={{ display: "flex", border: "2px solid  #7D7D7D", borderRadius: 3, mt: 4, padding: 4, gap: 3 }}>
           <Avatar alt="Employee Avatar" src={avImg} sx={{ width: 70, height: 70 }} />
           <Box sx={{ ml: 2, color: "#7D7D7D" }}>
-            <Typography sx={{ fontWeight: "bold" }} variant='h6'>{getEmployeeTimesheet?.employee_Name}</Typography>
+            <Typography sx={{ fontWeight: "bold" }} variant='h6'>{getEmployeeTimesheet?.employeeName}</Typography>
             <Typography variant='body2'>Employee Id {id}</Typography>
           </Box>
         </Box>

@@ -39,7 +39,7 @@ const EmployeeForm: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    navigate("/dashboard/occupancy-tracker/overview/emp-form?added=true");
+    navigate("/dashboard/occupancy-tracker/emp-form?added=true");
   };
 
   const isFormValid = (): boolean => {

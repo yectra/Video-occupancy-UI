@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import {
@@ -12,15 +11,18 @@ import {
   Paper,
   Box,
   Typography,
-  InputBase,
   InputAdornment,
   IconButton,
-
+  Popper,
   tableCellClasses,
+  InputBase,
 } from "@mui/material";
-import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
-
+import { Search as SearchIcon, Clear as ClearIcon, Today as TodayIcon } from "@mui/icons-material";
+import Calendar, { CalendarProps } from 'react-calendar';
+import 'react-calendar/dist/Calendar.css'; 
+import '@/styles/core/components/CalendarStyles.css'; // Assuming this exists
 import { AttendanceDetails } from "../../services/attendancetracker";
+import BaseSpinner from "@/common/components/UI/BaseSpinner";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -44,19 +46,20 @@ const EmployeeAttendance: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, _setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const navigate = useNavigate();
-
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
     setLoading(true);
+
     attendanceDetails
       .getAllEmployeeAttendanceDetails()
       .then((response) => {
-        console.log(response);
         setRows(response);
-        console.log(rows)
         setLoading(false);
       })
       .catch((err) => {
@@ -72,8 +75,18 @@ const EmployeeAttendance: React.FC = () => {
     navigate(`/dashboard/attendance/emp-details?name=${row.employee_Name}&id=${row.employee_Id}`);
   };
 
+  const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setCalendarOpen((prev) => !prev);
+  };
+
+  const handleDateChange: CalendarProps['onChange'] = (date: any) => {
+    setSelectedDate(Array.isArray(date) ? date[0] : date);
+    setCalendarOpen(false);
+  };
+
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return <BaseSpinner />;
   }
 
   if (error) {
@@ -81,96 +94,96 @@ const EmployeeAttendance: React.FC = () => {
   }
 
   return (
-
-      <TableContainer component={Paper}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "10px",
-          }}
-        >
-          <Typography
-            sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }}
-            variant="h5"
-          >
-            Attendance List
-          </Typography>
-          <Box sx={{ width: "350px", marginRight: 3 }}>
-            <InputBase
-              placeholder="Search"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              startAdornment={
-                <InputAdornment position="start">
-                  <SearchIcon />
+    <TableContainer component={Paper}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">
+          Attendance List
+        </Typography>
+        <Box sx={{ width: "350px", marginRight: 3 }}>
+          <InputBase
+            placeholder="Search"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            }
+            endAdornment={
+              searchTerm && (
+                <InputAdornment position="end">
+                  <IconButton edge="end" size="large">
+                    <ClearIcon />
+                  </IconButton>
                 </InputAdornment>
-              }
-              endAdornment={
-                searchTerm && (
-                  <InputAdornment position="end">
-                    <IconButton edge="end" size="large">
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }
-              sx={{
-                borderRadius: "4px",
-                border: "2px solid #ccc",
-                padding: "6px 10px",
-                width: "100%",
-                "&:hover": { borderColor: "#888" },
-                "&:focus": { borderColor: "#1C214F", boxShadow: "1px #1C214F" },
-              }}
-            />
-          </Box>
+              )
+            }
+            sx={{
+              borderRadius: "4px",
+              border: "2px solid #ccc",
+              padding: "6px 10px",
+              width: "100%",
+              "&:hover": { borderColor: "#888" },
+              "&:focus": { borderColor: "#1C214F", boxShadow: "1px #1C214F" },
+            }}
+          />
         </Box>
+      </Box>
 
-        <Table sx={{ minWidth: 700, boxShadow: 3, border: "1px solid #ccc" }}>
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Employee Id</StyledTableCell>
-              <StyledTableCell align="center">Name</StyledTableCell>
-              <StyledTableCell align="center">Email</StyledTableCell>
-              <StyledTableCell align="center">Date</StyledTableCell>
-              <StyledTableCell align="center">Punch In</StyledTableCell>
-              <StyledTableCell align="center">Punch Out</StyledTableCell>
-              <StyledTableCell align="center">Break</StyledTableCell>
-              <StyledTableCell align="center">Over time</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <StyledTableRow
-                key={row.id}
-                onClick={() => handleRowClick(row)}
-                sx={{ cursor: "pointer" }}
-              >
-                <StyledTableCell component="th" scope="row">
-                  {row.employee_Id}
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  {row.employee_Name}
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  {row.email}
-                </StyledTableCell>
-
-                <StyledTableCell align="center">10/09/2024</StyledTableCell>
-                <StyledTableCell align="center">{row.punchIn}</StyledTableCell>
-                <StyledTableCell align="center">
-                  {row.punchOut ? row.punchOut : "-"}
-                </StyledTableCell>
-                <StyledTableCell align="center">{row.break}</StyledTableCell>
-                <StyledTableCell align="center">{row.overTime}</StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-   
+      <Table sx={{ minWidth: 700, boxShadow: 3, border: "1px solid #ccc" }}>
+        <TableHead>
+          <TableRow>
+            <StyledTableCell align="center">Employee Id</StyledTableCell>
+            <StyledTableCell align="center">Name</StyledTableCell>
+            <StyledTableCell align="center">Email</StyledTableCell>
+            <StyledTableCell align="center">
+              Date
+              <IconButton onClick={handleIconClick}>
+                <TodayIcon style={{ color: 'white' }} />
+              </IconButton>
+              <Popper open={calendarOpen} anchorEl={anchorEl} placement="bottom">
+                <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px', backgroundColor: 'white' }}>
+                  <Calendar
+                    onChange={handleDateChange}
+                    value={selectedDate || new Date()}
+                    className="custom-calendar"
+                  />
+                </div>
+              </Popper>
+            </StyledTableCell>
+            <StyledTableCell align="center">Punch In</StyledTableCell>
+            <StyledTableCell align="center">Punch Out</StyledTableCell>
+            <StyledTableCell align="center">Break</StyledTableCell>
+            <StyledTableCell align="center">Over time</StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <StyledTableRow
+              key={row.id}
+              onClick={() => handleRowClick(row)}
+              sx={{ cursor: "pointer" }}
+            >
+              <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
+              <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
+              <StyledTableCell align="center">{row.email}</StyledTableCell>
+              <StyledTableCell align="center">{row.date}</StyledTableCell>
+              <StyledTableCell align="center">{row.firstPunchIn}</StyledTableCell>
+              <StyledTableCell align="center">{row.lastPunchOut}</StyledTableCell>
+              <StyledTableCell align="center">{row.break}</StyledTableCell>
+              <StyledTableCell align="center">{row.overTime}</StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

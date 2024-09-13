@@ -18,7 +18,7 @@ export interface IApiClient {
 }
 export default class ApiClient implements IApiClient {
   public axiosInstance: AxiosInstance;
-  private baseUrl: string = "https://videooccupancy.azure-api.net";
+  private baseUrl: string = "https://videooccupancy.azure-api.net/videoAttendanceV5";
   constructor() {
     this.axiosInstance = this.createAxiosInstance();
   }
