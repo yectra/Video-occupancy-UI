@@ -12,10 +12,4 @@ class CameraSetup {
   }
 
   
-class Row {
-  id: number;
-  dateOfJoining: string;
-  name: string;
-  role: string;
-  email: string;
-}
+

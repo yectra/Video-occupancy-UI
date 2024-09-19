@@ -20,7 +20,7 @@ import {
 import { Search as SearchIcon, Clear as ClearIcon, Today as TodayIcon } from "@mui/icons-material";
 import Calendar, { CalendarProps } from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; 
-import '@/styles/core/components/CalendarStyles.css'; // Assuming this exists
+import '@/styles/core/components/CalendarStyles.css'; 
 import { AttendanceDetails } from "../../services/attendancetracker";
 import BaseSpinner from "@/common/components/UI/BaseSpinner";
 
@@ -103,7 +103,10 @@ const EmployeeAttendance: React.FC = () => {
           marginBottom: "10px",
         }}
       >
-        <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">
+        <Typography
+          sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }}
+          variant="h5"
+        >
           Attendance List
         </Typography>
         <Box sx={{ width: "350px", marginRight: 3 }}>
@@ -146,10 +149,21 @@ const EmployeeAttendance: React.FC = () => {
             <StyledTableCell align="center">
               Date
               <IconButton onClick={handleIconClick}>
-                <TodayIcon style={{ color: 'white' }} />
+                <TodayIcon style={{ color: "white" }} />
               </IconButton>
-              <Popper open={calendarOpen} anchorEl={anchorEl} placement="bottom">
-                <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px', backgroundColor: 'white' }}>
+              <Popper
+                open={calendarOpen}
+                anchorEl={anchorEl}
+                placement="bottom"
+              >
+                <div
+                  style={{
+                    border: "1px solid #ccc",
+                    borderRadius: "8px",
+                    padding: "10px",
+                    backgroundColor: "white",
+                  }}
+                >
                   <Calendar
                     onChange={handleDateChange}
                     value={selectedDate || new Date()}
@@ -172,11 +186,17 @@ const EmployeeAttendance: React.FC = () => {
               sx={{ cursor: "pointer" }}
             >
               <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
-              <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
+              <StyledTableCell align="center">
+                {row.employeeName}
+              </StyledTableCell>
               <StyledTableCell align="center">{row.email}</StyledTableCell>
               <StyledTableCell align="center">{row.date}</StyledTableCell>
-              <StyledTableCell align="center">{row.firstPunchIn}</StyledTableCell>
-              <StyledTableCell align="center">{row.lastPunchOut}</StyledTableCell>
+              <StyledTableCell align="center">
+                {row.firstPunchIn}
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                {row.lastPunchOut}
+              </StyledTableCell>
               <StyledTableCell align="center">{row.break}</StyledTableCell>
               <StyledTableCell align="center">{row.overTime}</StyledTableCell>
             </StyledTableRow>

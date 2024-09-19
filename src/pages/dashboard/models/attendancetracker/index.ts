@@ -58,3 +58,25 @@ export class IndividualTimesheet{
   punchIn:string;
   punchOut:string;
 }
+
+
+///new
+
+
+export class AddEmployeeDetails{
+  employeeId:string;
+  employeeName:string;
+  role:string;
+  email:string;
+  dateOfJoining:string;
+  imageBase64:string;
+  action:string
+}
+
+export class ManageEmployeeDetails{
+  employeeId:string;
+  employeeName:string;
+  dateOfJoining:string;
+  role:string;
+  email:string;
+}

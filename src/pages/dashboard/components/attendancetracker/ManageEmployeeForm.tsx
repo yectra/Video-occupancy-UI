@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import {
   styled,
   Box,
@@ -25,6 +25,8 @@ import {
 } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import BaseButton from "@/common/components/controls/BaseButton";
+import { AttendanceDetails } from "../../services/attendancetracker";
+import { ManageEmployeeDetails } from "../../models/attendancetracker";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: { backgroundColor: theme.palette.common.black, color: theme.palette.common.white },
@@ -35,19 +37,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": { backgroundColor: theme.palette.action.hover },
 }));
-
-const initialRows: Row[] = [
-  { id: 1840, dateOfJoining: "21/04/2021", name: "Henry", role: "Employee", email: "henry@gmail.com" },
-  { id: 1841, dateOfJoining: "21/04/2021", name: "Charlie", role: "Employee", email: "charlie@gmail.com" },
-  { id: 1842, dateOfJoining: "21/04/2021", name: "Alexander", role: "Employee", email: "alexander@gmail.com" },
-  { id: 1843, dateOfJoining: "21/04/2021", name: "William", role: "Employee", email: "william@gmail.com" },
-  { id: 1844, dateOfJoining: "21/04/2021", name: "Oliver", role: "Employee", email: "oliver@gmail.com" },
-  { id: 1845, dateOfJoining: "21/04/2021", name: "George", role: "Employee", email: "george@gmail.com" },
-  { id: 1846, dateOfJoining: "21/04/2021", name: "Noah", role: "Employee", email: "noah@gmail.com" },
-  { id: 1847, dateOfJoining: "21/04/2021", name: "Jack", role: "Employee", email: "jack@gmail.com" },
-  { id: 1848, dateOfJoining: "21/04/2021", name: "James", role: "Employee", email: "james@gmail.com" },
-  { id: 1849, dateOfJoining: "21/04/2021", name: "Bexley", role: "Employee", email: "bexley@gmail.com" },
-];
 
 const DialogTextField = ({ label, value, name, onChange, disabled = false, select = false, children }: any) => (
   <TextField
@@ -66,44 +55,55 @@ const DialogTextField = ({ label, value, name, onChange, disabled = false, selec
 );
 
 const ManageEmployeeForm: React.FC = () => {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [editDialogOpen, setEditDialogOpen] = React.useState(false);
-  const [selectedEmployee, setSelectedEmployee] = React.useState<Row | null>(null);
-  const [rows, setRows] = React.useState<Row[]>(initialRows);
-  const [loading, setLoading] = React.useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [employeeForm, setEmployeeForm] = useState<ManageEmployeeDetails[]>([]);
+  const [selectedEmployee, setSelectedEmployee] = useState<ManageEmployeeDetails | null>(null);
+  const [loading, setLoading] = useState(false);
+  const attendanceDetails = new AttendanceDetails();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
-  const handleClearSearch = () => setSearchTerm("");
-  const handleEditClick = (employee: Row) => {
-    setSelectedEmployee(employee);
-    setEditDialogOpen(true);
+  useEffect(() => {
+    setLoading(true);
+    attendanceDetails
+      .getManageEmployeeDetails()
+      .then((response) => {
+        setEmployeeForm(response);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
   };
+
   const handleDialogClose = () => {
     setEditDialogOpen(false);
     setSelectedEmployee(null);
   };
-  const handleSave = () => {
-    setLoading(true);
-    if (selectedEmployee) {
-      setRows((prev) =>
-        prev.map((row) => (row.id === selectedEmployee.id ? selectedEmployee : row))
-      );
-      handleDialogClose();
-    }
-    setLoading(false);
-  };
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSelectedEmployee((prev) => (prev ? { ...prev, [name]: value } : prev));
-  };
-  const handleRoleChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-    const value = e.target.value as string;
-    setSelectedEmployee((prev) => (prev ? { ...prev, role: value } : prev));
+
+  const handleEditClick = (employee: ManageEmployeeDetails) => {
+    setSelectedEmployee(employee);
+    setEditDialogOpen(true);
   };
 
-  const filteredRows = rows.filter((row) =>
-    row.name.toLowerCase().includes(searchTerm.toLowerCase()) || row.id.toString().includes(searchTerm.trim())
-  );
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setSelectedEmployee((prev) => prev ? { ...prev, [name]: value } : null);
+  };
+
+  const handleRoleChange = (event: React.ChangeEvent<{ value: string }>) => {
+    const { value } = event.target;
+    setSelectedEmployee((prev) => prev ? { ...prev, role: value  } : null);
+  };
+
+  const handleSave = () => {
+    if (selectedEmployee) {
+      setLoading(true);
+     
+    }
+  };
 
   return (
     <Container>
@@ -116,7 +116,7 @@ const ManageEmployeeForm: React.FC = () => {
             <InputBase
               placeholder="Search"
               value={searchTerm}
-              onChange={handleChange}
+              onChange={handleSearch}
               startAdornment={
                 <InputAdornment position="start">
                   <SearchIcon />
@@ -125,7 +125,7 @@ const ManageEmployeeForm: React.FC = () => {
               endAdornment={
                 searchTerm && (
                   <InputAdornment position="end">
-                    <IconButton edge="end" onClick={handleClearSearch} size="large">
+                    <IconButton edge="end" size="large" onClick={() => setSearchTerm("")}>
                       <ClearIcon />
                     </IconButton>
                   </InputAdornment>
@@ -154,28 +154,20 @@ const ManageEmployeeForm: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRows.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center">
-                    No records found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredRows.map((row) => (
-                  <StyledTableRow key={row.id}>
-                    <StyledTableCell>{row.id}</StyledTableCell>
-                    <StyledTableCell align="center">{row.name}</StyledTableCell>
-                    <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
-                    <StyledTableCell align="center">{row.role}</StyledTableCell>
-                    <StyledTableCell align="center">{row.email}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      <BaseButton variant="text" color="primary" onClick={() => handleEditClick(row)}>
-                        EDIT
-                      </BaseButton>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))
-              )}
+              {employeeForm.map((row) => (
+                <StyledTableRow key={row.employeeId}>
+                  <StyledTableCell>{row.employeeId}</StyledTableCell>
+                  <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
+                  <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
+                  <StyledTableCell align="center">{row.role}</StyledTableCell>
+                  <StyledTableCell align="center">{row.email}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <BaseButton variant="text" color="primary" onClick={() => handleEditClick(row)}>
+                      EDIT
+                    </BaseButton>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -184,14 +176,41 @@ const ManageEmployeeForm: React.FC = () => {
           <DialogContent>
             {selectedEmployee && (
               <>
-                <DialogTextField label="Employee Id" value={selectedEmployee.id} name="id" onChange={handleInputChange} disabled />
-                <DialogTextField label="Name" value={selectedEmployee.name} name="name" onChange={handleInputChange} />
-                <DialogTextField label="Date of Joining" value={selectedEmployee.dateOfJoining} name="dateOfJoining" onChange={handleInputChange} />
-                <DialogTextField label="Role" value={selectedEmployee.role} name="role" onChange={handleRoleChange} select>
+                <DialogTextField
+                  label="Employee Id"
+                  value={selectedEmployee.employeeId}
+                  name="employeeId"
+                  disabled
+                />
+                <DialogTextField
+                  label="Name"
+                  value={selectedEmployee.employeeName}
+                  name="employeeName"
+                  onChange={handleInputChange}
+                />
+                <DialogTextField
+                  label="Date of Joining"
+                  value={selectedEmployee.dateOfJoining}
+                  name="dateOfJoining"
+                  onChange={handleInputChange}
+                />
+                <DialogTextField
+                  label="Role"
+                  value={selectedEmployee.role}
+                  name="role"
+                  onChange={handleRoleChange}
+                  select
+                >
                   <MenuItem value="Employee">Employee</MenuItem>
                   <MenuItem value="Manager">Manager</MenuItem>
+                  <MenuItem value="Manager">Developer</MenuItem>
                 </DialogTextField>
-                <DialogTextField label="Mail Id" value={selectedEmployee.email} name="email" onChange={handleInputChange} disabled />
+                <DialogTextField
+                  label="Mail Id"
+                  value={selectedEmployee.email}
+                  name="email"
+                  disabled
+                />
               </>
             )}
           </DialogContent>
@@ -200,7 +219,7 @@ const ManageEmployeeForm: React.FC = () => {
               Cancel
             </BaseButton>
             <BaseButton onClick={handleSave} color="primary" disabled={loading}>
-              {loading ? <CircularProgress size={24} color="inherit" /> : "Save"}
+            Save
             </BaseButton>
           </DialogActions>
         </Dialog>

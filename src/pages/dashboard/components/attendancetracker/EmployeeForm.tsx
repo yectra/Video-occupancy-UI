@@ -1,23 +1,30 @@
-// src/pages/EmployeeForm.tsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+
 import {
   Box,
   TextField,
   Typography,
   Autocomplete,
+  Avatar,
+  Button,
 } from "@mui/material";
 import BaseButton from "@/common/components/controls/BaseButton";
+import { AddEmployeeDetails } from "../../models/attendancetracker";
+import { AttendanceDetails } from "../../services/attendancetracker";
+
 
 const EmployeeForm: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [employeeId, setEmployeeId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<string>('');
+  const [dateOfJoining, setDateOfJoining] = useState<string>(""); 
+  const [avatarSrc, setAvatarSrc] = useState<string>("");
+  
 
-  const navigate = useNavigate();
-
+  const attendanceDetails=new AttendanceDetails();
+ 
   const roleOptions = ["Employee", "Manager"];
 
   const validateEmail = (email: string): boolean => {
@@ -38,8 +45,38 @@ const EmployeeForm: React.FC = () => {
     }
   };
 
+  const handlePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type === "image/jpeg") {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result) {
+          setAvatarSrc(reader.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Only .jpg format is allowed.");
+    }
+  };
+
   const handleSubmit = () => {
-    navigate("/dashboard/occupancy-tracker/emp-form?added=true");
+
+    const request:AddEmployeeDetails={
+      dateOfJoining,
+      role,
+      email,
+      employeeId,
+      employeeName:name,
+      imageBase64:"",
+      action:"Active"
+    }
+
+    attendanceDetails.addEmployeeDetails(request)
+    .then((response)=>{
+      console.log(response)
+    })
+    
   };
 
   const isFormValid = (): boolean => {
@@ -48,106 +85,148 @@ const EmployeeForm: React.FC = () => {
       employeeId.trim() &&
       email.trim() &&
       !emailError &&
-      role
+      role &&
+      dateOfJoining
     );
   };
 
   return (
     <Box
       sx={{
-        height: "650px",
-        width: "560px",
-        border: "2px solid #7D7D7D",
-        marginLeft: 40,
+        mt:4,
+        height: "auto",
         display: "flex",
-        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 3,
-        padding: 1,
+        overflow:"hidden"
       }}
     >
-      <Typography
-        sx={{ mb: 8, color: "#1C214F", fontWeight: "bold" }}
-        variant="h6"
-      >
-        Add Employee
-      </Typography>
       <Box
         sx={{
-          width: "460px",
+          width: "560px",
+          border: "2px solid #7D7D7D",
           display: "flex",
           flexDirection: "column",
-          gap: 5,
-          justifyContent: "center",
           alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 3,
+          padding: 1,
+          gap:5
         }}
       >
-        <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
-          <TextField
-            id="name"
-            label="Name"
-            variant="outlined"
-            sx={{ flex: 1 }}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <TextField
-            id="employeeId"
-            label="Employee ID"
-            variant="outlined"
-            sx={{ flex: 1 }}
-            value={employeeId}
-            onChange={(e) => setEmployeeId(e.target.value)}
-          />
-        </Box>
-        <Box sx={{ display: "flex", gap: 5, width: "100%" }}> 
-          <TextField
-            id="email"
-            label="Email ID"
-            variant="outlined"
-            sx={{ flex: 1 }}
-            value={email}
-            onChange={handleEmailChange}
-            error={!!emailError}
-            helperText={emailError}
-          />
-        </Box>
-        <Autocomplete
-          id="role"
-          options={roleOptions}
-          value={role}
-          onChange={(_, newValue) => {
-            setRole(newValue);
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Role"
-              variant="outlined"
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: <>{params.InputProps.endAdornment}</>,
-              }}
-              sx={{ flex: 1 }}
-            />
-          )}
-          sx={{ width: "100%" }}
-        />
-        <BaseButton
-          sx={{
-            width: 200,
-            height: 50,
-            mt: 3,
-            bgcolor: "#00D1A3",
-            "&:hover": { bgcolor: "#00D1A3" },
-          }}
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={!isFormValid()}
+        <Typography
+          sx={{ color: "#1C214F", fontWeight: "bold" }}
+          variant="h6"
         >
           Add Employee
-        </BaseButton>
+        </Typography>
+        <Box
+          sx={{
+            width: "460px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 5,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <Avatar
+              sx={{ width: 60, height: 60 }}
+              src={avatarSrc} // Display uploaded image
+            />
+            <Button
+              variant="outlined"
+              component="label"
+              sx={{ mt: 2 }}
+            >
+              Upload Picture
+              <input
+                type="file"
+                accept=".jpg"
+                hidden
+                onChange={handlePictureUpload}
+              />
+            </Button>
+          </Box>
+          <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
+            <TextField
+              id="name"
+              label="Name"
+              variant="outlined"
+              sx={{ flex: 1 }}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <TextField
+              id="employeeId"
+              label="Employee ID"
+              variant="outlined"
+              sx={{ flex: 1 }}
+              value={employeeId}
+              onChange={(e) => setEmployeeId(e.target.value)}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
+            <TextField
+              id="email"
+              label="Email ID"
+              variant="outlined"
+              sx={{ flex: 1 }}
+              value={email}
+              onChange={handleEmailChange}
+              error={!!emailError}
+              helperText={emailError}
+            />
+            <TextField
+              id="dateOfJoining"
+              label="Date of Joining"
+              variant="outlined"
+              sx={{ flex: 1 }}
+              value={dateOfJoining}
+              onChange={(e) => setDateOfJoining(e.target.value)}
+            />
+          </Box>
+
+          <Autocomplete
+            id="role"
+            options={roleOptions}
+            value={role}
+            onChange={(_, newValue) => {
+              setRole(newValue || "");
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Role"
+                variant="outlined"
+                sx={{ flex: 1 }}
+              />
+            )}
+            sx={{ width: "100%" }}
+          />
+          <BaseButton
+            sx={{
+              width: 200,
+              height: 50,
+              mt: 3,
+              bgcolor: "#00D1A3",
+              "&:hover": { bgcolor: "#00D1A3" },
+            }}
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={!isFormValid()}
+          >
+            Add Employee
+          </BaseButton>
+        </Box>
       </Box>
     </Box>
   );
