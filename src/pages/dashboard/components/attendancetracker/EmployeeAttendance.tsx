@@ -103,12 +103,7 @@ const EmployeeAttendance: React.FC = () => {
           marginBottom: "10px",
         }}
       >
-        <Typography
-          sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }}
-          variant="h5"
-        >
-          Attendance List
-        </Typography>
+        <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }}variant="h5">Attendance List</Typography>
         <Box sx={{ width: "350px", marginRight: 3 }}>
           <InputBase
             placeholder="Search"
@@ -146,9 +141,7 @@ const EmployeeAttendance: React.FC = () => {
             <StyledTableCell align="center">Employee Id</StyledTableCell>
             <StyledTableCell align="center">Name</StyledTableCell>
             <StyledTableCell align="center">Email</StyledTableCell>
-            <StyledTableCell align="center">
-              Date
-              <IconButton onClick={handleIconClick}>
+            <StyledTableCell align="center">Date<IconButton onClick={handleIconClick}>
                 <TodayIcon style={{ color: "white" }} />
               </IconButton>
               <Popper
@@ -181,22 +174,16 @@ const EmployeeAttendance: React.FC = () => {
         <TableBody>
           {rows.map((row) => (
             <StyledTableRow
-              key={row.id}
+              key={row.id} 
               onClick={() => handleRowClick(row)}
               sx={{ cursor: "pointer" }}
             >
               <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
-              <StyledTableCell align="center">
-                {row.employeeName}
-              </StyledTableCell>
+              <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
               <StyledTableCell align="center">{row.email}</StyledTableCell>
               <StyledTableCell align="center">{row.date}</StyledTableCell>
-              <StyledTableCell align="center">
-                {row.firstPunchIn}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {row.lastPunchOut}
-              </StyledTableCell>
+              <StyledTableCell align="center">{row.firstPunchIn}</StyledTableCell>
+              <StyledTableCell align="center">{row.lastPunchOut}</StyledTableCell>
               <StyledTableCell align="center">{row.break}</StyledTableCell>
               <StyledTableCell align="center">{row.overTime}</StyledTableCell>
             </StyledTableRow>

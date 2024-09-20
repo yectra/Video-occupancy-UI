@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Paper } from "@mui/material";
+import { Box, Button, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import empImg from "@/assets/afro man.png";
@@ -9,14 +9,14 @@ import empImg4 from "@/assets/red hair woman.png";
 import empImg5 from "@/assets/short hair man.png";
 import empImg6 from "@/assets/purple hair woman.png";
 
-import BaseButton from "@/common/components/controls/BaseButton";
-
 const EmployeeView: React.FC = () => {
   const navigate = useNavigate();
 
   const handleAddsubadminClick = () => {
     navigate("/dashboard/occupancy-tracker/add-emp");
   };
+
+  const employeeImages = React.useMemo(() => [empImg, empImg2, empImg3, empImg4, empImg5, empImg6], []);
 
   return (
     <Box
@@ -45,33 +45,31 @@ const EmployeeView: React.FC = () => {
             gap: 4,
           }}
         >
-          {[empImg, empImg2, empImg3, empImg4, empImg5, empImg6].map(
-            (img, index) => (
-              <Box
-                key={index}
-                sx={{
-                  boxShadow: 3,
-                  bgcolor:
-                    index % 2 === 0
-                      ? "#A0E7AB"
-                      : index % 3 === 0
-                      ? "#D78981"
-                      : "#807D7C",
-                  position: "relative",
-                  aspectRatio: "4 / 3",
-                }}
-              >
-                <img
-                  src={img}
-                  alt={`Employee ${index + 1}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              </Box>
-            )
-          )}
+          {employeeImages.map((img, index) => (
+            <Box
+              key={index}
+              sx={{
+                boxShadow: 3,
+                bgcolor:
+                  index % 2 === 0
+                    ? "#A0E7AB"
+                    : index % 3 === 0
+                    ? "#D78981"
+                    : "#807D7C",
+                position: "relative",
+                aspectRatio: "4 / 3",
+              }}
+            >
+              <img
+                src={img}
+                alt={`Employee ${index + 1}`}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </Box>
+          ))}
         </Box>
       </Paper>
-      <BaseButton
+      <Button
         variant="contained"
         sx={{
           fontWeight: "bold",
@@ -86,7 +84,7 @@ const EmployeeView: React.FC = () => {
         onClick={handleAddsubadminClick}
       >
         Add Employee
-      </BaseButton>
+      </Button>
     </Box>
   );
 };

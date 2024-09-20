@@ -20,11 +20,10 @@ import {
   TableRow,
   Paper,
   MenuItem,
-  CircularProgress,
   Container,
+  Button,
 } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
-import BaseButton from "@/common/components/controls/BaseButton";
 import { AttendanceDetails } from "../../services/attendancetracker";
 import { ManageEmployeeDetails } from "../../models/attendancetracker";
 
@@ -62,7 +61,7 @@ const ManageEmployeeForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const attendanceDetails = new AttendanceDetails();
 
-  useEffect(() => {
+  const fetchEmployeeDetails = () => {
     setLoading(true);
     attendanceDetails
       .getManageEmployeeDetails()
@@ -72,6 +71,10 @@ const ManageEmployeeForm: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchEmployeeDetails();
   }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,18 +93,35 @@ const ManageEmployeeForm: React.FC = () => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setSelectedEmployee((prev) => prev ? { ...prev, [name]: value } : null);
+    setSelectedEmployee((prev) => (prev ? { ...prev, [name]: value } : null));
   };
 
-  const handleRoleChange = (event: React.ChangeEvent<{ value: string }>) => {
-    const { value } = event.target;
-    setSelectedEmployee((prev) => prev ? { ...prev, role: value  } : null);
+  const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = event.target.value as string;
+    setSelectedEmployee((prev) => (prev ? { ...prev, role: value } : null));
   };
 
   const handleSave = () => {
     if (selectedEmployee) {
       setLoading(true);
-     
+      attendanceDetails
+        .updateEmployeeDetails(selectedEmployee.employeeId, {
+          employeeName: selectedEmployee.employeeName,
+          dateOfJoining: selectedEmployee.dateOfJoining,
+          role: selectedEmployee.role,
+        })
+        .then(() => {
+          // Refresh the employee list
+          fetchEmployeeDetails();
+          handleDialogClose();
+        })
+        .catch((error) => {
+          console.error("Error updating employee details:", error);
+          // Handle error (e.g., show an error message to the user)
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   };
 
@@ -162,9 +182,9 @@ const ManageEmployeeForm: React.FC = () => {
                   <StyledTableCell align="center">{row.role}</StyledTableCell>
                   <StyledTableCell align="center">{row.email}</StyledTableCell>
                   <StyledTableCell align="center">
-                    <BaseButton variant="text" color="primary" onClick={() => handleEditClick(row)}>
+                    <Button variant="text" color="primary" onClick={() => handleEditClick(row)}>
                       EDIT
-                    </BaseButton>
+                    </Button>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
@@ -203,7 +223,6 @@ const ManageEmployeeForm: React.FC = () => {
                 >
                   <MenuItem value="Employee">Employee</MenuItem>
                   <MenuItem value="Manager">Manager</MenuItem>
-                  <MenuItem value="Manager">Developer</MenuItem>
                 </DialogTextField>
                 <DialogTextField
                   label="Mail Id"
@@ -215,12 +234,12 @@ const ManageEmployeeForm: React.FC = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <BaseButton onClick={handleDialogClose} color="primary">
+            <Button onClick={handleDialogClose} color="primary">
               Cancel
-            </BaseButton>
-            <BaseButton onClick={handleSave} color="primary" disabled={loading}>
-            Save
-            </BaseButton>
+            </Button>
+            <Button onClick={handleSave} color="primary" disabled={loading}>
+              {loading ? "Saving..." : "Save"}
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>

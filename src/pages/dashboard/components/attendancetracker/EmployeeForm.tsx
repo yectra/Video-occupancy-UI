@@ -8,7 +8,6 @@ import {
   Avatar,
   Button,
 } from "@mui/material";
-import BaseButton from "@/common/components/controls/BaseButton";
 import { AddEmployeeDetails } from "../../models/attendancetracker";
 import { AttendanceDetails } from "../../services/attendancetracker";
 
@@ -212,7 +211,7 @@ const EmployeeForm: React.FC = () => {
             )}
             sx={{ width: "100%" }}
           />
-          <BaseButton
+          <Button
             sx={{
               width: 200,
               height: 50,
@@ -225,7 +224,7 @@ const EmployeeForm: React.FC = () => {
             disabled={!isFormValid()}
           >
             Add Employee
-          </BaseButton>
+          </Button>
         </Box>
       </Box>
     </Box>

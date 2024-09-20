@@ -9,13 +9,13 @@ import {
   FormControl,
   SelectChangeEvent,
   IconButton,
-  Tooltip
+  Tooltip,
+  Button
 } from "@mui/material";
 import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import setupImg from '@/assets/setupcamera.png';
-import BaseButton from "@/common/components/controls/BaseButton";
 
 
 
@@ -197,7 +197,7 @@ const TrackerSetupView: React.FC = () => {
                     helperText={errors[`videoSource${currentCameraIndex}`]}
                     required
                   />
-                  <BaseButton
+                  <Button
                     variant="outlined"
                     sx={{
                       color: "#00D1A3",
@@ -208,14 +208,14 @@ const TrackerSetupView: React.FC = () => {
                     onClick={handleAddCameraClick}
                   >
                     + Add another camera
-                  </BaseButton>
+                  </Button>
                 </>
               )}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2, alignItems: 'center' }}>
                 <Typography variant="body2" sx={{ color: '#1C214F', fontWeight: 'bold' }}>
                   Step <strong>{step}/2</strong>
                 </Typography>
-                <BaseButton
+                <Button
                   variant="contained"
                   color="primary"
                   onClick={() => step === 2 ? handlePreview() : handleStepChange(2)}
@@ -227,7 +227,7 @@ const TrackerSetupView: React.FC = () => {
                   }}
                 >
                   {step === 1 ? 'Next' : 'Preview'}
-                </BaseButton>
+                </Button>
               </Box>
             </Box>
           </>
