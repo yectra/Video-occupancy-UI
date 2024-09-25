@@ -86,9 +86,13 @@ const EmployeeAttendance: React.FC = () => {
     }
   }, [date]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) =>{
     setSearchTerm(event.target.value);
+    attendanceDetails.searchEmployeeDetails(searchTerm)
+    .then((response)=>setRows(response))
 
+  }
+  
   const handleRowClick = (row: any) => {
     navigate(
       `/dashboard/attendance/emp-details?name=${row.employeeName}&id=${row.employeeId}`

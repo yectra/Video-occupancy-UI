@@ -110,7 +110,8 @@ const ManageEmployeeForm: React.FC = () => {
           employeeName: selectedEmployee.employeeName,
           dateOfJoining: selectedEmployee.dateOfJoining,
           role: selectedEmployee.role,
-          email:selectedEmployee.email
+          email:selectedEmployee.email,
+          imageUrl:selectedEmployee.imageUrl
         })
         .then(() => {
        
@@ -236,6 +237,9 @@ const ManageEmployeeForm: React.FC = () => {
             )}
           </DialogContent>
           <DialogActions>
+            <Button sx={{color:"red"}}>
+              Remove    
+            </Button>
             <Button onClick={handleDialogClose} color="primary">
               Cancel
             </Button>

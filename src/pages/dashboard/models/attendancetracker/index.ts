@@ -77,7 +77,7 @@ export class AddEmployeeDetails{
   role:string;
   email:string;
   dateOfJoining:string;
-  imageUrl:string;
+  imageBase64:string;
 }
 
 export class ManageEmployeeDetails{

@@ -20,8 +20,8 @@ const EmployeeForm: React.FC = () => {
   const [role, setRole] = useState<string>("");
   const [dateOfJoining, setDateOfJoining] = useState<string>("");
   const [avatarSrc, setAvatarSrc] = useState<string>("");
-  const [imageUrl, setImageUrl] = useState<string>(""); 
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false); 
+  const [imageBase64, setImageBase64] = useState<string>("");
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
   const attendanceDetails = new AttendanceDetails();
   const roleOptions = ["Employee", "Manager"];
@@ -51,7 +51,7 @@ const EmployeeForm: React.FC = () => {
       reader.onload = () => {
         if (reader.result) {
           setAvatarSrc(reader.result as string);
-          setImageUrl(reader.result as string); 
+          setImageBase64(reader.result as string);
         }
       };
       reader.readAsDataURL(file);
@@ -67,14 +67,20 @@ const EmployeeForm: React.FC = () => {
       email,
       employeeId,
       employeeName: name,
-      imageUrl, 
+      imageBase64,
     };
+    console.log("Request payload: ", request);
 
     attendanceDetails
       .addEmployeeDetails(request)
       .then((response) => {
         console.log(response);
-        setSnackbarOpen(true); 
+        setSnackbarOpen(true);
+        
+        // Refresh the page after successful addition
+        setTimeout(() => {
+          window.location.reload(); // Refresh the page
+        }, 1000); // Optional delay before refreshing
       })
       .catch((error) => {
         console.error("Error adding employee:", error);
@@ -88,7 +94,7 @@ const EmployeeForm: React.FC = () => {
     if (reason === "clickaway") {
       return;
     }
-    setSnackbarOpen(false); 
+    setSnackbarOpen(false);
   };
 
   const isFormValid = (): boolean => {
@@ -98,7 +104,8 @@ const EmployeeForm: React.FC = () => {
       email.trim() &&
       !emailError &&
       role &&
-      dateOfJoining
+      dateOfJoining &&
+      imageBase64
     );
   };
 
@@ -155,26 +162,25 @@ const EmployeeForm: React.FC = () => {
           </Box>
           <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
             <TextField
-                id="name"
-                label="Name"
-                variant="outlined"
-                sx={{ flex: 1 }}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <TextField
-                id="employeeId"
-                label="Employee ID"
-          
-                variant="outlined"
-                sx={{ flex: 1 }}
-                value={employeeId}
-                onChange={(e) => setEmployeeId(Number(e.target.value))}
-              />
-            </Box>
-            <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
-              <TextField
-                id="email"
+              id="name"
+              label="Name"
+              variant="outlined"
+              sx={{ flex: 1 }}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <TextField
+              id="employeeId"
+              label="Employee ID"
+              variant="outlined"
+              sx={{ flex: 1 }}
+              value={employeeId}
+              onChange={(e) => setEmployeeId(Number(e.target.value))}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
+            <TextField
+              id="email"
               label="Email ID"
               variant="outlined"
               sx={{ flex: 1 }}
@@ -210,7 +216,7 @@ const EmployeeForm: React.FC = () => {
             sx={{
               width: 200,
               height: 50,
-              mb:2,
+              mb: 2,
               bgcolor: "#00D1A3",
               "&:hover": { bgcolor: "#00D1A3" },
             }}
@@ -225,9 +231,9 @@ const EmployeeForm: React.FC = () => {
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={6000}
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }} 
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: "100%" }}>
           Employee added successfully!
