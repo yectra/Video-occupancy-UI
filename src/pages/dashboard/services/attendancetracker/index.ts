@@ -8,7 +8,8 @@ interface IAttendanceDetails {
     getAllEmployeeAttendanceDetails(date: string): Promise<any>;
     getIndividualEmployeeDetails(employeeId: string): Promise<any>;
     getManageEmployeeDetails(): Promise<any>;
-    updateEmployeeDetails(employeeId: string, employeeDetails: Partial<ManageEmployeeDetails>): Promise<any>;
+    updateEmployeeDetails(employeeDetails: ManageEmployeeDetails): Promise<any>;
+    searchEmployeeDetails(employeeName:string):Promise<any>;
 }
 
 export class AttendanceDetails implements IAttendanceDetails {
@@ -19,20 +20,24 @@ export class AttendanceDetails implements IAttendanceDetails {
         return httpPost('/employee', employeeDetails)
             .then((response) => response)
     }
-    getAllEmployeeAttendanceDetails(): Promise<any> {
-        return httpGet('/attendance/all')
+    getAllEmployeeAttendanceDetails(date:string): Promise<any> {
+        return httpGet(`/attendance/all?date=${date}`)   
             .then((response) => response)
     }
     getIndividualEmployeeDetails(employeeId: string): Promise<any> {
-        return httpGet(`/attendance/all/${employeeId}`)
+        return httpGet(`/attendance/all?id=${employeeId}`)
             .then((response) => response)
     }
     getManageEmployeeDetails(): Promise<any> {
         return httpGet('/employees')
             .then((response) => response)
     }
-    updateEmployeeDetails(employeeId: string, employeeDetails: Partial<ManageEmployeeDetails>): Promise<any> {
-        return httpPut(`/update-employee/${employeeId}`, employeeDetails)
+    updateEmployeeDetails( employeeDetails: ManageEmployeeDetails): Promise<any> {
+        return httpPut(`/update-employee/${employeeDetails.employeeId}`, employeeDetails)
             .then((response) => response)
+    }
+    searchEmployeeDetails(employeeName: string): Promise<any> {
+        return httpGet(`/attendance/search?employee_name=${employeeName}`)
+            .then((response)=> response)
     }
 }

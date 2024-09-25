@@ -1,58 +1,101 @@
-import React, { useState } from 'react';
-import { Box, Typography, IconButton, Popper, TextField, InputAdornment} from '@mui/material';
-import TodayIcon from '@mui/icons-material/Today';
-import Calendar, { CalendarProps } from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'; 
-import '@/styles/core/components/CalendarStyles.css';
+import { Box, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { IndividualTimesheet } from '../../models/attendancetracker';
+import { AttendanceDetails } from '../../services/attendancetracker';
+import { useSearchParams } from 'react-router-dom';
 
 const EmployeeActivity: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get('id');
+  const [getEmployeeActivity, setEmployeeActivity] = useState<IndividualTimesheet[]>([]);
+  const attendanceDetails = new AttendanceDetails();
 
-  const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-    setCalendarOpen((prev) => !prev);
-  };
-
-  const handleDateChange: CalendarProps['onChange'] = (date: any) => {
-    if (Array.isArray(date)) {
-      setSelectedDate(date.length > 0 ? date[0] : null);
-    } else {
-      setSelectedDate(date);
+  useEffect(() => {
+    if (id) {
+      attendanceDetails
+        .getIndividualEmployeeDetails(id)
+        .then((res) => {
+          setEmployeeActivity(res);
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-    setCalendarOpen(false);
-  };
+  }, [id]);
 
   return (
-    <Box sx={{ height: "305px", width: "540px", boxShadow: 3, borderRadius: 3, padding: 3, display: 'flex', justifyContent: 'space-between' }}>
-      <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant='h6'>Today activity</Typography>
-      <Box>
-      <TextField variant="outlined"
-          label="Date"
-          value={selectedDate ? selectedDate.toLocaleDateString() : ''}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <IconButton onClick={handleIconClick}>
-                  <TodayIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Popper open={calendarOpen} anchorEl={anchorEl} placement="bottom">
-          <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px', backgroundColor: 'white' }}>
-            <Calendar
-              onChange={handleDateChange}
-              value={selectedDate || new Date()}
-              className="custom-calendar"
-            />
-          </div>
-        </Popper>
+    <Box
+      sx={{
+        height: '305px',
+        width: '540px',
+        boxShadow: 3,
+        borderRadius: 3,
+        padding: 3,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Typography sx={{ color: '#1C214F', fontWeight: 'bold' }} variant='h6'>
+        Today activity
+      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 2,
+          mt: 2,
+          overflowY: 'auto', 
+          height: '100%',
+        }}
+      >
+        {getEmployeeActivity &&
+          getEmployeeActivity[0]?.attendanceList?.map((map, index) => (
+            <Box
+              key={index}
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '100%', 
+                justifyContent: 'space-between', 
+                gap: 2,
+              }}
+            >
+              <Box
+                sx={{
+                  height: 40,
+                  width: 250,
+                  bgcolor: '#E6F5EE',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                Punched In at:
+                <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                  {map.punchIn}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  height: 40,
+                  width: 250,
+                  bgcolor: '#FBF5E8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                Punched Out at:
+                <Typography component="span" sx={{ fontWeight: 'bold' }}>
+                  {map.punchOut}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
       </Box>
     </Box>
   );
-}
+};
 
 export default EmployeeActivity;

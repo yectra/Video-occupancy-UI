@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import {
   Box,
   TextField,
@@ -7,23 +6,24 @@ import {
   Autocomplete,
   Avatar,
   Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
-import { AddEmployeeDetails } from "../../models/attendancetracker";
-import { AttendanceDetails } from "../../services/attendancetracker";
-
+import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
+import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 
 const EmployeeForm: React.FC = () => {
   const [name, setName] = useState<string>("");
-  const [employeeId, setEmployeeId] = useState<string>("");
+  const [employeeId, setEmployeeId] = useState<number | null>(null);
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
-  const [role, setRole] = useState<string>('');
-  const [dateOfJoining, setDateOfJoining] = useState<string>(""); 
+  const [role, setRole] = useState<string>("");
+  const [dateOfJoining, setDateOfJoining] = useState<string>("");
   const [avatarSrc, setAvatarSrc] = useState<string>("");
-  
+  const [imageUrl, setImageUrl] = useState<string>(""); 
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false); 
 
-  const attendanceDetails=new AttendanceDetails();
- 
+  const attendanceDetails = new AttendanceDetails();
   const roleOptions = ["Employee", "Manager"];
 
   const validateEmail = (email: string): boolean => {
@@ -51,6 +51,7 @@ const EmployeeForm: React.FC = () => {
       reader.onload = () => {
         if (reader.result) {
           setAvatarSrc(reader.result as string);
+          setImageUrl(reader.result as string); 
         }
       };
       reader.readAsDataURL(file);
@@ -60,28 +61,40 @@ const EmployeeForm: React.FC = () => {
   };
 
   const handleSubmit = () => {
-
-    const request:AddEmployeeDetails={
+    const request: AddEmployeeDetails = {
       dateOfJoining,
       role,
       email,
       employeeId,
-      employeeName:name,
-      imageBase64:"",
-      action:"Active"
-    }
+      employeeName: name,
+      imageUrl, 
+    };
 
-    attendanceDetails.addEmployeeDetails(request)
-    .then((response)=>{
-      console.log(response)
-    })
-    
+    attendanceDetails
+      .addEmployeeDetails(request)
+      .then((response) => {
+        console.log(response);
+        setSnackbarOpen(true); 
+      })
+      .catch((error) => {
+        console.error("Error adding employee:", error);
+      });
+  };
+
+  const handleCloseSnackbar = (
+    _event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false); 
   };
 
   const isFormValid = (): boolean => {
     return !!(
       name.trim() &&
-      employeeId.trim() &&
+      employeeId &&
       email.trim() &&
       !emailError &&
       role &&
@@ -92,12 +105,12 @@ const EmployeeForm: React.FC = () => {
   return (
     <Box
       sx={{
-        mt:4,
+        mt: 4,
         height: "auto",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        overflow:"hidden"
+        overflow: "hidden",
       }}
     >
       <Box
@@ -110,13 +123,10 @@ const EmployeeForm: React.FC = () => {
           justifyContent: "center",
           borderRadius: 3,
           padding: 1,
-          gap:5
+          gap: 5,
         }}
       >
-        <Typography
-          sx={{ color: "#1C214F", fontWeight: "bold" }}
-          variant="h6"
-        >
+        <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant="h6">
           Add Employee
         </Typography>
         <Box
@@ -137,45 +147,34 @@ const EmployeeForm: React.FC = () => {
               width: "100%",
             }}
           >
-            <Avatar
-              sx={{ width: 60, height: 60 }}
-              src={avatarSrc} // Display uploaded image
-            />
-            <Button
-              variant="outlined"
-              component="label"
-              sx={{ mt: 2 }}
-            >
+            <Avatar sx={{ width: 60, height: 60 }} src={avatarSrc} />
+            <Button variant="outlined" component="label" sx={{ mt: 2 }}>
               Upload Picture
-              <input
-                type="file"
-                accept=".jpg"
-                hidden
-                onChange={handlePictureUpload}
-              />
+              <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
             </Button>
           </Box>
           <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
             <TextField
-              id="name"
-              label="Name"
-              variant="outlined"
-              sx={{ flex: 1 }}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <TextField
-              id="employeeId"
-              label="Employee ID"
-              variant="outlined"
-              sx={{ flex: 1 }}
-              value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
-            />
-          </Box>
-          <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
-            <TextField
-              id="email"
+                id="name"
+                label="Name"
+                variant="outlined"
+                sx={{ flex: 1 }}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <TextField
+                id="employeeId"
+                label="Employee ID"
+          
+                variant="outlined"
+                sx={{ flex: 1 }}
+                value={employeeId}
+                onChange={(e) => setEmployeeId(Number(e.target.value))}
+              />
+            </Box>
+            <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
+              <TextField
+                id="email"
               label="Email ID"
               variant="outlined"
               sx={{ flex: 1 }}
@@ -202,20 +201,16 @@ const EmployeeForm: React.FC = () => {
               setRole(newValue || "");
             }}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Role"
-                variant="outlined"
-                sx={{ flex: 1 }}
-              />
+              <TextField {...params} label="Role" variant="outlined" sx={{ flex: 1 }} />
             )}
             sx={{ width: "100%" }}
           />
+
           <Button
             sx={{
               width: 200,
               height: 50,
-              mt: 3,
+              mb:2,
               bgcolor: "#00D1A3",
               "&:hover": { bgcolor: "#00D1A3" },
             }}
@@ -227,6 +222,17 @@ const EmployeeForm: React.FC = () => {
           </Button>
         </Box>
       </Box>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }} 
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: "100%" }}>
+          Employee added successfully!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

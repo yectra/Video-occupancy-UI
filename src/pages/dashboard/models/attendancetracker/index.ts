@@ -50,33 +50,42 @@ export class Row {
 }
 
 export class IndividualTimesheet{
-  email:string;
-  employeeId:string;
-  employeeName:string;
-  break:string;
-  overTime:string;
-  punchIn:string;
-  punchOut:string;
-}
+  attendanceList: {
+    punchIn: string;
+    punchOut: string;
+  }[];
+  break: string;
+  date: string;
+  email: string;
+  employeeId: number;
+  employeeName: string;
+  firstPunchIn: string;
+  id: string;
+  imageUrl: string;
+  lastPunchOut: string;
+  overTime: string;
+  }
 
 
-///new
+
+//new
 
 
 export class AddEmployeeDetails{
-  employeeId:string;
+  employeeId:number | null;
   employeeName:string;
   role:string;
   email:string;
   dateOfJoining:string;
-  imageBase64:string;
-  action:string
+  imageUrl:string;
 }
 
 export class ManageEmployeeDetails{
-  employeeId:string;
+  employeeId:number;
   employeeName:string;
   dateOfJoining:string;
   role:string;
   email:string;
+  imageUrl:string;
 }
+

@@ -105,19 +105,21 @@ const ManageEmployeeForm: React.FC = () => {
     if (selectedEmployee) {
       setLoading(true);
       attendanceDetails
-        .updateEmployeeDetails(selectedEmployee.employeeId, {
+        .updateEmployeeDetails({
+          employeeId:selectedEmployee.employeeId,
           employeeName: selectedEmployee.employeeName,
           dateOfJoining: selectedEmployee.dateOfJoining,
           role: selectedEmployee.role,
+          email:selectedEmployee.email
         })
         .then(() => {
-          // Refresh the employee list
+       
           fetchEmployeeDetails();
           handleDialogClose();
         })
         .catch((error) => {
           console.error("Error updating employee details:", error);
-          // Handle error (e.g., show an error message to the user)
+
         })
         .finally(() => {
           setLoading(false);
@@ -198,7 +200,7 @@ const ManageEmployeeForm: React.FC = () => {
               <>
                 <DialogTextField
                   label="Employee Id"
-                  value={selectedEmployee.employeeId}
+                  value={(selectedEmployee.employeeId)}
                   name="employeeId"
                   disabled
                 />
