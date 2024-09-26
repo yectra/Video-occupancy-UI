@@ -1,7 +1,7 @@
 import { CircularProgressProps } from "@mui/material";
 
 export class AttendanceData {
-  employeeId: number;
+  employeeId: string;
   date: string;
   punchIn: string;
   punchOut: string;
@@ -57,7 +57,7 @@ export class IndividualTimesheet{
   break: string;
   date: string;
   email: string;
-  employeeId: number;
+  employeeId: string;
   employeeName: string;
   firstPunchIn: string;
   id: string;
@@ -72,7 +72,7 @@ export class IndividualTimesheet{
 
 
 export class AddEmployeeDetails{
-  employeeId:number | null;
+  employeeId:string;
   employeeName:string;
   role:string;
   email:string;
@@ -81,7 +81,7 @@ export class AddEmployeeDetails{
 }
 
 export class ManageEmployeeDetails{
-  employeeId:number;
+  employeeId:string;
   employeeName:string;
   dateOfJoining:string;
   role:string;

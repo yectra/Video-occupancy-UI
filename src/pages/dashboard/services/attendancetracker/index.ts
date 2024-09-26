@@ -2,7 +2,7 @@ import { apiClient } from "@/common/hooks/useApiClient";
 
 import { AddEmployeeDetails, ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker"
 
-const { httpGet, httpPost, httpPut } = apiClient();
+const { httpGet, httpPost, httpPut,httpDelete } = apiClient();
 
 interface IAttendanceDetails {
 
@@ -17,6 +17,8 @@ interface IAttendanceDetails {
     updateEmployeeDetails(employeeDetails: ManageEmployeeDetails): Promise<any>;
 
     searchEmployeeDetails(employeeName:string):Promise<any>;
+
+    deleteEmployeeDetails(employeeId:string):Promise<any>;
 }
 
 export class AttendanceDetails implements IAttendanceDetails {
@@ -52,5 +54,10 @@ export class AttendanceDetails implements IAttendanceDetails {
     searchEmployeeDetails(employeeName: string): Promise<any> {
         return httpGet(`/attendance/search?employeeName=${employeeName}`)
             .then((response)=> response)
+    }
+
+    deleteEmployeeDetails(employeeId:string):Promise<any>{
+        return httpDelete(`/employee/${employeeId}`)
+        .then((response)=>(response))
     }
 }

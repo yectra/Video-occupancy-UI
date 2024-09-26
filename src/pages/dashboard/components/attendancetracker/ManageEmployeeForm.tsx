@@ -1,28 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  styled,
-  Box,
-  Typography,
-  IconButton,
-  InputAdornment,
-  InputBase,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  tableCellClasses,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  MenuItem,
-  Container,
-  Button,
-} from "@mui/material";
+import {styled,Box,Typography,IconButton,InputAdornment,InputBase,Dialog,DialogTitle,DialogContent,DialogActions,TextField,Table,TableBody,TableCell,tableCellClasses,TableContainer,TableHead,TableRow,Paper,MenuItem,Container,Button} from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import { AttendanceDetails } from "../../services/attendancetracker";
 import { ManageEmployeeDetails } from "../../models/attendancetracker";
@@ -106,21 +83,37 @@ const ManageEmployeeForm: React.FC = () => {
       setLoading(true);
       attendanceDetails
         .updateEmployeeDetails({
-          employeeId:selectedEmployee.employeeId,
+          employeeId: selectedEmployee.employeeId,
           employeeName: selectedEmployee.employeeName,
           dateOfJoining: selectedEmployee.dateOfJoining,
           role: selectedEmployee.role,
-          email:selectedEmployee.email,
-          imageUrl:selectedEmployee.imageUrl
+          email: selectedEmployee.email,
+          imageUrl: selectedEmployee.imageUrl,
         })
         .then(() => {
-       
           fetchEmployeeDetails();
           handleDialogClose();
         })
         .catch((error) => {
           console.error("Error updating employee details:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  };
 
+  const handleDelete = () => {
+    if (selectedEmployee) {
+      setLoading(true);
+      attendanceDetails
+        .deleteEmployeeDetails(selectedEmployee.employeeId)
+        .then(() => {
+          fetchEmployeeDetails();
+          handleDialogClose(); 
+        })
+        .catch((error) => {
+          console.error("Error deleting employee:", error);
         })
         .finally(() => {
           setLoading(false);
@@ -201,7 +194,7 @@ const ManageEmployeeForm: React.FC = () => {
               <>
                 <DialogTextField
                   label="Employee Id"
-                  value={(selectedEmployee.employeeId)}
+                  value={selectedEmployee.employeeId}
                   name="employeeId"
                   disabled
                 />
@@ -237,8 +230,8 @@ const ManageEmployeeForm: React.FC = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button sx={{color:"red"}}>
-              Remove    
+            <Button sx={{ color: "red" }} onClick={handleDelete}>
+              Remove
             </Button>
             <Button onClick={handleDialogClose} color="primary">
               Cancel

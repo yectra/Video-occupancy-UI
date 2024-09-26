@@ -14,7 +14,7 @@ import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker"
 
 const EmployeeForm: React.FC = () => {
   const [name, setName] = useState<string>("");
-  const [employeeId, setEmployeeId] = useState<number | null>(null);
+  const [employeeId, setEmployeeId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [role, setRole] = useState<string>("");
@@ -175,7 +175,7 @@ const EmployeeForm: React.FC = () => {
               variant="outlined"
               sx={{ flex: 1 }}
               value={employeeId}
-              onChange={(e) => setEmployeeId(Number(e.target.value))}
+              onChange={(e) => setEmployeeId((e.target.value))}
             />
           </Box>
           <Box sx={{ display: "flex", gap: 5, width: "100%" }}>

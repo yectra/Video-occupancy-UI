@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import {
@@ -25,8 +25,9 @@ import {
 import Calendar, { CalendarProps } from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "@/styles/core/components/CalendarStyles.css";
-import { AttendanceDetails } from "../../services/attendancetracker";
+import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import BaseSpinner from "@/common/components/UI/BaseSpinner";
+import { debounce } from "lodash";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -54,17 +55,16 @@ const EmployeeAttendance: React.FC = () => {
   const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [date, setDate] = useState<string>();
+  const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const attendanceDetails = new AttendanceDetails();
 
-
   useEffect(() => {
     const today = new Date();
-    const formattedDate = today.toLocaleDateString("en-CA"); 
+    const formattedDate = today.toLocaleDateString("en-CA");
     setDate(formattedDate);
   }, []);
-
 
   useEffect(() => {
     if (date) {
@@ -72,27 +72,86 @@ const EmployeeAttendance: React.FC = () => {
       attendanceDetails
         .getAllEmployeeAttendanceDetails(date)
         .then((response) => {
+          console.log("API response:", response);
 
-          const filteredRows = response.filter(
-            (record: { date: string }) => record.date === date
-          );
-          setRows(filteredRows);
+          if (Array.isArray(response)) {
+            const filteredRows = response.filter(
+              (record: { date: string }) => record.date === date
+            );
+            setRows(filteredRows);
+            setNoRecordsMessage(null); 
+          } else if (response?.message) {
+            setRows([]); 
+            setNoRecordsMessage(response.message); 
+          } else {
+            setRows([]); 
+            console.warn("Unexpected response format:", response);
+            setNoRecordsMessage("Unexpected response format."); 
+          }
+
           setLoading(false);
         })
         .catch((err) => {
           console.log(err);
           setLoading(false);
+          _setError("Failed to fetch data.");
         });
     }
   }, [date]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) =>{
-    setSearchTerm(event.target.value);
-    attendanceDetails.searchEmployeeDetails(searchTerm)
-    .then((response)=>setRows(response))
+  const fetchAttendanceRecords = useCallback(() => {
+    if (date) {
+      setLoading(true);
+      attendanceDetails
+        .getAllEmployeeAttendanceDetails(date)
+        .then((response) => {
+          console.log( response);
 
-  }
-  
+          if (Array.isArray(response)) {
+            const filteredRows = response.filter(
+              (record: { date: string }) => record.date === date
+            );
+            setRows(filteredRows);
+            setNoRecordsMessage(null); 
+          } else if (response?.message) {
+            setRows([]); 
+            setNoRecordsMessage(response.message); 
+          } else {
+            setRows([]); 
+            console.warn(response);
+            setNoRecordsMessage("Unexpected response format."); 
+          }
+
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          _setError("Failed to fetch data.");
+        });
+    }
+  }, [date]);
+
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      if (value.length >= 1) {
+        attendanceDetails
+          .searchEmployeeDetails(value)
+          .then((response) => setRows(response))
+          .catch((err) => console.error(err));
+      } else {
+        fetchAttendanceRecords();
+      }
+    }, 100),
+    [fetchAttendanceRecords]
+  );
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    debouncedSearch(value);
+  };
+
   const handleRowClick = (row: any) => {
     navigate(
       `/dashboard/attendance/emp-details?name=${row.employeeName}&id=${row.employeeId}`
@@ -104,12 +163,11 @@ const EmployeeAttendance: React.FC = () => {
     setCalendarOpen((prev) => !prev);
   };
 
-
   const handleDateChange: CalendarProps["onChange"] = (date: any) => {
-    const formattedDate = new Date(date).toLocaleDateString("en-CA"); 
-    setDate(formattedDate); 
+    const formattedDate = new Date(date).toLocaleDateString("en-CA");
+    setDate(formattedDate);
     setSelectedDate(date);
-    setCalendarOpen(false); 
+    setCalendarOpen(false);
   };
 
   if (loading) {
@@ -149,7 +207,14 @@ const EmployeeAttendance: React.FC = () => {
             endAdornment={
               searchTerm && (
                 <InputAdornment position="end">
-                  <IconButton edge="end" size="large">
+                  <IconButton
+                    edge="end"
+                    size="large"
+                    onClick={() => {
+                      setSearchTerm("");
+                      fetchAttendanceRecords(); 
+                    }}
+                  >
                     <ClearIcon />
                   </IconButton>
                 </InputAdornment>
@@ -191,7 +256,7 @@ const EmployeeAttendance: React.FC = () => {
                     onChange={handleDateChange}
                     value={selectedDate || new Date()}
                     className="custom-calendar"
-                    maxDate={new Date()} 
+                    maxDate={new Date()}
                   />
                 </div>
               </Popper>
@@ -201,6 +266,15 @@ const EmployeeAttendance: React.FC = () => {
             <StyledTableCell align="center">Break</StyledTableCell>
             <StyledTableCell align="center">Over time</StyledTableCell>
           </TableRow>
+          {noRecordsMessage && (
+            <TableRow>
+              <TableCell colSpan={7} align="center">
+                <Typography variant="body2" color="error">
+                  {noRecordsMessage}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          )}
         </TableHead>
         <TableBody>
           {rows.map((row) => (
@@ -210,17 +284,11 @@ const EmployeeAttendance: React.FC = () => {
               sx={{ cursor: "pointer" }}
             >
               <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
-              <StyledTableCell align="center">
-                {row.employeeName}
-              </StyledTableCell>
+              <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
               <StyledTableCell align="center">{row.email}</StyledTableCell>
               <StyledTableCell align="center">{row.date}</StyledTableCell>
-              <StyledTableCell align="center">
-                {row.firstPunchIn}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {row.lastPunchOut}
-              </StyledTableCell>
+              <StyledTableCell align="center">{row.firstPunchIn}</StyledTableCell>
+              <StyledTableCell align="center">{row.lastPunchOut}</StyledTableCell>
               <StyledTableCell align="center">{row.break}</StyledTableCell>
               <StyledTableCell align="center">{row.overTime}</StyledTableCell>
             </StyledTableRow>
