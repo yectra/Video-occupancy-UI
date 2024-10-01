@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -16,17 +16,31 @@ import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutl
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import setupImg from '@/assets/setupcamera.png';
-
-
+import { useNavigate, useLocation } from "react-router-dom";
 
 const TrackerSetupView: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const [capacity, setCapacity] = useState<string>("");
   const [alertMessage, setAlertMessage] = useState<string>("");
-  const [cameraSetups, setCameraSetups] = useState<CameraSetup[]>([{ entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" }]);
+  const [cameraSetups, setCameraSetups] = useState<any[]>([{ entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" }]);
   const [currentCameraIndex, setCurrentCameraIndex] = useState<number>(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [coordinates, setCoordinates] = useState<any>({});
+
+  const navigate = useNavigate();
+  const location = useLocation();
   
+  useEffect(() => {
+    if (location.state) {
+      const { cameraSetups, alertMessage, capacity, coordinates, step } = location.state;
+      if (cameraSetups) setCameraSetups(cameraSetups);
+      if (alertMessage) setAlertMessage(alertMessage);
+      if (capacity) setCapacity(capacity.toString());
+      if (coordinates) setCoordinates(coordinates);
+      if (step) setStep(step);
+    }
+  }, [location.state]);
+
   const handleStepChange = (newStep: number) => {
     if (newStep === 2 && !validateStep1()) return;
     setStep(newStep as 1 | 2);
@@ -34,7 +48,7 @@ const TrackerSetupView: React.FC = () => {
 
   const handleCameraIndexChange = (delta: number) => setCurrentCameraIndex(prev => Math.min(Math.max(prev + delta, 0), cameraSetups.length - 1));
 
-  const handleChangeTextField = (index: number, field: keyof CameraSetup) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeTextField = (index: number, field: any) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setCameraSetups(prev => {
       const updated = [...prev];
       updated[index][field] = event.target.value;
@@ -43,7 +57,7 @@ const TrackerSetupView: React.FC = () => {
     setErrors(prev => ({ ...prev, [field]: "" }));
   };
 
-  const handleChangeSelectField = (index: number, field: keyof CameraSetup) => (event: SelectChangeEvent<string>) => {
+  const handleChangeSelectField = (index: number, field: any) => (event: SelectChangeEvent<string>) => {
     setCameraSetups(prev => {
       const updated = [...prev];
       updated[index][field] = event.target.value;
@@ -65,20 +79,15 @@ const TrackerSetupView: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const validateStep2 = () => {
-    const newErrors: { [key: string]: string } = {};
-    cameraSetups.forEach((setup, index) => {
-      if (!setup.entranceName) newErrors[`entranceName${index}`] = "Camera Identifier is required";
-      if (!setup.videoSource) newErrors[`videoSource${index}`] = "Video source URL is required";
-    });
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handlePreview = () => {
-    if (validateStep2()) {
-      console.log("Previewing the setup...");
-    }
+    navigate('/dashboard/occupancy-tracker/preview', { 
+      state: { 
+        cameraSetups,
+        alertMessage,
+        capacity,
+        coordinates 
+      } 
+    });
   };
 
   return (
@@ -146,7 +155,7 @@ const TrackerSetupView: React.FC = () => {
                         setErrors(prev => ({ ...prev, alertMessage: "" }));
                       }}
                     >
-                      {Array.from({ length: 5 }, (_, i) => (
+                      {Array.from({ length: 5}, (_, i) => (
                         <MenuItem key={i} value={`${i * 20}-${i * 20 + 20}`}>
                           {`${i * 20}-${i * 20 + 20}`}
                         </MenuItem>

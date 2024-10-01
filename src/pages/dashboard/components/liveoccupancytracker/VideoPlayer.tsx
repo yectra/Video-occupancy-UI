@@ -2,16 +2,30 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactPlayer from 'react-player';
 import { Box } from '@mui/material';
 
+interface Rectangle {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface IProps {
   source: string;
   fullscreen?: boolean;
   settingCoordinates?: boolean;
   onClick?: () => void;
+  onCoordinateCapture?: (newCoordinates: number[][]) => void;
+  coordinates?: number[][];
 }
 
-
-
-const VideoPlayer: React.FC<IProps> = ({ source, fullscreen = false, settingCoordinates = false, onClick }) => {
+export const VideoPlayer: React.FC<IProps> = ({ 
+  source, 
+  fullscreen = false, 
+  settingCoordinates = false, 
+  onClick, 
+  onCoordinateCapture, 
+  coordinates = []
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [rectangle, setRectangle] = useState<Rectangle | null>(null);
   const [drawing, setDrawing] = useState(false);
@@ -36,7 +50,6 @@ const VideoPlayer: React.FC<IProps> = ({ source, fullscreen = false, settingCoor
           y <= rectangle.y + rectangle.height
         ) {
           setInitialClick({ x, y });
-
 
           if (
             x >= rectangle.x + rectangle.width - handleSize &&
@@ -116,25 +129,44 @@ const VideoPlayer: React.FC<IProps> = ({ source, fullscreen = false, settingCoor
     setDragging(false);
     setResizing(false);
     setResizeHandle(null);
+
+    if (rectangle && onCoordinateCapture) {
+      const newCoordinate: number[][] = [
+        [Math.round(rectangle.x), Math.round(rectangle.y)],
+        [Math.round(rectangle.x + rectangle.width), Math.round(rectangle.y + rectangle.height)]
+      ];
+      onCoordinateCapture(newCoordinate);
+    }
   };
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
-      if (ctx && rectangle) {
+      if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = 'red';
+        ctx.strokeStyle = 'green';
         ctx.lineWidth = 2;
 
-        ctx.strokeRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+        // Draw existing coordinates
+        coordinates.forEach(coord => {
+          if (coord.length === 2 && Array.isArray(coord[0]) && Array.isArray(coord[1])) {
+            const [x1, y1] = coord[0];
+            const [x2, y2] = coord[1];
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+          }
+        });
 
-        ctx.fillStyle = 'red';
-        ctx.fillRect(rectangle.x - 5, rectangle.y - 5, 10, 10);
-        ctx.fillRect(rectangle.x + rectangle.width - 5, rectangle.y + rectangle.height - 5, 10, 10);
+        // Draw current rectangle
+        if (rectangle) {
+          ctx.strokeRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+          ctx.fillStyle = 'green';
+          ctx.fillRect(rectangle.x - 5, rectangle.y - 5, 10, 10);
+          ctx.fillRect(rectangle.x + rectangle.width - 5, rectangle.y + rectangle.height - 5, 10, 10);
+        }
       }
     }
-  }, [rectangle]);
+  }, [rectangle, coordinates]);
 
   return (
     <Box
@@ -152,7 +184,7 @@ const VideoPlayer: React.FC<IProps> = ({ source, fullscreen = false, settingCoor
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <ReactPlayer url={source} controls width="100%" height="100%" />
+      <ReactPlayer url={source} controls width="100%" height="100%" playing={true} />
       {fullscreen && settingCoordinates && (
         <canvas
           ref={canvasRef}

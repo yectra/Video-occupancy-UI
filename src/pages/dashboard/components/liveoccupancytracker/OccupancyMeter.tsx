@@ -3,7 +3,7 @@ import MeterComponent from "@/pages/dashboard/components/liveoccupancytracker/Me
 import Alert from "@mui/material/Alert";
 
 const OccupancyMeter = () => {
-  let percentage = 90; 
+  let percentage = 70; 
 
   return (
     <Box sx={{ width: "522px", height: "383px", borderRadius: 3, boxShadow: 3 }}>
