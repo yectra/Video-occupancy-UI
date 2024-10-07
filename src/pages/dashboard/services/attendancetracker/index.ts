@@ -37,7 +37,7 @@ export class AttendanceDetails implements IAttendanceDetails {
     }
 
     getIndividualEmployeeDetails(employeeId: string): Promise<any> {
-        return httpGet(`/attendance/all?id=${employeeId}`)
+        return httpGet(`/attendance/all?employeeId=${employeeId}`)
             .then((response) => response)
     }
 

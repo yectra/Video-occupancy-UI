@@ -20,8 +20,8 @@ import {
   TableRow,
   Paper,
   MenuItem,
-  Container,
   Button,
+  Avatar
 } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import { AttendanceDetails } from "../../services/attendancetracker";
@@ -136,7 +136,7 @@ const ManageEmployeeForm: React.FC = () => {
   };
 
   return (
-    <Container>
+
       <Box sx={{ padding: 2 }}>
         <Box
           sx={{
@@ -191,6 +191,7 @@ const ManageEmployeeForm: React.FC = () => {
               <TableRow>
                 {[
                   "Employee Id",
+                  "Profile",
                   "Name",
                   "Date of Joining",
                   "Role",
@@ -209,7 +210,18 @@ const ManageEmployeeForm: React.FC = () => {
             <TableBody>
               {employeeForm.map((row) => (
                 <StyledTableRow key={row.employeeId}>
-                  <StyledTableCell>{row.employeeId}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.employeeId}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Box sx={{ display: "flex", justifyContent: "center" }}>
+                      <Avatar
+                        alt={row.employeeName}
+                        src={row.imageUrl}
+                        sx={{ width: 45, height: 45 }}
+                      />
+                    </Box>
+                  </StyledTableCell>
                   <StyledTableCell align="center">
                     {row.employeeName}
                   </StyledTableCell>
@@ -233,10 +245,11 @@ const ManageEmployeeForm: React.FC = () => {
           </Table>
         </TableContainer>
         <Dialog open={editDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>Edit Employee</DialogTitle>
+          <DialogTitle sx={{fontWeight:"bold"}}>Edit Employee</DialogTitle>
           <DialogContent>
             {selectedEmployee && (
               <>
+              <Button sx={{mb:2}} variant="outlined">Edit profile picture</Button>
                 <DialogTextField
                   label="Employee Id"
                   value={selectedEmployee.employeeId}
@@ -275,19 +288,19 @@ const ManageEmployeeForm: React.FC = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button sx={{ color: "red" }} onClick={handleDelete}>
+            <Button variant="contained" sx={{bgcolor:"red" }} onClick={handleDelete}>
               Remove
             </Button>
-            <Button onClick={handleDialogClose} color="primary">
+            <Button variant="outlined" onClick={handleDialogClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={handleSave} color="primary" disabled={loading}>
+            <Button variant="outlined" onClick={handleSave} color="primary" disabled={loading}>
               {loading ? "Saving..." : "Save"}
             </Button>
           </DialogActions>
         </Dialog>
       </Box>
-    </Container>
+
   );
 };
 

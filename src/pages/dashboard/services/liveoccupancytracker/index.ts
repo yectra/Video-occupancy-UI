@@ -1,5 +1,5 @@
 import { apiClient } from "@/common/hooks/useApiClient";
-import { BackendPayload } from "../../models/liveoccupanytracker";
+import { BackendPayload } from "@/pages/dashboard/models/liveoccupanytracker";
 
 
 const {  httpPost } = apiClient();

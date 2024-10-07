@@ -145,10 +145,9 @@ export const VideoPlayer: React.FC<IProps> = ({
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = 'green';
+        ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
 
-        // Draw existing coordinates
         coordinates.forEach(coord => {
           if (coord.length === 2 && Array.isArray(coord[0]) && Array.isArray(coord[1])) {
             const [x1, y1] = coord[0];
@@ -156,11 +155,9 @@ export const VideoPlayer: React.FC<IProps> = ({
             ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
           }
         });
-
-        // Draw current rectangle
         if (rectangle) {
           ctx.strokeRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-          ctx.fillStyle = 'green';
+          ctx.fillStyle = 'red';
           ctx.fillRect(rectangle.x - 5, rectangle.y - 5, 10, 10);
           ctx.fillRect(rectangle.x + rectangle.width - 5, rectangle.y + rectangle.height - 5, 10, 10);
         }
