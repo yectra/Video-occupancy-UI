@@ -1,12 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, ListItemIcon } from "@mui/material";
 import { LightModeOutlined, NotificationsOutlined, AccountCircle, Logout } from "@mui/icons-material";
-import { useMsal } from "@azure/msal-react";
+import { useIsAuthenticated, useMsal } from "@azure/msal-react";
+import { getUserDetailsFromMsal } from "@/common/services/AuthHelper";
 
 const Appbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const { instance } = useMsal(); 
+  const { instance,accounts} = useMsal(); 
+  const isAuthenticated=useIsAuthenticated();
+  const [email, setEmail] = useState<string>("");
+
+
+  useEffect(() => {
+    if(isAuthenticated){
+    const userDetails = getUserDetailsFromMsal(accounts);
+    setEmail(userDetails.email || "");
+    }
+  }, [accounts,isAuthenticated]);
+
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -35,7 +47,7 @@ const Appbar: React.FC = () => {
           <AccountCircle sx={{ color: "#00D1A3" }} />
         </IconButton>
         <Typography sx={{ alignSelf: "center" }} variant="subtitle1">
-          rohitkumar@yectra.com
+          {email}
         </Typography>
         <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
           <MenuItem onClick={handleMenuClose}>

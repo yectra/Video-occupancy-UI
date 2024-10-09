@@ -22,7 +22,7 @@ import {
   Clear as ClearIcon,
   Today as TodayIcon,
 } from "@mui/icons-material";
-import Calendar, { CalendarProps } from "react-calendar";
+import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "@/styles/core/components/CalendarStyles.css";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
@@ -50,9 +50,9 @@ const EmployeeAttendance: React.FC = () => {
   const [rows, setRows] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, _setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [date, setDate] = useState<string>();
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
@@ -62,83 +62,59 @@ const EmployeeAttendance: React.FC = () => {
 
   useEffect(() => {
     const today = new Date();
-    const formattedDate = today.toLocaleDateString("en-CA");
-    setDate(formattedDate);
+    setDate(today.toLocaleDateString("en-CA"));
   }, []);
 
   useEffect(() => {
     if (date) {
       setLoading(true);
-      attendanceDetails
-        .getAllEmployeeAttendanceDetails(date)
+      attendanceDetails.getAllEmployeeAttendanceDetails(date)
         .then((response) => {
-          console.log("API response:", response);
-
           if (Array.isArray(response)) {
-            const filteredRows = response.filter(
-              (record: { date: string }) => record.date === date
-            );
+            const filteredRows = response.filter(record => record.date === date);
             setRows(filteredRows);
-            setNoRecordsMessage(null); 
+            setNoRecordsMessage(filteredRows.length ? null : "No records found.");
           } else if (response?.message) {
-            setRows([]); 
-            setNoRecordsMessage(response.message); 
+            setRows([]);
+            setNoRecordsMessage(response.message);
           } else {
-            setRows([]); 
-            console.warn("Unexpected response format:", response);
-            setNoRecordsMessage("Unexpected response format."); 
+            setRows([]);
+            setNoRecordsMessage("Unexpected response format.");
           }
-
-          setLoading(false);
         })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-          _setError("Failed to fetch data.");
-        });
+        .catch(() => setError("Failed to fetch data."))
+        .finally(() => setLoading(false));
     }
   }, [date]);
 
   const fetchAttendanceRecords = useCallback(() => {
     if (date) {
       setLoading(true);
-      attendanceDetails
-        .getAllEmployeeAttendanceDetails(date)
+      attendanceDetails.getAllEmployeeAttendanceDetails(date)
         .then((response) => {
-          console.log( response);
-
           if (Array.isArray(response)) {
-            const filteredRows = response.filter(
-              (record: { date: string }) => record.date === date
-            );
+            const filteredRows = response.filter(record => record.date === date);
             setRows(filteredRows);
-            setNoRecordsMessage(null); 
+            setNoRecordsMessage(filteredRows.length ? null : "No records found.");
           } else if (response?.message) {
-            setRows([]); 
-            setNoRecordsMessage(response.message); 
+            setRows([]);
+            setNoRecordsMessage(response.message);
           } else {
-            setRows([]); 
-            console.warn(response);
-            setNoRecordsMessage("Unexpected response format."); 
+            setRows([]);
+            setNoRecordsMessage("Unexpected response format.");
           }
-
-          setLoading(false);
         })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-          _setError("Failed to fetch data.");
-        });
+        .catch(() => setError("Failed to fetch data."))
+        .finally(() => setLoading(false));
     }
   }, [date]);
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
-      if (value.length >= 1) {
-        attendanceDetails
-          .searchEmployeeDetails(value)
-          .then((response) => setRows(response))
-          .catch((err) => console.error(err));
+      if (value) {
+        attendanceDetails.searchEmployeeDetails(value)
+          .then(setRows)
+          .catch(console.error);
       } else {
         fetchAttendanceRecords();
       }
@@ -153,45 +129,28 @@ const EmployeeAttendance: React.FC = () => {
   };
 
   const handleRowClick = (row: any) => {
-    navigate(
-      `/dashboard/attendance/emp-details?name=${row.employeeName}&id=${row.employeeId}`
-    );
+    navigate(`/dashboard/attendance/emp-details?name=${row.employeeName}&id=${row.employeeId}`);
   };
 
   const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-    setCalendarOpen((prev) => !prev);
+    setCalendarOpen(prev => !prev);
   };
 
-  const handleDateChange: CalendarProps["onChange"] = (date: any) => {
+  const handleDateChange = (date: any) => {
     const formattedDate = new Date(date).toLocaleDateString("en-CA");
     setDate(formattedDate);
     setSelectedDate(date);
     setCalendarOpen(false);
   };
 
-  if (loading) {
-    return <BaseSpinner />;
-  }
-
-  if (error) {
-    return <Typography>{error}</Typography>;
-  }
+  if (loading) return <BaseSpinner />;
+  if (error) return <Typography>{error}</Typography>;
 
   return (
     <TableContainer component={Paper}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "10px",
-        }}
-      >
-        <Typography
-          sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }}
-          variant="h5"
-        >
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+        <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">
           Attendance List
         </Typography>
         <Box sx={{ width: "350px", marginRight: 3 }}>
@@ -200,26 +159,15 @@ const EmployeeAttendance: React.FC = () => {
             value={searchTerm}
             onChange={handleSearchChange}
             startAdornment={
-              <InputAdornment position="start">
-                <SearchIcon />
+              <InputAdornment position="start"><SearchIcon /></InputAdornment>
+            }
+            endAdornment={searchTerm && (
+              <InputAdornment position="end">
+                <IconButton edge="end" size="large" onClick={() => setSearchTerm("")}>
+                  <ClearIcon />
+                </IconButton>
               </InputAdornment>
-            }
-            endAdornment={
-              searchTerm && (
-                <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    size="large"
-                    onClick={() => {
-                      setSearchTerm("");
-                      fetchAttendanceRecords(); 
-                    }}
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }
+            )}
             sx={{
               borderRadius: "4px",
               border: "2px solid #ccc",
@@ -244,20 +192,8 @@ const EmployeeAttendance: React.FC = () => {
                 <TodayIcon style={{ color: "white" }} />
               </IconButton>
               <Popper open={calendarOpen} anchorEl={anchorEl} placement="bottom">
-                <div
-                  style={{
-                    border: "1px solid #ccc",
-                    borderRadius: "8px",
-                    padding: "10px",
-                    backgroundColor: "white",
-                  }}
-                >
-                  <Calendar
-                    onChange={handleDateChange}
-                    value={selectedDate || new Date()}
-                    className="custom-calendar"
-                    maxDate={new Date()}
-                  />
+                <div style={{ border: "1px solid #ccc", borderRadius: "8px", padding: "10px", backgroundColor: "white" }}>
+                  <Calendar onChange={handleDateChange} value={selectedDate || new Date()} className="custom-calendar" maxDate={new Date()} />
                 </div>
               </Popper>
             </StyledTableCell>
@@ -269,20 +205,14 @@ const EmployeeAttendance: React.FC = () => {
           {noRecordsMessage && (
             <TableRow>
               <TableCell colSpan={7} align="center">
-                <Typography variant="body2" color="error">
-                  {noRecordsMessage}
-                </Typography>
+                <Typography variant="body2" color="error">{noRecordsMessage}</Typography>
               </TableCell>
             </TableRow>
           )}
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <StyledTableRow
-              key={row.id}
-              onClick={() => handleRowClick(row)}
-              sx={{ cursor: "pointer" }}
-            >
+            <StyledTableRow key={row.id} onClick={() => handleRowClick(row)} sx={{ cursor: "pointer" }}>
               <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
               <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
               <StyledTableCell align="center">{row.email}</StyledTableCell>

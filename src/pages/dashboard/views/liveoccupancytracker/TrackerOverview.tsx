@@ -7,7 +7,7 @@ import VideoFeeds from "@/pages/dashboard/components/liveoccupancytracker/VideoF
 const TrackerOverview: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ overflow: 'hidden' }}>
-      <Box sx={{ display: "flex", mb: 2, gap: 4 }}>
+      <Box sx={{ display: "flex", mb: 2, gap: 2 }}>
         <Box sx={{ flex: 1 }}>
           <VideoFeeds />
         </Box>

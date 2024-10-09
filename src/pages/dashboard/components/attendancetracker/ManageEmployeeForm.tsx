@@ -23,7 +23,7 @@ import {
   Button,
   Avatar
 } from "@mui/material";
-import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
+import { Search as SearchIcon, Clear as ClearIcon, Close as CloseIcon } from "@mui/icons-material";
 import { AttendanceDetails } from "../../services/attendancetracker";
 import { ManageEmployeeDetails } from "../../models/attendancetracker";
 
@@ -67,10 +67,11 @@ const DialogTextField = ({
 const ManageEmployeeForm: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [employeeForm, setEmployeeForm] = useState<ManageEmployeeDetails[]>([]);
-  const [selectedEmployee, setSelectedEmployee] =
-    useState<ManageEmployeeDetails | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<ManageEmployeeDetails | null>(null);
   const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const attendanceDetails = new AttendanceDetails();
 
   const fetchEmployeeDetails = useCallback(() => {
@@ -87,18 +88,27 @@ const ManageEmployeeForm: React.FC = () => {
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
     setSearchTerm(event.target.value);
+  
   const handleDialogClose = () => {
     setEditDialogOpen(false);
     setSelectedEmployee(null);
   };
+
+  const handleImageDialogClose = () => {
+    setImageDialogOpen(false);
+    setImageUrl(null);
+  };
+
   const handleEditClick = (employee: ManageEmployeeDetails) => {
     setSelectedEmployee(employee);
     setEditDialogOpen(true);
   };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setSelectedEmployee((prev) => (prev ? { ...prev, [name]: value } : null));
   };
+
   const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedEmployee((prev) =>
       prev ? { ...prev, role: event.target.value as string } : null
@@ -135,172 +145,206 @@ const ManageEmployeeForm: React.FC = () => {
     }
   };
 
+  const handleAvatarClick = (url: string) => {
+    setImageUrl(url);
+    setImageDialogOpen(true);
+  };
+
   return (
-
-      <Box sx={{ padding: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 2,
-          }}
-        >
-          <Typography
-            sx={{ fontWeight: "bold", color: "#1C214F" }}
-            variant="h5"
-          >
-            Employee Registry
-          </Typography>
-          <Box sx={{ position: "relative", width: "350px" }}>
-            <InputBase
-              placeholder="Search"
-              value={searchTerm}
-              onChange={handleSearch}
-              startAdornment={
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              }
-              endAdornment={
-                searchTerm && (
-                  <InputAdornment position="end">
-                    <IconButton
-                      edge="end"
-                      size="large"
-                      onClick={() => setSearchTerm("")}
-                    >
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }
-              sx={{
-                borderRadius: "8px",
-                border: "2px solid #ccc",
-                padding: "6px 10px",
-                width: "100%",
-                "&:hover": { borderColor: "#888" },
-              }}
-            />
-          </Box>
-        </Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 700 }} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                {[
-                  "Employee Id",
-                  "Profile",
-                  "Name",
-                  "Date of Joining",
-                  "Role",
-                  "Mail Id",
-                  "Action",
-                ].map((header) => (
-                  <StyledTableCell
-                    key={header}
-                    align={header === "Employee Id" ? "left" : "center"}
+    <Box sx={{ padding: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 2,
+        }}
+      >
+        <Typography sx={{ fontWeight: "bold", color: "#1C214F" }} variant="h5">
+          Employee Registry
+        </Typography>
+        <Box sx={{ position: "relative", width: "350px" }}>
+          <InputBase
+            placeholder="Search"
+            value={searchTerm}
+            onChange={handleSearch}
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            }
+            endAdornment={
+              searchTerm && (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    size="large"
+                    onClick={() => setSearchTerm("")}
                   >
-                    {header}
-                  </StyledTableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {employeeForm.map((row) => (
-                <StyledTableRow key={row.employeeId}>
-                  <StyledTableCell align="center">
-                    {row.employeeId}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    <Box sx={{ display: "flex", justifyContent: "center" }}>
-                      <Avatar
-                        alt={row.employeeName}
-                        src={row.imageUrl}
-                        sx={{ width: 45, height: 45 }}
-                      />
-                    </Box>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    {row.employeeName}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    {row.dateOfJoining}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">{row.role}</StyledTableCell>
-                  <StyledTableCell align="center">{row.email}</StyledTableCell>
-                  <StyledTableCell align="center">
-                    <Button
-                      variant="text"
-                      color="primary"
-                      onClick={() => handleEditClick(row)}
-                    >
-                      EDIT
-                    </Button>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Dialog open={editDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle sx={{fontWeight:"bold"}}>Edit Employee</DialogTitle>
-          <DialogContent>
-            {selectedEmployee && (
-              <>
-              <Button sx={{mb:2}} variant="outlined">Edit profile picture</Button>
-                <DialogTextField
-                  label="Employee Id"
-                  value={selectedEmployee.employeeId}
-                  name="employeeId"
-                  disabled
-                />
-                <DialogTextField
-                  label="Name"
-                  value={selectedEmployee.employeeName}
-                  name="employeeName"
-                  onChange={handleInputChange}
-                />
-                <DialogTextField
-                  label="Date of Joining"
-                  value={selectedEmployee.dateOfJoining}
-                  name="dateOfJoining"
-                  onChange={handleInputChange}
-                />
-                <DialogTextField
-                  label="Role"
-                  value={selectedEmployee.role}
-                  name="role"
-                  onChange={handleRoleChange}
-                  select
-                >
-                  <MenuItem value="Employee">Employee</MenuItem>
-                  <MenuItem value="Manager">Manager</MenuItem>
-                </DialogTextField>
-                <DialogTextField
-                  label="Mail Id"
-                  value={selectedEmployee.email}
-                  name="email"
-                  disabled
-                />
-              </>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button variant="contained" sx={{bgcolor:"red" }} onClick={handleDelete}>
-              Remove
-            </Button>
-            <Button variant="outlined" onClick={handleDialogClose} color="primary">
-              Cancel
-            </Button>
-            <Button variant="outlined" onClick={handleSave} color="primary" disabled={loading}>
-              {loading ? "Saving..." : "Save"}
-            </Button>
-          </DialogActions>
-        </Dialog>
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }
+            sx={{
+              borderRadius: "8px",
+              border: "2px solid #ccc",
+              padding: "6px 10px",
+              width: "100%",
+              "&:hover": { borderColor: "#888" },
+            }}
+          />
+        </Box>
       </Box>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              {[
+                "Employee Id",
+                "Profile",
+                "Name",
+                "Date of Joining",
+                "Role",
+                "Mail Id",
+                "Action",
+              ].map((header) => (
+                <StyledTableCell
+                  key={header}
+                  align={header === "Employee Id" ? "left" : "center"}
+                >
+                  {header}
+                </StyledTableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {employeeForm.map((row) => (
+              <StyledTableRow key={row.employeeId}>
+                <StyledTableCell align="center">
+                  {row.employeeId}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
+                    onClick={() => handleAvatarClick(row.imageUrl)}
+                  >
+                    <Avatar
+                      alt={row.employeeName}
+                      src={row.imageUrl}
+                      sx={{ width: 45, height: 45 }}
+                    />
+                  </Box>
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {row.employeeName}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {row.dateOfJoining}
+                </StyledTableCell>
+                <StyledTableCell align="center">{row.role}</StyledTableCell>
+                <StyledTableCell align="center">{row.email}</StyledTableCell>
+                <StyledTableCell align="center">
+                  <Button
+                    variant="text"
+                    color="primary"
+                    onClick={() => handleEditClick(row)}
+                  >
+                    EDIT
+                  </Button>
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
+      {/* Edit Employee Dialog */}
+      <Dialog open={editDialogOpen} onClose={handleDialogClose}>
+        <DialogTitle sx={{ fontWeight: "bold" }}>Edit Employee</DialogTitle>
+        <DialogContent>
+          {selectedEmployee && (
+            <>
+              <Button sx={{ mb: 2 }} variant="outlined">
+                Change profile picture
+              </Button>
+              <DialogTextField
+                label="Employee Id"
+                value={selectedEmployee.employeeId}
+                name="employeeId"
+                disabled
+              />
+              <DialogTextField
+                label="Name"
+                value={selectedEmployee.employeeName}
+                name="employeeName"
+                onChange={handleInputChange}
+              />
+              <DialogTextField
+                label="Date of Joining"
+                value={selectedEmployee.dateOfJoining}
+                name="dateOfJoining"
+                onChange={handleInputChange}
+              />
+              <DialogTextField
+                label="Role"
+                value={selectedEmployee.role}
+                name="role"
+                onChange={handleRoleChange}
+                select
+              >
+                <MenuItem value="Employee">Employee</MenuItem>
+                <MenuItem value="Manager">Manager</MenuItem>
+              </DialogTextField>
+              <DialogTextField
+                label="Mail Id"
+                value={selectedEmployee.email}
+                name="email"
+                disabled
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" sx={{ bgcolor: "red" }} onClick={handleDelete}>
+            Remove
+          </Button>
+          <Button variant="outlined" onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button variant="outlined" onClick={handleSave} color="primary" disabled={loading}>
+            {loading ? "Saving..." : "Save"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={imageDialogOpen} onClose={handleImageDialogClose} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <IconButton
+            aria-label="close"
+            onClick={handleImageDialogClose}
+            sx={{
+              position: "absolute",
+              right: 2,
+              top: 4,
+              color:"red"
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {imageUrl && (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <img
+                src={imageUrl}
+                alt="Profile"
+                style={{ maxWidth: "100%", maxHeight: "300px" }}
+              />
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
+    </Box>
   );
 };
 

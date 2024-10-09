@@ -12,11 +12,13 @@ import empImg6 from "@/assets/purple hair woman.png";
 const EmployeeView: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleAddsubadminClick = () => {
+  const handleAddSubAdminClick = () => {
     navigate("/dashboard/occupancy-tracker/add-emp");
   };
 
-  const employeeImages = React.useMemo(() => [empImg, empImg2, empImg3, empImg4, empImg5, empImg6], []);
+  const employeeImages = React.useMemo(() => [
+    empImg, empImg2, empImg3, empImg4, empImg5, empImg6
+  ], []);
 
   return (
     <Box
@@ -81,7 +83,7 @@ const EmployeeView: React.FC = () => {
           textTransform: "capitalize",
           fontSize: "17px",
         }}
-        onClick={handleAddsubadminClick}
+        onClick={handleAddSubAdminClick}
       >
         Add Employee
       </Button>

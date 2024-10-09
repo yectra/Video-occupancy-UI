@@ -9,12 +9,14 @@ import {
   FormControl,
   SelectChangeEvent,
   IconButton,
-  Tooltip,
-  Button
+  Button,
+  Popper,
+  Paper
 } from "@mui/material";
 import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import DeleteIcon from '@mui/icons-material/Delete';
 import setupImg from '@/assets/setupcamera.png';
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -26,10 +28,23 @@ const TrackerSetupView: React.FC = () => {
   const [currentCameraIndex, setCurrentCameraIndex] = useState<number>(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [coordinates, setCoordinates] = useState<any>({});
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [tooltipContent, setTooltipContent] = useState<string>('');
 
   const navigate = useNavigate();
   const location = useLocation();
-  
+
+  // Clear the form state on page refresh
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      setCapacity("");
+      setAlertMessage("");
+      setCameraSetups([{ entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" }]);
+      setCurrentCameraIndex(0);
+      setErrors({});
+    };
+  }, []);
+
   useEffect(() => {
     if (location.state) {
       const { cameraSetups, alertMessage, capacity, coordinates, step } = location.state;
@@ -71,6 +86,14 @@ const TrackerSetupView: React.FC = () => {
     setCurrentCameraIndex(cameraSetups.length);
   };
 
+  const handleDeleteCameraClick = (index: number) => {
+    const updatedCameras = cameraSetups.filter((_, i) => i !== index);
+    setCameraSetups(updatedCameras);
+    if (currentCameraIndex >= updatedCameras.length) {
+      setCurrentCameraIndex(Math.max(0, updatedCameras.length - 1));
+    }
+  };
+
   const validateStep1 = () => {
     const newErrors: { [key: string]: string } = {};
     if (!capacity) newErrors.capacity = "Capacity is required";
@@ -88,6 +111,20 @@ const TrackerSetupView: React.FC = () => {
         coordinates 
       } 
     });
+  };
+
+  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>, content: string) => {
+    setAnchorEl(event.currentTarget);
+    setTooltipContent(content);
+  };
+
+  const handleMouseLeave = () => {
+    setAnchorEl(null);
+    setTooltipContent('');
+  };
+
+  const handleMoveToAttendance = () => {
+    navigate('/dashboard/attendance');
   };
 
   return (
@@ -123,6 +160,11 @@ const TrackerSetupView: React.FC = () => {
                   {currentCameraIndex < cameraSetups.length - 1 && (
                     <IconButton onClick={() => handleCameraIndexChange(1)}>
                       <ArrowRightIcon sx={{ fontSize: '20px', color: '#252C58' }} />
+                    </IconButton>
+                  )}
+                  {currentCameraIndex > 0 && (
+                    <IconButton onClick={() => handleDeleteCameraClick(currentCameraIndex)}>
+                      <DeleteIcon sx={{ fontSize: '20px', color: 'red' }} />
                     </IconButton>
                   )}
                 </>
@@ -184,15 +226,19 @@ const TrackerSetupView: React.FC = () => {
                       onChange={handleChangeSelectField(currentCameraIndex, 'cameraPosition')}
                       label="Camera Position"
                     >
-                      <MenuItem value="INSIDE-OUT">
-                        <Tooltip title="Camera installed inside the entrance and facing the door. People entering are facing the camera, while those leaving are not" placement="right">
-                          <span>INSIDE-OUT</span>
-                        </Tooltip>
+                      <MenuItem 
+                        value="INSIDE-OUT"
+                        onMouseEnter={(e) => handleMouseEnter(e, "Camera installed inside the entrance and facing the door. People entering are facing the camera, while those leaving are not.")}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        INSIDE-OUT
                       </MenuItem>
-                      <MenuItem value="OUTSIDE-IN">
-                        <Tooltip title="Camera installed outside the entrance and facing the door. People entering are not facing the camera, while those leaving are" placement="right">
-                          <span>OUTSIDE-IN</span>
-                        </Tooltip>
+                      <MenuItem 
+                        value="OUTSIDE-IN"
+                        onMouseEnter={(e) => handleMouseEnter(e, "Camera installed outside the entrance and facing the door. People entering are not facing the camera, while those leaving are.")}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        OUTSIDE-IN
                       </MenuItem>
                     </Select>
                   </FormControl>
@@ -238,10 +284,29 @@ const TrackerSetupView: React.FC = () => {
                   {step === 1 ? 'Next' : 'Preview'}
                 </Button>
               </Box>
+              {step === 1 && (
+                <Button
+                  variant="contained"
+                  sx={{
+                    marginTop: 2,
+                    height:45,
+                    bgcolor:"#1C214F",
+                    "&:hover": { bgcolor:"#1C214F"}
+                  }}
+                  onClick={handleMoveToAttendance}
+                >
+                  Move to Attendance
+                </Button>
+              )}
             </Box>
           </>
         </Box>
       </Box>
+      <Popper open={!!anchorEl} anchorEl={anchorEl} placement="right">
+        <Paper sx={{ padding: 1, maxWidth: 300 }}>
+          <Typography>{tooltipContent}</Typography>
+        </Paper>
+      </Popper>
     </Box>
   );
 };

@@ -26,7 +26,7 @@ const UserTimesheet: React.FC = () => {
   return (
     <Box sx={{ height: "305px", width: "540px", boxShadow: 3, padding: 3, borderRadius: 3, position: 'relative' }}>
       <Box sx={{ display: 'flex', justifyContent: "flex-start", mb: 2 }}>
-        <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant='h6'>Timesheet 13/01/24</Typography>
+        <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant='h6'>Timesheet </Typography>
       </Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

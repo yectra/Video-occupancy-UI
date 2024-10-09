@@ -1,12 +1,11 @@
-
+import { loginRequest } from '../../config/auth';
 import { InteractionStatus, IPublicClientApplication, AccountInfo } from '@azure/msal-browser';
-import { loginRequest } from '@/config/auth';
- 
- 
- 
+
+
+
 export const signInUser = async (
-  instance: IPublicClientApplication,
-  inProgress: InteractionStatus,
+  instance: IPublicClientApplication, 
+  inProgress: InteractionStatus, 
   isAuthenticated: boolean
 ) => {
   try {
@@ -17,30 +16,30 @@ export const signInUser = async (
     console.error('Login redirect error:', e);
   }
 };
- 
+
 export const signOutUser = (
-  instance: IPublicClientApplication,
+  instance: IPublicClientApplication, 
   postLogoutRedirectUri: string = "/"
 ): void => {
   instance.logoutRedirect({
     postLogoutRedirectUri: postLogoutRedirectUri,
   });
 };
- 
- 
+
+
 interface AccountDetails {
   email: string;
   name: string | any;
 }
- 
- 
+
+
 export const getUserDetailsFromMsal = (accounts: AccountInfo[]): AccountDetails => {
   if (accounts.length > 0) {
     const account = accounts[0];
- 
+
     return {
-      email: account.username,
-      name: account.idTokenClaims?.given_name || '',
+      email: account.username, 
+      name: account.idTokenClaims?.given_name || '', 
     };
   }
   return {
@@ -48,6 +47,3 @@ export const getUserDetailsFromMsal = (accounts: AccountInfo[]): AccountDetails 
     name: '',
   };
 };
- 
- 
- 

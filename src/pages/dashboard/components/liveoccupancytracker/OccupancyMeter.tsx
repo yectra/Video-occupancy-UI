@@ -6,7 +6,7 @@ const OccupancyMeter = () => {
   let percentage = 70; 
 
   return (
-    <Box sx={{ width: "522px", height: "383px", borderRadius: 3, boxShadow: 3 }}>
+    <Box sx={{ width: "520px", height: "390px", borderRadius: 3, boxShadow: 3 }}>
       <Typography sx={{ ml: 2, color: "#00D1A3",fontWeight:"bold" }} variant="h6">
         Live occupancy meter
       </Typography>
