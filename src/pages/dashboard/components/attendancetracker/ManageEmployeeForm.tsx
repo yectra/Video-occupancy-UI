@@ -21,11 +21,11 @@ import {
   Paper,
   MenuItem,
   Button,
-  Avatar
+  Avatar,
 } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon, Close as CloseIcon } from "@mui/icons-material";
-import { AttendanceDetails } from "../../services/attendancetracker";
-import { ManageEmployeeDetails } from "../../models/attendancetracker";
+import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import { ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -72,6 +72,8 @@ const ManageEmployeeForm: React.FC = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<ManageEmployeeDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [newImage, setNewImage] = useState<File | null>(null);
+  const [imageBase64, setImageBase64] = useState<string>(""); 
   const attendanceDetails = new AttendanceDetails();
 
   const fetchEmployeeDetails = useCallback(() => {
@@ -88,7 +90,7 @@ const ManageEmployeeForm: React.FC = () => {
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
     setSearchTerm(event.target.value);
-  
+
   const handleDialogClose = () => {
     setEditDialogOpen(false);
     setSelectedEmployee(null);
@@ -97,6 +99,8 @@ const ManageEmployeeForm: React.FC = () => {
   const handleImageDialogClose = () => {
     setImageDialogOpen(false);
     setImageUrl(null);
+    setNewImage(null);
+    setImageBase64(""); // Reset Base64 when closing
   };
 
   const handleEditClick = (employee: ManageEmployeeDetails) => {
@@ -145,9 +149,48 @@ const ManageEmployeeForm: React.FC = () => {
     }
   };
 
-  const handleAvatarClick = (url: string) => {
-    setImageUrl(url);
+  const handleAvatarClick = (employee :ManageEmployeeDetails) => {
+    setSelectedEmployee(employee)
+    setImageUrl(employee.imageUrl || "");
     setImageDialogOpen(true);
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setNewImage(file); 
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageBase64(reader.result as string); // Store Base64 image
+        setImageUrl(reader.result as string)
+      };
+      reader.readAsDataURL(file);
+    
+    }
+  };
+
+  const handleImageSave = () => {
+    if (newImage && imageBase64 && selectedEmployee) {
+      console.log("Sending Base64 image to the backend:", imageBase64);
+      const data = {
+        employeeId: selectedEmployee?.employeeId,
+        imageBase64: imageBase64, 
+      };
+      setLoading(true);
+      attendanceDetails
+        .updateEmployeeDetails(data)
+        .then(() => {
+          fetchEmployeeDetails();
+          handleDialogClose();
+        })
+        .catch((error) =>
+          console.error("Error updating employee details:", error)
+        )
+        .finally(() => setLoading(false));
+    
+
+      handleImageDialogClose(); 
+    }
   };
 
   return (
@@ -176,11 +219,7 @@ const ManageEmployeeForm: React.FC = () => {
             endAdornment={
               searchTerm && (
                 <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    size="large"
-                    onClick={() => setSearchTerm("")}
-                  >
+                  <IconButton edge="end" size="large" onClick={() => setSearchTerm("")}>
                     <ClearIcon />
                   </IconButton>
                 </InputAdornment>
@@ -196,60 +235,38 @@ const ManageEmployeeForm: React.FC = () => {
           />
         </Box>
       </Box>
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              {[
-                "Employee Id",
-                "Profile",
-                "Name",
-                "Date of Joining",
-                "Role",
-                "Mail Id",
-                "Action",
-              ].map((header) => (
-                <StyledTableCell
-                  key={header}
-                  align={header === "Employee Id" ? "left" : "center"}
-                >
-                  {header}
-                </StyledTableCell>
-              ))}
+              {["Employee Id", "Profile", "Name", "Date of Joining", "Role", "Mail Id", "Action"].map(
+                (header) => (
+                  <StyledTableCell key={header} align={header === "Employee Id" ? "left" : "center"}>
+                    {header}
+                  </StyledTableCell>
+                )
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
             {employeeForm.map((row) => (
               <StyledTableRow key={row.employeeId}>
-                <StyledTableCell align="center">
-                  {row.employeeId}
-                </StyledTableCell>
+                <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
                 <StyledTableCell align="center">
                   <Box
                     sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
-                    onClick={() => handleAvatarClick(row.imageUrl)}
+                    onClick={() => handleAvatarClick(row)}
                   >
-                    <Avatar
-                      alt={row.employeeName}
-                      src={row.imageUrl}
-                      sx={{ width: 45, height: 45 }}
-                    />
+                    <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 45, height: 45 }} />
                   </Box>
                 </StyledTableCell>
-                <StyledTableCell align="center">
-                  {row.employeeName}
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  {row.dateOfJoining}
-                </StyledTableCell>
+                <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
+                <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
                 <StyledTableCell align="center">{row.role}</StyledTableCell>
                 <StyledTableCell align="center">{row.email}</StyledTableCell>
                 <StyledTableCell align="center">
-                  <Button
-                    variant="text"
-                    color="primary"
-                    onClick={() => handleEditClick(row)}
-                  >
+                  <Button variant="text" color="primary" onClick={() => handleEditClick(row)}>
                     EDIT
                   </Button>
                 </StyledTableCell>
@@ -259,49 +276,19 @@ const ManageEmployeeForm: React.FC = () => {
         </Table>
       </TableContainer>
 
-      {/* Edit Employee Dialog */}
       <Dialog open={editDialogOpen} onClose={handleDialogClose}>
         <DialogTitle sx={{ fontWeight: "bold" }}>Edit Employee</DialogTitle>
         <DialogContent>
           {selectedEmployee && (
             <>
-              <Button sx={{ mb: 2 }} variant="outlined">
-                Change profile picture
-              </Button>
-              <DialogTextField
-                label="Employee Id"
-                value={selectedEmployee.employeeId}
-                name="employeeId"
-                disabled
-              />
-              <DialogTextField
-                label="Name"
-                value={selectedEmployee.employeeName}
-                name="employeeName"
-                onChange={handleInputChange}
-              />
-              <DialogTextField
-                label="Date of Joining"
-                value={selectedEmployee.dateOfJoining}
-                name="dateOfJoining"
-                onChange={handleInputChange}
-              />
-              <DialogTextField
-                label="Role"
-                value={selectedEmployee.role}
-                name="role"
-                onChange={handleRoleChange}
-                select
-              >
+              <DialogTextField label="Employee Id" value={selectedEmployee.employeeId} name="employeeId" disabled />
+              <DialogTextField label="Name" value={selectedEmployee.employeeName} name="employeeName" onChange={handleInputChange} />
+              <DialogTextField label="Date of Joining" value={selectedEmployee.dateOfJoining} name="dateOfJoining" onChange={handleInputChange} />
+              <DialogTextField label="Role" value={selectedEmployee.role} name="role" onChange={handleRoleChange} select>
                 <MenuItem value="Employee">Employee</MenuItem>
                 <MenuItem value="Manager">Manager</MenuItem>
               </DialogTextField>
-              <DialogTextField
-                label="Mail Id"
-                value={selectedEmployee.email}
-                name="email"
-                disabled
-              />
+              <DialogTextField label="Mail Id" value={selectedEmployee.email} name="email" disabled />
             </>
           )}
         </DialogContent>
@@ -317,32 +304,29 @@ const ManageEmployeeForm: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
       <Dialog open={imageDialogOpen} onClose={handleImageDialogClose} maxWidth="sm" fullWidth>
         <DialogTitle>
-          <IconButton
-            aria-label="close"
-            onClick={handleImageDialogClose}
-            sx={{
-              position: "absolute",
-              right: 2,
-              top: 4,
-              color:"red"
-            }}
-          >
+          <IconButton aria-label="close" onClick={handleImageDialogClose} sx={{ position: "absolute", right: 2, top: 4, color: "red" }}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent>
           {imageUrl && (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <img
-                src={imageUrl}
-                alt="Profile"
-                style={{ maxWidth: "100%", maxHeight: "300px" }}
-              />
+            <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+              <img src={imageUrl} alt="Profile" style={{ maxWidth: "100%", height: "300px" }} />
+              <Button sx={{ mt: 2 }} variant="contained" component="label">
+                Change profile picture
+                <input type="file" accept="image/*" hidden onChange={handleFileChange} />
+              </Button>
             </Box>
           )}
         </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleImageSave} disabled={!imageBase64}>
+            Save Image
+          </Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );

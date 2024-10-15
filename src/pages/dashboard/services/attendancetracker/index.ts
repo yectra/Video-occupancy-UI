@@ -12,7 +12,7 @@ interface IAttendanceDetails {
 
     getIndividualEmployeeDetails(employeeId: string): Promise<any>;
 
-    getManageEmployeeDetails(): Promise<any>;
+    getManageEmployeeDetails(): Promise<any>;   
 
     updateEmployeeDetails(employeeDetails: ManageEmployeeDetails): Promise<any>;
 

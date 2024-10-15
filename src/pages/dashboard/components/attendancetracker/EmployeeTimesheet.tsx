@@ -84,7 +84,7 @@ const EmployeeTimesheet: React.FC = () => {
           sx={{
             display: "flex",
             border: "2px solid  #7D7D7D",
-            borderRadius: 3,
+            bxorderRadius: 3,
             mt: 4,
             padding: 4,
             gap: 3,

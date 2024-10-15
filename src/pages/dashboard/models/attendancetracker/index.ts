@@ -82,10 +82,10 @@ export class AddEmployeeDetails{
 
 export class ManageEmployeeDetails{
   employeeId:string;
-  employeeName:string;
-  dateOfJoining:string;
-  role:string;
-  email:string;
-  imageUrl:string;
+  employeeName?:string;
+  dateOfJoining?:string;
+  role?:string;
+  email?:string;
+  imageUrl?:string;
 }
 
