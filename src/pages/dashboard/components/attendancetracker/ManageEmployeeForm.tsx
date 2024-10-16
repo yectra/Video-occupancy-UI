@@ -174,7 +174,7 @@ const ManageEmployeeForm: React.FC = () => {
       console.log("Sending Base64 image to the backend:", imageBase64);
       const data = {
         employeeId: selectedEmployee?.employeeId,
-        imageBase64: imageBase64, 
+        newImageBase64: imageBase64, 
       };
       setLoading(true);
       attendanceDetails

@@ -16,6 +16,8 @@ import {
   Popper,
   tableCellClasses,
   InputBase,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -26,7 +28,6 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "@/styles/core/components/CalendarStyles.css";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
-import BaseSpinner from "@/common/components/UI/BaseSpinner";
 import { debounce } from "lodash";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -112,9 +113,14 @@ const EmployeeAttendance: React.FC = () => {
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       if (value) {
-        attendanceDetails.searchEmployeeDetails(value)
+        attendanceDetails.searchEmployeeDetails(date || "",value)
           .then(setRows)
-          .catch(console.error);
+          .catch(err=>{
+            console.log(err)
+            setRows([]) 
+            setNoRecordsMessage("No user found");
+
+          });
       } else {
         fetchAttendanceRecords();
       }
@@ -144,11 +150,15 @@ const EmployeeAttendance: React.FC = () => {
     setCalendarOpen(false);
   };
 
-  if (loading) return <BaseSpinner />;
+ 
   if (error) return <Typography>{error}</Typography>;
 
   return (
     <TableContainer component={Paper}>
+      <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
+        <CircularProgress color={"primary"}/>
+      </Backdrop>
+
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
         <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">
           Attendance List
@@ -202,7 +212,7 @@ const EmployeeAttendance: React.FC = () => {
             <StyledTableCell align="center">Break</StyledTableCell>
             <StyledTableCell align="center">Over time</StyledTableCell>
           </TableRow>
-          {noRecordsMessage && (
+          {noRecordsMessage && rows.length==0 && (
             <TableRow>
               <TableCell colSpan={7} align="center">
                 <Typography variant="body2" color="error">{noRecordsMessage}</Typography>

@@ -16,7 +16,7 @@ interface IAttendanceDetails {
 
     updateEmployeeDetails(employeeDetails: ManageEmployeeDetails): Promise<any>;
 
-    searchEmployeeDetails(employeeName:string):Promise<any>;
+    searchEmployeeDetails(date:string,employeeName:string):Promise<any>;
 
     deleteEmployeeDetails(employeeId:string):Promise<any>;
 }
@@ -51,8 +51,8 @@ export class AttendanceDetails implements IAttendanceDetails {
             .then((response) => response)
     }
 
-    searchEmployeeDetails(employeeName: string): Promise<any> {
-        return httpGet(`/attendance/search?employeeName=${employeeName}`)
+    searchEmployeeDetails(date:string,employeeName: string): Promise<any> {
+        return httpGet(`/attendance/search?date=${date}&employeeName=${employeeName}`)
             .then((response)=> response)
     }
 
