@@ -155,7 +155,7 @@ const EmployeeForm: React.FC = () => {
             }}
           >
             <Avatar sx={{ width: 60, height: 60 }} src={avatarSrc} />
-            <Button variant="outlined" component="label" sx={{ mt: 2 }}>
+            <Button variant="contained" component="label" sx={{ mt: 2,bgcolor:"#00D1A3",'&:hover':{bgcolor:"#00A387"} }}>
               Upload Picture
               <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
             </Button>
@@ -218,7 +218,7 @@ const EmployeeForm: React.FC = () => {
               height: 50,
               mb: 2,
               bgcolor: "#00D1A3",
-              "&:hover": { bgcolor: "#00D1A3" },
+              '&:hover':{bgcolor:"#00A387"},
             }}
             variant="contained"
             onClick={handleSubmit}

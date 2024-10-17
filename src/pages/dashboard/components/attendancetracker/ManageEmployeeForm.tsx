@@ -24,6 +24,7 @@ import {
   Avatar,
 } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon, Close as CloseIcon } from "@mui/icons-material";
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import { ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 
@@ -240,7 +241,7 @@ const ManageEmployeeForm: React.FC = () => {
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              {["Employee Id", "Profile", "Name", "Date of Joining", "Role", "Mail Id", "Action"].map(
+              {["EMPLOYEE ID", "PROFILE", "NAME", "DATE OF JOINING", "ROLE", "EMAIL", "EDIT"].map(
                 (header) => (
                   <StyledTableCell key={header} align={header === "Employee Id" ? "left" : "center"}>
                     {header}
@@ -266,9 +267,9 @@ const ManageEmployeeForm: React.FC = () => {
                 <StyledTableCell align="center">{row.role}</StyledTableCell>
                 <StyledTableCell align="center">{row.email}</StyledTableCell>
                 <StyledTableCell align="center">
-                  <Button variant="text" color="primary" onClick={() => handleEditClick(row)}>
-                    EDIT
-                  </Button>
+                <IconButton sx={{ bgcolor: "#00D1A3", color: "white",'&:hover':{bgcolor:"#00A387"} }} onClick={() => handleEditClick(row)}>
+                  <EditOutlinedIcon />
+                </IconButton>
                 </StyledTableCell>
               </StyledTableRow>
             ))}

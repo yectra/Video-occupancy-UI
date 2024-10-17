@@ -37,7 +37,7 @@ const VideoFeeds: React.FC = () => {
         }}
       >
         <Typography
-          sx={{ fontWeight: "bold", color: "#00D1A3", ml: 2 }}
+          sx={{ fontWeight: "bold", color: "#1C214F",p:2 }}
           variant="h6"
         >
           Video Feeds
