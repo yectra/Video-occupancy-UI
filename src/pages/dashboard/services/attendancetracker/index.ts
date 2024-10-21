@@ -18,6 +18,8 @@ interface IAttendanceDetails {
 
     searchEmployeeDetails(date:string,employeeName:string):Promise<any>;
 
+    searchAllEmployeeDetails(searchTerm:string):Promise<any>
+
     deleteEmployeeDetails(employeeId:string):Promise<any>;
 }
 
@@ -54,6 +56,11 @@ export class AttendanceDetails implements IAttendanceDetails {
     searchEmployeeDetails(date:string,employeeName: string): Promise<any> {
         return httpGet(`/attendance/search?date=${date}&employeeName=${employeeName}`)
             .then((response)=> response)
+    }
+
+    searchAllEmployeeDetails(searchTerm:string): Promise<any> {
+        return httpGet(`/employees/search?search=${searchTerm}`)
+            .then((response)=>response)
     }
 
     deleteEmployeeDetails(employeeId:string):Promise<any>{

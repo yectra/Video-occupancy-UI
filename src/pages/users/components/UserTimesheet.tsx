@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Box, Typography, Divider, Button, TextField } from '@mui/material';
+import { Box, Typography, Divider, TextField } from '@mui/material';
 import { styled } from '@mui/system';
 
 const GaugeChart = styled('div')<{
@@ -29,7 +29,7 @@ const UserTimesheet: React.FC = () => {
         <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant='h6'>Timesheet </Typography>
       </Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
           <TextField
             variant="outlined"
             size="medium"
@@ -40,18 +40,6 @@ const UserTimesheet: React.FC = () => {
             }}
             sx={{ width: '250px' }}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{
-              bgcolor: '#00C49A',
-              '&:hover': {
-                bgcolor: '#00A37A',
-              },
-            }}
-          >
-            Punch out
-          </Button>
         </Box>
         <GaugeChart angle={angle}>
           {time.toFixed(2)} hrs

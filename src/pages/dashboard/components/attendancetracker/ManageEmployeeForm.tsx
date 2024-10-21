@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { debounce } from 'lodash';
 import {
   styled,
   Box,
@@ -22,8 +23,10 @@ import {
   MenuItem,
   Button,
   Avatar,
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
-import { Search as SearchIcon, Clear as ClearIcon, Close as CloseIcon } from "@mui/icons-material";
+import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import { ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
@@ -75,13 +78,17 @@ const ManageEmployeeForm: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
   const [imageBase64, setImageBase64] = useState<string>(""); 
+  const [noUserFound, setNoUserFound] = useState(false);  
   const attendanceDetails = new AttendanceDetails();
 
   const fetchEmployeeDetails = useCallback(() => {
     setLoading(true);
     attendanceDetails
       .getManageEmployeeDetails()
-      .then(setEmployeeForm)
+      .then((response) => {
+        setEmployeeForm(response);
+        setNoUserFound(response.length === 0);  
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -89,8 +96,28 @@ const ManageEmployeeForm: React.FC = () => {
     fetchEmployeeDetails();
   }, [fetchEmployeeDetails]);
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchTerm(event.target.value);
+  const debouncedSearch = useCallback(
+    debounce((searchValue: string) => {
+      if (searchValue) {
+        attendanceDetails.searchAllEmployeeDetails(searchValue)
+          .then((response) => {
+            setEmployeeForm(response);
+            setNoUserFound(response.length === 0); 
+          })
+          .catch((error) => console.error("Error fetching search results:", error));
+      } else {
+        fetchEmployeeDetails(); 
+      }
+    }, 300), 
+    [attendanceDetails, fetchEmployeeDetails]
+  );
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    debouncedSearch(value);
+
+  };
 
   const handleDialogClose = () => {
     setEditDialogOpen(false);
@@ -101,7 +128,7 @@ const ManageEmployeeForm: React.FC = () => {
     setImageDialogOpen(false);
     setImageUrl(null);
     setNewImage(null);
-    setImageBase64(""); // Reset Base64 when closing
+    setImageBase64(""); 
   };
 
   const handleEditClick = (employee: ManageEmployeeDetails) => {
@@ -150,7 +177,7 @@ const ManageEmployeeForm: React.FC = () => {
     }
   };
 
-  const handleAvatarClick = (employee :ManageEmployeeDetails) => {
+  const handleAvatarClick = (employee: ManageEmployeeDetails) => {
     setSelectedEmployee(employee)
     setImageUrl(employee.imageUrl || "");
     setImageDialogOpen(true);
@@ -162,11 +189,10 @@ const ManageEmployeeForm: React.FC = () => {
       setNewImage(file); 
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageBase64(reader.result as string); // Store Base64 image
+        setImageBase64(reader.result as string); 
         setImageUrl(reader.result as string)
       };
       reader.readAsDataURL(file);
-    
     }
   };
 
@@ -188,8 +214,6 @@ const ManageEmployeeForm: React.FC = () => {
           console.error("Error updating employee details:", error)
         )
         .finally(() => setLoading(false));
-    
-
       handleImageDialogClose(); 
     }
   };
@@ -237,95 +261,144 @@ const ManageEmployeeForm: React.FC = () => {
         </Box>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              {["EMPLOYEE ID", "PROFILE", "NAME", "DATE OF JOINING", "ROLE", "EMAIL", "EDIT"].map(
-                (header) => (
-                  <StyledTableCell key={header} align={header === "Employee Id" ? "left" : "center"}>
-                    {header}
+      {noUserFound ? (
+        <Box sx={{ textAlign: "center", marginTop: 4 }}>
+          <Typography variant="h6" color="textSecondary">
+            No user found
+          </Typography>
+        </Box>
+      ) : (
+        <TableContainer component={Paper}>
+          <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
+        <CircularProgress color={"primary"}/>
+      </Backdrop>
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                {["ID", "PROFILE", "NAME", "DATE OF JOINING", "ROLE", "EMAIL", "EDIT"].map(
+                  (header) => (
+                    <StyledTableCell key={header} align={header === "Employee Id" ? "left" : "center"}>
+                      {header}
+                    </StyledTableCell>
+                  )
+                )}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {employeeForm.map((row) => (
+                <StyledTableRow key={row.employeeId}>
+                  <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
+                      onClick={() => handleAvatarClick(row)}
+                    >
+                      <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 50, height: 50 }} />
+                    </Box>
                   </StyledTableCell>
-                )
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {employeeForm.map((row) => (
-              <StyledTableRow key={row.employeeId}>
-                <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
-                <StyledTableCell align="center">
-                  <Box
-                    sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
-                    onClick={() => handleAvatarClick(row)}
-                  >
-                    <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 45, height: 45 }} />
-                  </Box>
-                </StyledTableCell>
-                <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
-                <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
-                <StyledTableCell align="center">{row.role}</StyledTableCell>
-                <StyledTableCell align="center">{row.email}</StyledTableCell>
-                <StyledTableCell align="center">
-                <IconButton sx={{ bgcolor: "#00D1A3", color: "white",'&:hover':{bgcolor:"#00A387"} }} onClick={() => handleEditClick(row)}>
-                  <EditOutlinedIcon />
-                </IconButton>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
+                  <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
+                  <StyledTableCell align="center">{row.role}</StyledTableCell>
+                  <StyledTableCell align="center">{row.email}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <IconButton sx={{ bgcolor: "#00D1A3", color: "white",'&:hover':{bgcolor:"#00A387"} }} onClick={() => handleEditClick(row)}>
+                      <EditOutlinedIcon />
+                    </IconButton>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+      {noUserFound && (
+   <Typography variant="body2" color="error">{noUserFound}</Typography>
+)}
+
 
       <Dialog open={editDialogOpen} onClose={handleDialogClose}>
-        <DialogTitle sx={{ fontWeight: "bold" }}>Edit Employee</DialogTitle>
+        <DialogTitle>Edit Employee</DialogTitle>
         <DialogContent>
-          {selectedEmployee && (
-            <>
-              <DialogTextField label="Employee Id" value={selectedEmployee.employeeId} name="employeeId" disabled />
-              <DialogTextField label="Name" value={selectedEmployee.employeeName} name="employeeName" onChange={handleInputChange} />
-              <DialogTextField label="Date of Joining" value={selectedEmployee.dateOfJoining} name="dateOfJoining" onChange={handleInputChange} />
-              <DialogTextField label="Role" value={selectedEmployee.role} name="role" onChange={handleRoleChange} select>
-                <MenuItem value="Employee">Employee</MenuItem>
-                <MenuItem value="Manager">Manager</MenuItem>
-              </DialogTextField>
-              <DialogTextField label="Mail Id" value={selectedEmployee.email} name="email" disabled />
-            </>
-          )}
+          <DialogTextField
+            label="Employee ID"
+            value={selectedEmployee?.employeeId || ""}
+            name="employeeId"
+            onChange={handleInputChange}
+            disabled
+          />
+          <DialogTextField
+            label="Name"
+            value={selectedEmployee?.employeeName || ""}
+            name="employeeName"
+            onChange={handleInputChange}
+          />
+          <DialogTextField
+            label="Email"
+            value={selectedEmployee?.email || ""}
+            name="email"
+            onChange={handleInputChange}
+          />
+          <DialogTextField
+            label="Date of Joining"
+            value={selectedEmployee?.dateOfJoining || ""}
+            name="dateOfJoining"
+            onChange={handleInputChange}
+            disabled
+          />
+          <DialogTextField
+            label="Role"
+            value={selectedEmployee?.role || ""}
+            name="role"
+            onChange={handleRoleChange}
+            select
+          >
+            <MenuItem value="Manager">Manager</MenuItem>
+            <MenuItem value="Employee">Employee</MenuItem>
+            <MenuItem value="Admin">Admin</MenuItem>
+          </DialogTextField>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" sx={{ bgcolor: "red" }} onClick={handleDelete}>
-            Remove
+          <Button onClick={handleDelete} color="error">
+            Delete
           </Button>
-          <Button variant="outlined" onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button variant="outlined" onClick={handleSave} color="primary" disabled={loading}>
-            {loading ? "Saving..." : "Save"}
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleSave} color="primary">
+            Save
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={imageDialogOpen} onClose={handleImageDialogClose} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          <IconButton aria-label="close" onClick={handleImageDialogClose} sx={{ position: "absolute", right: 2, top: 4, color: "red" }}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+      <Dialog open={imageDialogOpen} onClose={handleImageDialogClose}>
+        <DialogTitle>Profile Picture</DialogTitle>
         <DialogContent>
-          {imageUrl && (
-            <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-              <img src={imageUrl} alt="Profile" style={{ maxWidth: "100%", height: "300px" }} />
-              <Button sx={{ mt: 2 }} variant="contained" component="label">
-                Change profile picture
-                <input type="file" accept="image/*" hidden onChange={handleFileChange} />
-              </Button>
-            </Box>
-          )}
+          <Box sx={{ textAlign: 'center', marginBottom: 2 }}>
+            <Avatar
+              src={imageUrl||undefined}
+              alt="Employee Image"
+              sx={{ width: 100, height: 100, margin: '0 auto' }}
+            />
+          </Box>
+          <Button
+            variant="contained"
+            component="label"
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          >
+            Upload New Image
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </Button>
         </DialogContent>
         <DialogActions>
-          <Button variant="outlined" onClick={handleImageSave} disabled={!imageBase64}>
-            Save Image
+          <Button onClick={handleImageDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleImageSave} color="primary">
+            Save
           </Button>
         </DialogActions>
       </Dialog>
