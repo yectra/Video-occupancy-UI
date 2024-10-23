@@ -17,8 +17,10 @@ export interface IApiClient {
   put<TRequest, TResponse>(path: string, payload: TRequest): Promise<TResponse>;
 }
 export default class ApiClient implements IApiClient {
+  
   public axiosInstance: AxiosInstance;
   private baseUrl: string = "https://videooccupancy.azure-api.net/videoAttendanceV5";
+
   constructor() {
     this.axiosInstance = this.createAxiosInstance();
   }

@@ -55,7 +55,7 @@ const route = [
     children: [
       
       {
-        path: "dashboard",
+        path: "",
         element: <Dashboard />,
         children: [
           {
@@ -63,7 +63,7 @@ const route = [
             element: <DashboardSetupView />,
           },
           {
-            path: "occupancy-tracker",
+            path: "dashboard/occupancy-tracker",
             element: <LiveOccupancyTrackerView />,
             children: [
               {
@@ -101,7 +101,7 @@ const route = [
             ],
           },
           {
-            path: "attendance",
+            path: "dashboard/attendance",
             element: <AttendanceView />,
             children: [
               {

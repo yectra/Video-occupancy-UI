@@ -1,24 +1,27 @@
 import React, { useEffect, useState } from "react";
+
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, ListItemIcon } from "@mui/material";
 import { LightModeOutlined, NotificationsOutlined, AccountCircle, Logout } from "@mui/icons-material";
+
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
+
 import { getUserDetailsFromMsal } from "@/common/services/AuthHelper";
 
 const Appbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const { instance,accounts} = useMsal(); 
-  const isAuthenticated=useIsAuthenticated();
   const [email, setEmail] = useState<string>("");
 
+  const open = Boolean(anchorEl);
+
+  const { instance, accounts } = useMsal();
+  const isAuthenticated = useIsAuthenticated();
 
   useEffect(() => {
-    if(isAuthenticated){
-    const userDetails = getUserDetailsFromMsal(accounts);
-    setEmail(userDetails.email || "");
+    if (isAuthenticated) {
+      const userDetails = getUserDetailsFromMsal(accounts);
+      setEmail(userDetails.email || "");
     }
-  }, [accounts,isAuthenticated]);
-
+  }, [accounts, isAuthenticated]);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -30,7 +33,7 @@ const Appbar: React.FC = () => {
 
   const handleLogout = () => {
     instance.logoutRedirect({
-      postLogoutRedirectUri: "/dashboard", 
+      postLogoutRedirectUri: "/dashboard",
     });
   };
 

@@ -1,21 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
+
 import { Box, Container, IconButton, Typography} from "@mui/material";
 import VideocamIcon from '@mui/icons-material/Videocam';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
-import { signInUser } from "@/common/services/AuthHelper";
-import BaseSpinner from "@/common/components/UI/BaseSpinner";
+
+
 
 const DashboardSetupView: React.FC = () => {
   const navigate = useNavigate();
 
-  const isAuthenticated = useIsAuthenticated();
-  const { instance, inProgress } = useMsal();
 
-  useEffect(() => {
-    signInUser(instance, inProgress, isAuthenticated);
-  }, [isAuthenticated]);
 
   const handleVideocamClick = () => {
     navigate("/dashboard/occupancy-tracker");
@@ -40,12 +35,6 @@ const DashboardSetupView: React.FC = () => {
   );
 
 
-  if(!isAuthenticated)
-  {
-    return(
-      <BaseSpinner/>
-    )
-  }
 
   return (
     <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", mt: 10, gap: 12 }}>
