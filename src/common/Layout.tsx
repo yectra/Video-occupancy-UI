@@ -1,27 +1,48 @@
 import React from "react";
-import { Box, Grid, Toolbar } from "@mui/material";
+import { Box, Grid, Toolbar, Hidden, Drawer } from "@mui/material";
 import Appbar from "@/common/components/layout/Appbar";
 import Sidebar from "@/common/components/layout/Sidebar";
 import { Outlet } from "react-router-dom";
+import { useState } from "react";
 
 const Layout: React.FC = () => {
+
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-
-      <Appbar />
+      <Appbar onMenuClick={handleDrawerToggle} />
       <Toolbar />
 
+      <Grid container>
+        <Hidden mdUp>
+          <Drawer
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true, 
+            }}
+            sx={{
+              "& .MuiDrawer-paper": { boxSizing: "border-box", width: 220 },
+            }}
+          >
+            <Sidebar />
+          </Drawer>
+        </Hidden>
 
-      <Grid container >
-        <Grid item xs={0} md={2} lg={2}>
-          <Sidebar />
-        </Grid>
+        <Hidden mdDown>
+          <Grid item md={4} lg={2}>
+            <Sidebar />
+          </Grid>
+        </Hidden>
 
-    
-        <Grid item xs={12} md={10} lg={10}>
-          <Box >
+        <Grid item xs={12} md={8} lg={10}>
             <Outlet />
-          </Box>
         </Grid>
       </Grid>
     </Box>

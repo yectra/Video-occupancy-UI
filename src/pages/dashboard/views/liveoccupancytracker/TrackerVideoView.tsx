@@ -133,7 +133,7 @@ const TrackerVideoView: React.FC = () => {
       </Grid>
 
       {videoSources.map((video, index) => (
-        <Grid item xs={4} key={index}>
+        <Grid item xs={12} sm={6} md={4} key={index}>
           <Card>
             <CardContent>
               <Typography
@@ -160,7 +160,7 @@ const TrackerVideoView: React.FC = () => {
       ))}
 
       <Grid item xs={12}>
-        <Box sx={{ display: "flex",justifyContent:"space-between" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Button
             sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" } }}
             variant="contained"
@@ -193,6 +193,8 @@ const TrackerVideoView: React.FC = () => {
               boxShadow: 24,
               p: 4,
               position: "absolute", 
+              maxWidth: "100%", 
+              maxHeight: "100%" 
             }}
           >
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

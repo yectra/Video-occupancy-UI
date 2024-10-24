@@ -22,7 +22,7 @@ const VideoFeeds: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         height: "390px",
-        width: "620px",
+        width: "100%",
         borderRadius: 2,
         boxShadow: 3,
         overflow: "hidden",
@@ -37,7 +37,7 @@ const VideoFeeds: React.FC = () => {
         }}
       >
         <Typography
-          sx={{ fontWeight: "bold", color: "#1C214F",p:2 }}
+          sx={{ fontWeight: "bold", color: "#1C214F",ml:1 }}
           variant="h6"
         >
           Video Feeds

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-
-import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, ListItemIcon } from "@mui/material";
-import { LightModeOutlined, NotificationsOutlined, AccountCircle, Logout } from "@mui/icons-material";
-
+import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, ListItemIcon, Box } from "@mui/material";
+import { LightModeOutlined, NotificationsOutlined, AccountCircle, Logout, Menu as MenuIcon } from "@mui/icons-material";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
-
 import { getUserDetailsFromMsal } from "@/common/services/AuthHelper";
 
-const Appbar: React.FC = () => {
+interface AppbarProps {
+  onMenuClick: () => void;
+}
+
+const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [email, setEmail] = useState<string>("");
 
@@ -39,19 +40,27 @@ const Appbar: React.FC = () => {
 
   return (
     <AppBar sx={{ bgcolor: "#1C214F" }} position="fixed">
-      <Toolbar sx={{ justifyContent: "flex-end" }}>
-        <IconButton color="inherit">
-          <LightModeOutlined />
+      <Toolbar sx={{ justifyContent: "space-between" }}>
+        <IconButton color="inherit" onClick={onMenuClick} edge="start" sx={{ display: { md: "none" } }}>
+          <MenuIcon />
         </IconButton>
-        <IconButton color="inherit">
-          <NotificationsOutlined />
-        </IconButton>
-        <IconButton color="inherit" onClick={handleMenuClick}>
-          <AccountCircle sx={{ color: "#00D1A3" }} />
-        </IconButton>
-        <Typography sx={{ alignSelf: "center" }} variant="subtitle1">
-          {email}
-        </Typography>
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <IconButton color="inherit">
+            <LightModeOutlined />
+          </IconButton>
+          <IconButton color="inherit">
+            <NotificationsOutlined />
+          </IconButton>
+          <IconButton color="inherit" onClick={handleMenuClick}>
+            <AccountCircle sx={{ color: "#00D1A3" }} />
+          </IconButton>
+          <Typography sx={{ ml: 1 }} variant="subtitle1">
+            {email}
+          </Typography>
+        </Box>
         <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
           <MenuItem onClick={handleMenuClose}>
             <ListItemIcon>

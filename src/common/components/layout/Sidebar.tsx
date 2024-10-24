@@ -33,10 +33,10 @@
     return (
       <Drawer
         sx={{
-          width: "250px",
+          width: "220px",
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: "250px",
+            width: "220px",
             bgcolor: "#1C214F",
             color: "white",
             overflow: "hidden",
@@ -138,7 +138,7 @@
               </ListItem>
               <Collapse in={openUserManagement} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                  <ListItem sx={{ ml: 7 }}>
+                  <ListItem sx={{ ml: 4 }}>
                     <Link
                       to="/dashboard/occupancy-tracker/add-emp"
                       style={{ textDecoration: "none", color: "inherit" }}
@@ -153,7 +153,7 @@
                       </ListItemText>
                     </Link>
                   </ListItem>
-                  <ListItem sx={{ ml: 7 }}>
+                  <ListItem sx={{ ml: 4 }}>
                     <Link
                       to="/dashboard/occupancy-tracker/emp-form"
                       style={{ textDecoration: "none", color: "inherit" }}
