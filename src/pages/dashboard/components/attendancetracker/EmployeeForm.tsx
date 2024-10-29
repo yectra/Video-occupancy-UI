@@ -8,6 +8,7 @@ import {
   Button,
   Snackbar,
   Alert,
+  Grid,
 } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
@@ -122,111 +123,111 @@ const EmployeeForm: React.FC = () => {
     >
       <Box
         sx={{
-          width: "560px",
+          width: "100%",
+          maxWidth: "560px",
           border: "2px solid #7D7D7D",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
           borderRadius: 3,
-          padding: 1,
-          gap: 5,
+          padding: 2,
         }}
       >
-        <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant="h6">
+        <Typography sx={{ color: "#1C214F", fontWeight: "bold", textAlign: "center" }} variant="h6">
           Add Employee
         </Typography>
-        <Box
-          sx={{
-            width: "460px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 5,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
+        <Grid container spacing={3}>
+          {/* Avatar Section */}
+          <Grid item xs={12} container justifyContent="center">
             <Avatar sx={{ width: 60, height: 60 }} src={avatarSrc} />
-            <Button variant="contained" component="label" sx={{ mt: 2,bgcolor:"#00D1A3",'&:hover':{bgcolor:"#00A387"} }}>
+          </Grid>
+          <Grid item xs={12} container justifyContent="center">
+            <Button
+              variant="contained"
+              component="label"
+              sx={{ mt: 2, bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
+            >
               Upload Picture
               <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
             </Button>
-          </Box>
-          <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
+          </Grid>
+
+          {/* Name and Employee ID Fields */}
+          <Grid item xs={12} sm={6}>
             <TextField
               id="name"
               label="Name"
               variant="outlined"
-              sx={{ flex: 1 }}
+              fullWidth
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <TextField
               id="employeeId"
               label="Employee ID"
               variant="outlined"
-              sx={{ flex: 1 }}
+              fullWidth
               value={employeeId}
-              onChange={(e) => setEmployeeId((e.target.value))}
+              onChange={(e) => setEmployeeId(e.target.value)}
             />
-          </Box>
-          <Box sx={{ display: "flex", gap: 5, width: "100%" }}>
+          </Grid>
+
+          {/* Email and Date of Joining Fields */}
+          <Grid item xs={12} sm={6}>
             <TextField
               id="email"
               label="Email ID"
               variant="outlined"
-              sx={{ flex: 1 }}
+              fullWidth
               value={email}
               onChange={handleEmailChange}
               error={!!emailError}
               helperText={emailError}
             />
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <TextField
               id="dateOfJoining"
               label="Date of Joining"
               variant="outlined"
-              sx={{ flex: 1 }}
+              fullWidth
               value={dateOfJoining}
               onChange={(e) => setDateOfJoining(e.target.value)}
             />
-          </Box>
+          </Grid>
 
-          <Autocomplete
-            id="role"
-            options={roleOptions}
-            value={role}
-            onChange={(_, newValue) => {
-              setRole(newValue || "");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Role" variant="outlined" sx={{ flex: 1 }} />
-            )}
-            sx={{ width: "100%" }}
-          />
+          {/* Role Selection */}
+          <Grid item xs={12}>
+            <Autocomplete
+              id="role"
+              options={roleOptions}
+              value={role}
+              onChange={(_, newValue) => {
+                setRole(newValue || "");
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Role" variant="outlined" fullWidth />
+              )}
+            />
+          </Grid>
 
-          <Button
-            sx={{
-              width: 200,
-              height: 50,
-              mb: 2,
-              bgcolor: "#00D1A3",
-              '&:hover':{bgcolor:"#00A387"},
-            }}
-            variant="contained"
-            onClick={handleSubmit}
-            disabled={!isFormValid()}
-          >
-            Add Employee
-          </Button>
-        </Box>
+          {/* Submit Button */}
+          <Grid item xs={12} container justifyContent="center">
+            <Button
+              sx={{
+                width: 200,
+                height: 50,
+                mb: 2,
+                bgcolor: "#00D1A3",
+                '&:hover': { bgcolor: "#00A387" },
+              }}
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={!isFormValid()}
+            >
+              Add Employee
+            </Button>
+          </Grid>
+        </Grid>
       </Box>
 
       <Snackbar

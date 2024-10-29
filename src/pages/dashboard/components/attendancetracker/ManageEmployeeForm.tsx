@@ -16,10 +16,8 @@ import {
   TableBody,
   TableCell,
   tableCellClasses,
-  TableContainer,
   TableHead,
   TableRow,
-  Paper,
   MenuItem,
   Button,
   Avatar,
@@ -268,7 +266,7 @@ const ManageEmployeeForm: React.FC = () => {
           </Typography>
         </Box>
       ) : (
-        <TableContainer component={Paper}>
+        <Box>
           <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
         <CircularProgress color={"primary"}/>
       </Backdrop>
@@ -309,7 +307,7 @@ const ManageEmployeeForm: React.FC = () => {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+          </Box>
       )}
       {noUserFound && (
    <Typography variant="body2" color="error">{noUserFound}</Typography>

@@ -1,3 +1,4 @@
+import AttendanceSetupView from "@/pages/dashboard/views/attendancetracker/AttendanceSetupView";
 import React from "react";
 
 //Layout
@@ -74,6 +75,10 @@ const route = [
                 path:"preview",
                 element:<TrackerVideoView/>
                 
+              },
+              {
+                path:"attendance-setup",
+                element:<AttendanceSetupView/>,
               },
               {
                 path: "",

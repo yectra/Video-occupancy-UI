@@ -170,9 +170,8 @@ const MeterComponent: React.FC<MeterComponentProps> = ({ percentage }) => {
         </CustomDialogTitle>
         <CustomDialogContent>
           <Typography variant="body1" sx={{ mt: 2, mb: 2 }}>
-            Lorem ipsum dolor sit amet consectetur. Morbi euismod elementum
-            lorem scelerisque. Sit maecenas aliquam eu diam odio. Nisi faucibus
-            ultricies iaculis euismod. Id at etiam auctor ac.
+          The current space is reaching its limit with the members inside. 
+          Please monitor closely as only a few spots remain before maximum capacity is reached.
           </Typography>
         </CustomDialogContent>
         <CustomDialogActions>

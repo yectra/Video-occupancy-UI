@@ -5,10 +5,8 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Box,
   Typography,
   InputAdornment,
@@ -154,16 +152,16 @@ const EmployeeAttendance: React.FC = () => {
   if (error) return <Typography>{error}</Typography>;
 
   return (
-    <TableContainer component={Paper}>
+    <Box>
       <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
         <CircularProgress color={"primary"}/>
       </Backdrop>
 
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+      <Box sx={{ display: "flex", alignItems: "center",justifyContent:"space-between",marginBottom: "10px" }}>
         <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">
           Attendance List
         </Typography>
-        <Box sx={{ width: "350px", marginRight: 3 }}>
+        <Box sx={{width:"350px" }}>
           <InputBase
             placeholder="Search"
             value={searchTerm}
@@ -235,7 +233,7 @@ const EmployeeAttendance: React.FC = () => {
           ))}
         </TableBody>
       </Table>
-    </TableContainer>
+      </Box>
   );
 };
 

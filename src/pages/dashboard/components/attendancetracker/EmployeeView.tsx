@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Paper } from "@mui/material";
+import { Box, Button, Paper, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import empImg from "@/assets/afro man.png";
@@ -16,9 +16,10 @@ const EmployeeView: React.FC = () => {
     navigate("/dashboard/occupancy-tracker/add-emp");
   };
 
-  const employeeImages = React.useMemo(() => [
-    empImg, empImg2, empImg3, empImg4, empImg5, empImg6
-  ], []);
+  const employeeImages = React.useMemo(
+    () => [empImg, empImg2, empImg3, empImg4, empImg5, empImg6, empImg2, empImg],
+    []
+  );
 
   return (
     <Box
@@ -26,51 +27,48 @@ const EmployeeView: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        mt: 10,
+        mt: 10
       }}
     >
       <Paper
         elevation={7}
         sx={{
-          p: 5,
+          p: 2,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          width: "auto",
+          width: "100%",
           height: "auto",
         }}
       >
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 4,
-          }}
-        >
+        <Grid container spacing={4} justifyContent="center">
           {employeeImages.map((img, index) => (
-            <Box
-              key={index}
-              sx={{
-                boxShadow: 3,
-                bgcolor:
-                  index % 2 === 0
-                    ? "#A0E7AB"
-                    : index % 3 === 0
-                    ? "#D78981"
-                    : "#807D7C",
-                position: "relative",
-                aspectRatio: "4 / 3",
-              }}
-            >
-              <img
-                src={img}
-                alt={`Employee ${index + 1}`}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </Box>
+            <Grid item xs={12} sm={6}  md={4}  lg={3} key={index}>
+              <Box
+                sx={{
+                  height:"100%",
+                  boxShadow: 3,
+                  bgcolor:
+                    index % 2 === 0
+                      ? "#A0E7AB"
+                      : index % 3 === 0
+                      ? "#D78981"
+                      : "#807D7C",
+                  position: "relative",
+                  aspectRatio: "4 / 3"
+                }}
+              >
+                <img
+                  src={img}
+                  alt={`Employee ${index + 1}`}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </Box>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       </Paper>
+
       <Button
         variant="contained"
         sx={{
