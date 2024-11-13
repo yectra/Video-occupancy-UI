@@ -2,7 +2,7 @@ import { apiClient } from "@/common/hooks/useApiClient";
 import { BackendPayload } from "@/pages/dashboard/models/liveoccupanytracker";
 
 
-const {  httpPost } = apiClient();
+const {  httpPost} = apiClient();
 
 interface IOccupancyTracker{
 

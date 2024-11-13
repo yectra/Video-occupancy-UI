@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  TextField,
-  Typography,
-  Autocomplete,
-  Avatar,
-  Button,
-  Snackbar,
-  Alert,
-  Grid,
-} from "@mui/material";
+import {Box,TextField,Typography,Autocomplete,Avatar,Button,Snackbar,Alert,Grid,} from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 
@@ -78,10 +68,9 @@ const EmployeeForm: React.FC = () => {
         console.log(response);
         setSnackbarOpen(true);
         
-        // Refresh the page after successful addition
         setTimeout(() => {
-          window.location.reload(); // Refresh the page
-        }, 1000); // Optional delay before refreshing
+          window.location.reload();
+        }, 1000);
       })
       .catch((error) => {
         console.error("Error adding employee:", error);
@@ -123,33 +112,28 @@ const EmployeeForm: React.FC = () => {
     >
       <Box
         sx={{
-          width: "100%",
-          maxWidth: "560px",
-          border: "2px solid #7D7D7D",
+          maxWidth: "800px", border: "2px solid #7D7D7D",
           borderRadius: 3,
-          padding: 2,
+          padding: 10,
         }}
       >
         <Typography sx={{ color: "#1C214F", fontWeight: "bold", textAlign: "center" }} variant="h6">
           Add Employee
         </Typography>
         <Grid container spacing={3}>
-          {/* Avatar Section */}
           <Grid item xs={12} container justifyContent="center">
-            <Avatar sx={{ width: 60, height: 60 }} src={avatarSrc} />
+            <Avatar sx={{ width: 60, height: 60,mt:2 }} src={avatarSrc} />
           </Grid>
           <Grid item xs={12} container justifyContent="center">
             <Button
               variant="contained"
               component="label"
-              sx={{ mt: 2, bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
+              sx={{  bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
             >
               Upload Picture
               <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
             </Button>
           </Grid>
-
-          {/* Name and Employee ID Fields */}
           <Grid item xs={12} sm={6}>
             <TextField
               id="name"
@@ -170,8 +154,6 @@ const EmployeeForm: React.FC = () => {
               onChange={(e) => setEmployeeId(e.target.value)}
             />
           </Grid>
-
-          {/* Email and Date of Joining Fields */}
           <Grid item xs={12} sm={6}>
             <TextField
               id="email"
@@ -194,8 +176,6 @@ const EmployeeForm: React.FC = () => {
               onChange={(e) => setDateOfJoining(e.target.value)}
             />
           </Grid>
-
-          {/* Role Selection */}
           <Grid item xs={12}>
             <Autocomplete
               id="role"
@@ -209,8 +189,6 @@ const EmployeeForm: React.FC = () => {
               )}
             />
           </Grid>
-
-          {/* Submit Button */}
           <Grid item xs={12} container justifyContent="center">
             <Button
               sx={{

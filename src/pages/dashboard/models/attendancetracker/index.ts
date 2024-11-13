@@ -68,9 +68,6 @@ export class IndividualTimesheet{
 
 
 
-//new
-
-
 export class AddEmployeeDetails{
   employeeId:string;
   employeeName:string;
@@ -89,3 +86,13 @@ export class ManageEmployeeDetails{
   imageUrl?:string;
 }
 
+export interface AttendanceSetup{
+  organizationName:string;
+  email:string;
+  cameraDetails1: {
+    entranceName:string;
+    camera:string;
+    punchIn_url:string;
+    punchOut_url:string;
+  }
+}

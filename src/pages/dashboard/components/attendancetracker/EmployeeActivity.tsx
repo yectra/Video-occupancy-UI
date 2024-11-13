@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { IndividualTimesheet } from '../../models/attendancetracker';
-import { AttendanceDetails } from '../../services/attendancetracker';
+import { IndividualTimesheet } from '@/pages/dashboard/models/attendancetracker';
+import { AttendanceDetails } from '@/pages/dashboard/services/attendancetracker';
 import { useSearchParams } from 'react-router-dom';
 
 const EmployeeActivity: React.FC = () => {
