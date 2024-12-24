@@ -8,7 +8,9 @@ const Users: React.FC = () => {
   return <Box sx={{ display: "flex", height: "100vh" }}>
   <Sidebar />
   <Box sx={{ flexGrow: 1 }}>
-    <Appbar />
+    <Appbar onMenuClick={function (): void {
+        throw new Error("Function not implemented.");
+      } }  />
     <Toolbar />
   
       <Outlet />

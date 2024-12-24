@@ -4,12 +4,7 @@
 
     "rewrite": "/index.html"
 
-  },
-  "excludedFiles": [
-    "**/*.map",
-    "**/*.test.*",
-    "node_modules/**"
-  ]
+  }
 
 }
  
