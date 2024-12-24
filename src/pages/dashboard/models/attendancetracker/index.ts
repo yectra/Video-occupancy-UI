@@ -86,13 +86,20 @@ export class ManageEmployeeDetails{
   imageUrl?:string;
 }
 
-export interface AttendanceSetup{
+export class OrganizationSetup{
   organizationName:string;
-  email:string;
+  phoneNumber:string;
+  websiteUrl:string;
+  domainName:string;
+  address:string;
+}
+
+export class CameraurlSetup {
   cameraDetails1: {
-    entranceName:string;
-    camera:string;
-    punchIn_url:string;
-    punchOut_url:string;
-  }
+    email: string;
+    cameraI: string;
+    punchinUrl: string;
+    cameraII: string;
+    punchoutUrl: string;
+  }[];
 }

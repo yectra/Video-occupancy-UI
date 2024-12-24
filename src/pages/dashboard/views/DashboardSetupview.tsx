@@ -13,7 +13,7 @@ const DashboardSetupView: React.FC = () => {
   };
 
   const handleGroupClick = () => {
-    navigate("/dashboard/attendance");
+    navigate("/dashboard/occupancy-tracker/organization");
   };
 
   const Card = ({ to, onClick, icon, label, description }: { to: string, onClick: () => void, icon: React.ReactNode, label: string, description: string }) => (
@@ -51,7 +51,7 @@ const DashboardSetupView: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <Card
-            to="/dashboard/attendance"
+            to="/dashboard/occupancy-tracker/organization"
             onClick={handleGroupClick}
             icon={<GroupsRoundedIcon sx={{ color: "white", fontSize: 40 }} />}
             label="Attendance Tracker"

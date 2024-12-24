@@ -1,34 +1,57 @@
-import { useState } from 'react';
 import attImg from '@/assets/attendancecamera.jpg';
-import { Box, Button, Grid, TextField, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import { SelectChangeEvent } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, Snackbar, Alert, CircularProgress } from '@mui/material';
+import { AttendanceDetails } from '../../services/attendancetracker';
+import { useState } from 'react';
+import { CameraurlSetup } from '../../models/attendancetracker';
 
 const AttendanceSetupView = () => {
-  
-  const [CameraPosition, setPunchInCameraPosition] = useState<string>('PUNCH-IN');
-  const [CameraIdentifier, setPunchInCameraIdentifier] = useState<string>('');
-  const [CameraFeedUrl, setPunchInCameraFeedUrl] = useState<string>('');
+  const attendanceDetails = new AttendanceDetails();
+  const [cameraurlData, setCameraurlData] = useState<CameraurlSetup>({
+    cameraDetails1: [
+      {
+        email: '',
+        cameraI: '',
+        punchinUrl: '',
+        cameraII: '',
+        punchoutUrl: '',
+      },
+    ],
+  });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const [isLoading, setIsLoading] = useState(false); // <-- Loading state
 
-  
-  const [punchOutCameraPosition, setPunchOutCameraPosition] = useState<string>('PUNCH-OUT');
-  const [punchOutCameraFeedUrl, setPunchOutCameraFeedUrl] = useState<string>('');
+  type CameraDetailKeys = 'email' | 'cameraI' | 'punchinUrl' | 'cameraII' | 'punchoutUrl';
 
-  
-  const handlePunchInCameraPositionChange = (event: SelectChangeEvent<string>) => {
-    setPunchInCameraPosition(event.target.value as string);
+  const handleInputChange = (index: number, field: CameraDetailKeys, value: string) => {
+    const updatedData = { ...cameraurlData };
+    updatedData.cameraDetails1[index][field] = value;
+    setCameraurlData(updatedData);
   };
 
-  const handlePunchInInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
-    setter(value);
+  const handleSave = () => {
+    setIsLoading(true); // Set loading to true before starting the API call
+    attendanceDetails
+      .cameraurlDetails(cameraurlData)
+      .then((response) => {
+        setSnackbarMessage('Camera setup details saved successfully!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        console.log(response);
+      })
+      .catch((error) => {
+        setSnackbarMessage('Failed to save camera setup details.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+        console.error('Error saving camera setup details:', error);
+      })
+      .finally(() => setIsLoading(false)); // Set loading to false after API call finishes
   };
 
-  
-  const handlePunchOutCameraPositionChange = (event: SelectChangeEvent<string>) => {
-    setPunchOutCameraPosition(event.target.value as string);
-  };
-
-  const handlePunchOutInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
-    setter(value);
+  const handleCloseSnackbar = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setSnackbarOpen(false);
   };
 
   return (
@@ -36,77 +59,75 @@ const AttendanceSetupView = () => {
       <Grid item xs={12} md={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <img src={attImg} alt="Setup" style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 10 }} />
       </Grid>
+
       <Grid item xs={12} md={6} sx={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: 4, gap: 6 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Typography variant="h4" gutterBottom sx={{ color: "#00D1A3", fontWeight: "bold" }}>
             ATTENDANCE TRACKER
           </Typography>
 
-          <Typography variant="h6" sx={{ color: "#1C214F", fontWeight: "bold" }}>
-            Setup Details
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1C214F" }}>
+            Camera Setup Details
           </Typography>
 
           <TextField
-          label="Name of the Organization"/>
-          <TextField
-            label=" Camera Identifier"
+            required
             fullWidth
-            value={CameraIdentifier}
-            onChange={(e) => handlePunchInInputChange(setPunchInCameraIdentifier, e.target.value)}
+            label="Email Address"
+            variant="outlined"
+            onChange={(e) => handleInputChange(0, 'email', e.target.value)}
           />
 
-          <FormControl fullWidth>
-            <InputLabel id="camera-position-label">Camera Position</InputLabel>
-            <Select
-              labelId="camera-position-label"
-              value={CameraPosition}
-              onChange={handlePunchInCameraPositionChange}
-              label="Camera Position"
-            >
-              <MenuItem value="PUNCH-IN">Punch-IN Camera</MenuItem>
-            </Select>
-          </FormControl>
-
           <TextField
-            label="Punch-IN Camera URL"
             fullWidth
-            value={CameraFeedUrl}
-            onChange={(e) => handlePunchInInputChange(setPunchInCameraFeedUrl, e.target.value)}
+            label="Camera I"
+            variant="outlined"
+            onChange={(e) => handleInputChange(0, 'cameraI', e.target.value)}
           />
 
-          <FormControl fullWidth>
-            <InputLabel id="camera-position-label">Camera Position</InputLabel>
-            <Select
-              labelId="camera-position-label"
-              value={punchOutCameraPosition}
-              onChange={handlePunchOutCameraPositionChange}
-              label="Camera Position"
-            >
-              <MenuItem value="PUNCH-OUT">Punch-OUT Camera</MenuItem>
-            </Select>
-          </FormControl>
-
           <TextField
-            label="Punch-OUT Camera URL"
+            required
             fullWidth
-            value={punchOutCameraFeedUrl}
-            onChange={(e) => handlePunchOutInputChange(setPunchOutCameraFeedUrl, e.target.value)}
+            label="Punch-In URL"
+            variant="outlined"
+            onChange={(e) => handleInputChange(0, 'punchinUrl', e.target.value)}
           />
 
-          <Button 
-            variant="contained"
-            sx={{
-              bgcolor: "#00D1A3",
-              "&:hover": { backgroundColor: "#00A685" },
-              width: "150px",
-              display: "flex",
-              alignSelf: "flex-end",
-            }}
-          >
-            SAVE
-          </Button>
+          <TextField
+            fullWidth
+            label="Camera II"
+            variant="outlined"
+            onChange={(e) => handleInputChange(0, 'cameraII', e.target.value)}
+          />
+
+          <TextField
+            required
+            fullWidth
+            label="Punch-Out URL"
+            variant="outlined"
+            onChange={(e) => handleInputChange(0, 'punchoutUrl', e.target.value)}
+          />
         </Box>
+        <Button
+          variant='contained'
+          sx={{ bgcolor: "#00D1A3", '&:hover': { bgcolor: '#00D1A3' } }}
+          onClick={handleSave}
+          disabled={isLoading} // Disable the button when loading
+        >
+          {isLoading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Save"}
+        </Button>
       </Grid>
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Grid>
   );
 };

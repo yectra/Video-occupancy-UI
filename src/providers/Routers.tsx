@@ -1,4 +1,3 @@
-import AttendanceSetupView from "@/pages/dashboard/views/attendancetracker/AttendanceSetupView";
 import React from "react";
 
 //Layout
@@ -25,9 +24,6 @@ const TrackerVideoView = React.lazy(() => import("@/pages/dashboard/views/liveoc
 //Overview
 const TrackerOverview = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/TrackerOverview"));
 
-//EmployeeView
-const EmployeeView = React.lazy(() => import("@/pages/dashboard/components/attendancetracker/EmployeeView"));
-
 //Add Employee
 const EmployeeForm = React.lazy(() => import("@/pages/dashboard/components/attendancetracker/EmployeeForm"));
 
@@ -39,6 +35,12 @@ const AttendanceView = React.lazy(() => import("@/pages/dashboard/views/attendan
 
 //AttendanceList
 const AttendanceListView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/AttendanceListView"));
+
+//AttendanceSetupView
+const AttendanceSetupView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/AttendanceSetupView"))
+
+//OrganizationView
+const OrganizationView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/OrganizationView"))
 
 //EmployeeDetails
 const EmployeeDetailsView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/EmployeeDetailsView"));
@@ -74,7 +76,10 @@ const route = [
               {
                 path:"preview",
                 element:<TrackerVideoView/>
-                
+              },
+              {
+                path:"organization",
+                element:<OrganizationView/>
               },
               {
                 path:"attendance-setup",
@@ -88,10 +93,6 @@ const route = [
                   {
                     path: "overview",
                     element: <TrackerOverview />,
-                  },
-                  {
-                    path:"emp-view",
-                    element:<EmployeeView/>
                   },
                   {
                     path:"add-emp",
@@ -130,8 +131,7 @@ const route = [
             element:<UserTrackerView/>
           }
         ]
-      }
-    
+      } 
     ],
   },
 ];

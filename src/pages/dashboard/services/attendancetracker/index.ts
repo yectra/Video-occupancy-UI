@@ -1,6 +1,6 @@
 import { apiClient } from "@/common/hooks/useApiClient";
 
-import { AddEmployeeDetails, ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker"
+import { AddEmployeeDetails, CameraurlSetup, ManageEmployeeDetails, OrganizationSetup } from "@/pages/dashboard/models/attendancetracker"
 
 const { httpGet, httpPost, httpPut,httpDelete } = apiClient();
 
@@ -21,6 +21,10 @@ interface IAttendanceDetails {
     searchAllEmployeeDetails(searchTerm:string):Promise<any>
 
     deleteEmployeeDetails(employeeId:string):Promise<any>;
+
+    organizationDetails(organizationDetails:OrganizationSetup):Promise<any>;
+
+    cameraurlDetails(cameraurlDetails:CameraurlSetup):Promise<any>;
 }
 
 export class AttendanceDetails implements IAttendanceDetails {
@@ -66,5 +70,15 @@ export class AttendanceDetails implements IAttendanceDetails {
     deleteEmployeeDetails(employeeId:string):Promise<any>{
         return httpDelete(`/employee/${employeeId}`)
         .then((response)=>(response))
+    }
+
+    organizationDetails(organizationDetails: OrganizationSetup): Promise<any> {
+        return httpPost('/organization', organizationDetails)
+            .then((response) => response);
+    }
+
+    cameraurlDetails(cameraurlDetails:CameraurlSetup): Promise<any> {
+        return httpPost('api/cameraUrl',cameraurlDetails)
+            .then((response)=> response);
     }
 }
