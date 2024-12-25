@@ -55,42 +55,26 @@ const Sidebar: React.FC = () => {
         <ListItem />
         {isUserDetailsPage ? (
           <>
-            <Link
-              to={isUserDetailsPage ? "" : "/dashboard/attendance"}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <ListItem
-                sx={{
-                  cursor: "pointer",
-                  backgroundColor: isActive("/dashboard/attendance")
-                    ? "#00D1A3"
-                    : "inherit",
-                }}
-              >
-                <Box sx={{ display: "flex" }}>
-                  <EventAvailableIcon sx={{ mt: 1 }} />
-                  <ListItemText sx={{ ml: 2 }}>
-                    <Typography sx={{ fontSize: 19 }} variant="h6">
-                      Attendance
-                    </Typography>
-                  </ListItemText>
-                </Box>
-              </ListItem>
-            </Link>
+            {/* Static Item for User Attendance */}
             <ListItem
               sx={{
                 cursor: "pointer",
-                backgroundColor: "inherit",
+                backgroundColor: "#00D1A3",
               }}
             >
-              <LogoutIcon />
-              <Typography sx={{ fontSize: 19, ml: 2 }} variant="h6">
-                Logout
-              </Typography>
+              <Box sx={{ display: "flex" }}>
+                <EventAvailableIcon sx={{ mt: 1 }} />
+                <ListItemText sx={{ ml: 2 }}>
+                  <Typography sx={{ fontSize: 19 }} variant="h6">
+                    User Attendance
+                  </Typography>
+                </ListItemText>
+              </Box>
             </ListItem>
           </>
         ) : (
           <>
+            {/* Other Sidebar Items */}
             <Link
               to="/dashboard/occupancy-tracker/overview"
               style={{ textDecoration: "none", color: "inherit" }}
@@ -117,7 +101,7 @@ const Sidebar: React.FC = () => {
             </Link>
 
             <ListItem
-              onClick={toggleUserManagement} // Changed to toggle dropdown without navigation
+              onClick={toggleUserManagement}
               sx={{
                 cursor: "pointer",
                 display: "flex",
@@ -176,6 +160,7 @@ const Sidebar: React.FC = () => {
                 </ListItem>
               </List>
             </Collapse>
+
             <Link
               to="/dashboard/occupancy-tracker"
               style={{ textDecoration: "none", color: "inherit" }}
@@ -194,7 +179,7 @@ const Sidebar: React.FC = () => {
               </ListItem>
             </Link>
             <Link
-              to={isUserDetailsPage ? "" : "/dashboard/attendance"}
+              to="/dashboard/attendance"
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <ListItem
@@ -215,6 +200,16 @@ const Sidebar: React.FC = () => {
                 </Box>
               </ListItem>
             </Link>
+            <ListItem
+              sx={{
+                cursor: "pointer",
+              }}
+            >
+              <LogoutIcon />
+              <Typography sx={{ fontSize: 19, ml: 2 }} variant="h6">
+                Logout
+              </Typography>
+            </ListItem>
           </>
         )}
       </List>
