@@ -16,7 +16,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import PreviewIcon from "@mui/icons-material/Preview";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import PersonIcon from "@mui/icons-material/Person";
-import LogoutIcon from "@mui/icons-material/Logout";
+
 
 const Sidebar: React.FC = () => {
   const [openUserManagement, setOpenUserManagement] = useState(false);
@@ -55,7 +55,7 @@ const Sidebar: React.FC = () => {
         <ListItem />
         {isUserDetailsPage ? (
           <>
-            {/* Static Item for User Attendance */}
+
             <ListItem
               sx={{
                 cursor: "pointer",
@@ -74,7 +74,7 @@ const Sidebar: React.FC = () => {
           </>
         ) : (
           <>
-            {/* Other Sidebar Items */}
+          
             <Link
               to="/dashboard/occupancy-tracker/overview"
               style={{ textDecoration: "none", color: "inherit" }}
@@ -200,16 +200,6 @@ const Sidebar: React.FC = () => {
                 </Box>
               </ListItem>
             </Link>
-            <ListItem
-              sx={{
-                cursor: "pointer",
-              }}
-            >
-              <LogoutIcon />
-              <Typography sx={{ fontSize: 19, ml: 2 }} variant="h6">
-                Logout
-              </Typography>
-            </ListItem>
           </>
         )}
       </List>
