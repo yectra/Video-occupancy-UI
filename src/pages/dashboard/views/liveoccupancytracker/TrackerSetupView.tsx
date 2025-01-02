@@ -41,7 +41,9 @@ const TrackerSetupView: React.FC = () => {
     window.onbeforeunload = () => {
       setCapacity("");
       setAlertMessage("");
-      setCameraSetups([{ entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" }]);
+      setCameraSetups([
+        { entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" },
+      ]);
       setCurrentCameraIndex(0);
       setErrors({});
     };
@@ -49,7 +51,8 @@ const TrackerSetupView: React.FC = () => {
 
   useEffect(() => {
     if (location.state) {
-      const { cameraSetups, alertMessage, capacity, coordinates, step } = location.state;
+      const { cameraSetups, alertMessage, capacity, coordinates, step } =
+        location.state;
       if (cameraSetups) setCameraSetups(cameraSetups);
       if (alertMessage) setAlertMessage(alertMessage);
       if (capacity) setCapacity(capacity.toString());
@@ -63,28 +66,37 @@ const TrackerSetupView: React.FC = () => {
     setStep(newStep as 1 | 2);
   };
 
-  const handleCameraIndexChange = (delta: number) => setCurrentCameraIndex((prev) => Math.min(Math.max(prev + delta, 0), cameraSetups.length - 1));
+  const handleCameraIndexChange = (delta: number) =>
+    setCurrentCameraIndex((prev) =>
+      Math.min(Math.max(prev + delta, 0), cameraSetups.length - 1)
+    );
 
-  const handleChangeTextField = (index: number, field: any) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCameraSetups((prev) => {
-      const updated = [...prev];
-      updated[index][field] = event.target.value;
-      return updated;
-    });
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
+  const handleChangeTextField =
+    (index: number, field: any) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCameraSetups((prev) => {
+        const updated = [...prev];
+        updated[index][field] = event.target.value;
+        return updated;
+      });
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    };
 
-  const handleChangeSelectField = (index: number, field: any) => (event: SelectChangeEvent<string>) => {
-    setCameraSetups((prev) => {
-      const updated = [...prev];
-      updated[index][field] = event.target.value;
-      return updated;
-    });
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
+  const handleChangeSelectField =
+    (index: number, field: any) => (event: SelectChangeEvent<string>) => {
+      setCameraSetups((prev) => {
+        const updated = [...prev];
+        updated[index][field] = event.target.value;
+        return updated;
+      });
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    };
 
   const handleAddCameraClick = () => {
-    setCameraSetups((prev) => [...prev, { entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" }]);
+    setCameraSetups((prev) => [
+      ...prev,
+      { entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" },
+    ]);
     setCurrentCameraIndex(cameraSetups.length);
   };
 
@@ -115,7 +127,10 @@ const TrackerSetupView: React.FC = () => {
     });
   };
 
-  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>, content: string) => {
+  const handleMouseEnter = (
+    event: React.MouseEvent<HTMLElement>,
+    content: string
+  ) => {
     setAnchorEl(event.currentTarget);
     setTooltipContent(content);
   };
@@ -127,47 +142,96 @@ const TrackerSetupView: React.FC = () => {
 
   return (
     <Grid container sx={{ width: "100vw", height: "100vh" }} spacing={0}>
-      <Grid item xs={12} md={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <img src={setupImg} alt="Setup" style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 10 }} />
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+      >
+        <img
+          src={setupImg}
+          alt="Setup"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            borderRadius: 10,
+          }}
+        />
       </Grid>
-      <Grid item xs={12} md={6} sx={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: 4, gap: 6 }}>
-        <Typography variant="h4" gutterBottom sx={{ color: "#00D1A3", fontWeight: "bold" }}>
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: 4,
+          gap: 6,
+        }}
+      >
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ color: "#00D1A3", fontWeight: "bold" }}
+        >
           LIVE OCCUPANCY TRACKER
         </Typography>
         <>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             {step === 2 && (
-              <IconButton onClick={() => handleStepChange(1)} sx={{ marginRight: 2 }}>
-                <ArrowCircleLeftOutlinedIcon sx={{ fontSize: "30px", color: "#252C58" }} />
+              <IconButton
+                onClick={() => handleStepChange(1)}
+                sx={{ marginRight: 2 }}
+              >
+                <ArrowCircleLeftOutlinedIcon
+                  sx={{ fontSize: "30px", color: "#252C58" }}
+                />
               </IconButton>
             )}
-            <Typography variant="h6" sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10 }}>
+            <Typography
+              variant="h6"
+              sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10 }}
+            >
               Setup details
             </Typography>
             {step === 2 && (
               <>
                 {currentCameraIndex > 0 && (
                   <IconButton onClick={() => handleCameraIndexChange(-1)}>
-                    <ArrowLeftIcon sx={{ fontSize: "20px", color: "#252C58" }} />
+                    <ArrowLeftIcon
+                      sx={{ fontSize: "20px", color: "#252C58" }}
+                    />
                   </IconButton>
                 )}
-                <Typography variant="body1" sx={{ color: "#1C214F", fontWeight: "bold" }}>
+                <Typography
+                  variant="body1"
+                  sx={{ color: "#1C214F", fontWeight: "bold" }}
+                >
                   LOCATION {currentCameraIndex + 1}
                 </Typography>
                 {currentCameraIndex < cameraSetups.length - 1 && (
                   <IconButton onClick={() => handleCameraIndexChange(1)}>
-                    <ArrowRightIcon sx={{ fontSize: "20px", color: "#252C58" }} />
+                    <ArrowRightIcon
+                      sx={{ fontSize: "20px", color: "#252C58" }}
+                    />
                   </IconButton>
                 )}
                 {currentCameraIndex > 0 && (
-                  <IconButton onClick={() => handleDeleteCameraClick(currentCameraIndex)}>
+                  <IconButton
+                    onClick={() => handleDeleteCameraClick(currentCameraIndex)}
+                  >
                     <DeleteIcon sx={{ fontSize: "20px", color: "red" }} />
                   </IconButton>
                 )}
               </>
             )}
           </Box>
-          <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <Box
+            component="form"
+            sx={{ display: "flex", flexDirection: "column", gap: 4 }}
+          >
             {step === 1 ? (
               <>
                 <TextField
@@ -175,16 +239,37 @@ const TrackerSetupView: React.FC = () => {
                   variant="outlined"
                   value={capacity}
                   onChange={(e) => {
-                    setCapacity(e.target.value);
-                    setErrors((prev) => ({ ...prev, capacity: "" }));
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value) && value.length <= 8) {
+                      setCapacity(value);
+                      setErrors((prev) => ({ ...prev, capacity: "" }));
+                    } else if (!/^\d*$/.test(value)) {
+                      setErrors((prev) => ({
+                        ...prev,
+                        capacity: "Only numbers are allowed",
+                      }));
+                    } else if (value.length > 8) {
+                      setErrors((prev) => ({
+                        ...prev,
+                        capacity: "Capacity cannot exceed 8 digits",
+                      }));
+                    }
                   }}
                   fullWidth
                   error={!!errors.capacity}
                   helperText={errors.capacity}
                   required
                 />
-                <FormControl variant="outlined" fullWidth error={!!errors.alertMessage} required>
-                  <InputLabel id="alert-message-label">Alert message</InputLabel>
+
+                <FormControl
+                  variant="outlined"
+                  fullWidth
+                  error={!!errors.alertMessage}
+                  required
+                >
+                  <InputLabel id="alert-message-label">
+                    Alert message
+                  </InputLabel>
                   <Select
                     labelId="alert-message-label"
                     label="Alert message"
@@ -200,7 +285,9 @@ const TrackerSetupView: React.FC = () => {
                       </MenuItem>
                     ))}
                   </Select>
-                  {errors.alertMessage && <Typography color="error">{errors.alertMessage}</Typography>}
+                  {errors.alertMessage && (
+                    <Typography color="error">{errors.alertMessage}</Typography>
+                  )}
                 </FormControl>
               </>
             ) : (
@@ -209,24 +296,35 @@ const TrackerSetupView: React.FC = () => {
                   label="Camera Identifier"
                   variant="outlined"
                   value={cameraSetups[currentCameraIndex].entranceName}
-                  onChange={handleChangeTextField(currentCameraIndex, "entranceName")}
+                  onChange={handleChangeTextField(
+                    currentCameraIndex,
+                    "entranceName"
+                  )}
                   fullWidth
                   error={!!errors[`entranceName${currentCameraIndex}`]}
                   helperText={errors[`entranceName${currentCameraIndex}`]}
                   required
                 />
                 <FormControl variant="outlined" fullWidth required>
-                  <InputLabel id="camera-position-label">Camera Position</InputLabel>
+                  <InputLabel id="camera-position-label">
+                    Camera Position
+                  </InputLabel>
                   <Select
                     labelId="camera-position-label"
                     value={cameraSetups[currentCameraIndex].cameraPosition}
-                    onChange={handleChangeSelectField(currentCameraIndex, "cameraPosition")}
+                    onChange={handleChangeSelectField(
+                      currentCameraIndex,
+                      "cameraPosition"
+                    )}
                     label="Camera Position"
                   >
                     <MenuItem
                       value="INSIDE-OUT"
                       onMouseEnter={(e) =>
-                        handleMouseEnter(e, "Camera installed inside the entrance and facing the door. People entering are facing the camera, while those leaving are not.")
+                        handleMouseEnter(
+                          e,
+                          "Camera installed inside the entrance and facing the door. People entering are facing the camera, while those leaving are not."
+                        )
                       }
                       onMouseLeave={handleMouseLeave}
                     >
@@ -235,7 +333,10 @@ const TrackerSetupView: React.FC = () => {
                     <MenuItem
                       value="OUTSIDE-IN"
                       onMouseEnter={(e) =>
-                        handleMouseEnter(e, "Camera installed outside the entrance and facing the door. People entering are not facing the camera, while those leaving are.")
+                        handleMouseEnter(
+                          e,
+                          "Camera installed outside the entrance and facing the door. People entering are not facing the camera, while those leaving are."
+                        )
                       }
                       onMouseLeave={handleMouseLeave}
                     >
@@ -247,7 +348,10 @@ const TrackerSetupView: React.FC = () => {
                   label="URL of the video source"
                   variant="outlined"
                   value={cameraSetups[currentCameraIndex].videoSource}
-                  onChange={handleChangeTextField(currentCameraIndex, "videoSource")}
+                  onChange={handleChangeTextField(
+                    currentCameraIndex,
+                    "videoSource"
+                  )}
                   fullWidth
                   error={!!errors[`videoSource${currentCameraIndex}`]}
                   helperText={errors[`videoSource${currentCameraIndex}`]}
@@ -267,14 +371,26 @@ const TrackerSetupView: React.FC = () => {
                 </Button>
               </>
             )}
-            <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2, alignItems: "center" }}>
-              <Typography variant="body2" sx={{ color: "#1C214F", fontWeight: "bold" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: 2,
+                alignItems: "center",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{ color: "#1C214F", fontWeight: "bold" }}
+              >
                 Step <strong>{step}/2</strong>
               </Typography>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => (step === 2 ? handlePreview() : handleStepChange(2))}
+                onClick={() =>
+                  step === 2 ? handlePreview() : handleStepChange(2)
+                }
                 sx={{
                   width: "150px",
                   height: "50px",
