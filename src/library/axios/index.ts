@@ -1,4 +1,4 @@
-import Axios, { AxiosResponse, AxiosInstance } from "axios";
+import Axios, { AxiosResponse, AxiosInstance, AxiosRequestConfig } from "axios";
  
 export interface IApiClient {
   get<TResponse>(path: string): Promise<TResponse>;
@@ -6,7 +6,7 @@ export interface IApiClient {
   post<TRequest, TResponse>(
     path: string,
     payload: TRequest,
-    config?: any
+    config?: AxiosRequestConfig
   ): Promise<TResponse>;
  
   patch<TRequest, TResponse>(
@@ -15,21 +15,32 @@ export interface IApiClient {
   ): Promise<TResponse>;
  
   put<TRequest, TResponse>(path: string, payload: TRequest): Promise<TResponse>;
+
+  setAccessToken(token: string): void;
 }
 export default class ApiClient implements IApiClient {
   
-  public axiosInstance: AxiosInstance;
+  private axiosInstance: AxiosInstance;
   private baseUrl: string = "https://videooccupancy.azure-api.net/occupancyTracker";
+  private accessToken: string | null = null;
 
   constructor() {
-    this.axiosInstance = this.createAxiosInstance();
-  }
- 
-  protected createAxiosInstance(): AxiosInstance {
-    return Axios.create({
+    this.axiosInstance = Axios.create({
       baseURL: this.baseUrl,
       responseType: "json" as const,
     });
+
+    this.axiosInstance.interceptors.request.use((config) => {
+      if (this.accessToken) {
+        config.headers.Authorization = `Bearer ${this.accessToken}`;
+      }
+      return config;
+    });
+  }
+
+  public setAccessToken(token: string): void {
+    this.accessToken = token;
+    console.log("Access token updated");
   }
  
   async get<TResponse>(path: string): Promise<TResponse> {
