@@ -25,8 +25,8 @@ const DashboardSetupView: React.FC = () => {
           </IconButton>
         </Link>
       </Box>
-      <Typography sx={{ color: "#1C214F", textAlign: "center", fontWeight: "bold" }} variant="h6">{label}</Typography>
-      <Typography sx={{ color: "#7D7D7D", textAlign: "center" }} variant="body2">{description}</Typography>
+      <Typography sx={{ color: "#1C214F", textAlign: "center", fontWeight: "bold" }} variant="h5">{label}</Typography>
+      <Typography sx={{ color: "#7D7D7D", textAlign: "center" }} variant="subtitle1">{description}</Typography>
     </Box>
   );
 
@@ -34,7 +34,7 @@ const DashboardSetupView: React.FC = () => {
     <Container sx={{ mt: 10 }}>
       <Box sx={{ textAlign: "center", mb: 5 }}>
         <Typography sx={{ fontWeight: "bold", color: "#252C58" }} variant="h4">Admin Dashboard Setup</Typography>
-        <Typography sx={{ color: "#7D7D7D", mt: 2 }} variant="subtitle1">
+        <Typography sx={{ color: "#7D7D7D", mt: 2 }} variant="h6">
           Choose the desired tracking feature to get started with monitoring and managing key organizational metrics.
         </Typography>
       </Box>
