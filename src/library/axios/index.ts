@@ -1,27 +1,27 @@
 import Axios, { AxiosResponse, AxiosInstance, AxiosRequestConfig } from "axios";
- 
+
 export interface IApiClient {
   get<TResponse>(path: string): Promise<TResponse>;
- 
+
   post<TRequest, TResponse>(
     path: string,
     payload: TRequest,
     config?: AxiosRequestConfig
   ): Promise<TResponse>;
- 
+
   patch<TRequest, TResponse>(
     path: string,
     payload: TRequest
   ): Promise<TResponse>;
- 
+
   put<TRequest, TResponse>(path: string, payload: TRequest): Promise<TResponse>;
 
   setAccessToken(token: string): void;
 }
 export default class ApiClient implements IApiClient {
-  
   private axiosInstance: AxiosInstance;
-  private baseUrl: string = "https://videooccupancy.azure-api.net/occupancyTracker";
+  private baseUrl: string =
+    "https://videooccupancy.azure-api.net/occupancyTracker";
   private accessToken: string | null = null;
 
   constructor() {
@@ -42,7 +42,7 @@ export default class ApiClient implements IApiClient {
     this.accessToken = token;
     console.log("Access token updated");
   }
- 
+
   async get<TResponse>(path: string): Promise<TResponse> {
     try {
       const response = await this.axiosInstance.get<
@@ -55,11 +55,10 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   async post<TRequest, TResponse>(
     path: string,
-    payload: TRequest,
- 
+    payload: TRequest
   ): Promise<TResponse> {
     try {
       const response = await this.axiosInstance.post<
@@ -73,7 +72,7 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   async patch<TRequest, TResponse>(
     path: string,
     payload: TRequest
@@ -90,7 +89,7 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   async put<TRequest, TResponse>(
     path: string,
     payload: TRequest
@@ -107,7 +106,7 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   async delete<TResponse>(path: string): Promise<TResponse> {
     try {
       const response = await this.axiosInstance.delete<TResponse>(path);
@@ -117,7 +116,7 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   protected handleErrors(errors: any) {
     console.log(errors);
     throw errors;
