@@ -1,16 +1,36 @@
+import { useEffect, useState } from "react";
+
 import { Box, Typography } from "@mui/material";
 import MeterComponent from "@/pages/dashboard/components/liveoccupancytracker/MeterComponent";
 import Alert from "@mui/material/Alert";
 
-const OccupancyMeter = () => {
-  let percentage = 90; 
+// Services
+import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
+interface IProps {
+  capacity: number;
+}
+const OccupancyMeter: React.FC<IProps> = ({ capacity }) => {
+  const [percentage, setPercentage] = useState<number>(0);
+
+  const occupancyTracker = new OccupancyTracker();
+
+  useEffect(() => {
+    occupancyTracker.getAllCounts().then((response: any) => {
+      // const data:any=response;
+      //  let counts = Number(data.total.entry)-Number(data.total.exist)
+      //  console.log('countscountscounts',counts)   
+      //  let percentage = (counts*100)/capacity;
+      //  setPercentage(percentage)
+      console.log('capacity1', capacity, response)
+    })
+  }, [location])
 
   return (
-    <Box sx={{ width: "100%", height: "390px", borderRadius: 3, boxShadow: 3,display:"flex",flexDirection:"column",alignContent:"center",alignItems:"center" }}>
-      <Box sx={{alignSelf:"flex-start"}}>
-      <Typography sx={{ p:2, color: "#1C214F",fontWeight:"bold" }} variant="h6">
-        Live occupancy meter
-      </Typography>
+    <Box sx={{ width: "100%", height: "390px", borderRadius: 3, boxShadow: 3, display: "flex", flexDirection: "column", alignContent: "center", alignItems: "center" }}>
+      <Box sx={{ alignSelf: "flex-start" }}>
+        <Typography sx={{ p: 2, color: "#1C214F", fontWeight: "bold" }} variant="h6">
+          Live occupancy meter
+        </Typography>
       </Box>
       {percentage >= 90 && (
         <Box

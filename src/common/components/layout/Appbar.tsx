@@ -4,17 +4,21 @@ import { LightModeOutlined, NotificationsOutlined, AccountCircle, Logout, Menu a
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { getUserDetailsFromMsal } from "@/common/services/AuthHelper";
 
+import { useAuth } from "@/common/hooks/AuthContext";
+
 interface AppbarProps {
   onMenuClick: () => void;
 }
 
 const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
+  const { signOutUser} = useAuth();
+  
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [email, setEmail] = useState<string>("");
 
   const open = Boolean(anchorEl);
 
-  const { instance, accounts } = useMsal();
+  const { accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
 
   useEffect(() => {
@@ -33,9 +37,7 @@ const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
   };
 
   const handleLogout = () => {
-    instance.logoutRedirect({
-      postLogoutRedirectUri: "/dashboard",
-    });
+    signOutUser()
   };
 
   return (

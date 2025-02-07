@@ -29,15 +29,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [name, setName] = useState<string>();
   const [email, setEmail] = useState<string | undefined>();
  
-  useEffect(() => {
-    if (accounts.length > 0) {
-      const account = accounts[0];
-      setEmail(account.username as string);
-      setName(account.idTokenClaims?.given_name as string | undefined);
-    }
-  }, [accounts]);
- 
- 
   const handleSignInUser = async () => {
     try {
       if (inProgress === InteractionStatus.None && !isAuthenticated) {
@@ -53,6 +44,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       postLogoutRedirectUri: "/",
     });
   };
+
+  useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        const response = await instance.handleRedirectPromise();
+        if (response) {
+          const accessToken = response.accessToken;
+
+          localStorage.setItem("accessToken", accessToken);
+        }
+      } catch (error) {
+        console.error("Error handling redirect response", error);
+      }
+    };
+
+    // Call the function to handle the redirect response
+    handleRedirect();
+  }, []);
+
+  useEffect(() => {
+    if (accounts.length > 0) {
+      const account = accounts[0];
+      setEmail(account.username as string);
+      setName(account.idTokenClaims?.given_name as string | undefined);
+    }
+  }, [accounts]);
  
   return (
     <AuthContext.Provider

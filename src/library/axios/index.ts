@@ -15,32 +15,48 @@ export interface IApiClient {
   ): Promise<TResponse>;
  
   put<TRequest, TResponse>(path: string, payload: TRequest): Promise<TResponse>;
-
-  setAccessToken(token: string): void;
 }
 export default class ApiClient implements IApiClient {
-  
-  private axiosInstance: AxiosInstance;
+  public axiosInstance: AxiosInstance;
   private baseUrl: string = "https://videooccupancy.azure-api.net/occupancyTracker";
-  private accessToken: string | null = null;
-
   constructor() {
-    this.axiosInstance = Axios.create({
+    this.axiosInstance = this.createAxiosInstance();
+  }
+
+  protected createAxiosInstance(): AxiosInstance {
+    const axiosInstance = Axios.create({
       baseURL: this.baseUrl,
       responseType: "json" as const,
     });
 
-    this.axiosInstance.interceptors.request.use((config) => {
-      if (this.accessToken) {
-        config.headers.Authorization = `Bearer ${this.accessToken}`;
-      }
-      return config;
-    });
-  }
+    // Add a request interceptor
+    axiosInstance.interceptors.request.use((config) => {
+        // Retrieve the access token (replace with your token logic)
+        const accessToken = localStorage.getItem("accessToken");
 
-  public setAccessToken(token: string): void {
-    this.accessToken = token;
-    console.log("Access token updated");
+        if (accessToken && config.headers) {        
+          // Use the `set` method for AxiosHeaders
+          config.headers.set("Authorization", `Bearer ${accessToken}`);
+        }
+        return config;
+      },
+      (error) => {
+        // Handle request errors
+        return Promise.reject(error);
+      }
+    );
+
+    // Optionally, add a response interceptor
+    axiosInstance.interceptors.response.use(
+      (response) => response, // Pass through successful responses
+      (error) => {
+        // Handle response errors
+        console.error("API Error:", error);
+        return Promise.reject(error);
+      }
+    );
+
+    return axiosInstance;
   }
  
   async get<TResponse>(path: string): Promise<TResponse> {
@@ -59,7 +75,7 @@ export default class ApiClient implements IApiClient {
   async post<TRequest, TResponse>(
     path: string,
     payload: TRequest,
- 
+    config?: any
   ): Promise<TResponse> {
     try {
       const response = await this.axiosInstance.post<
@@ -108,9 +124,18 @@ export default class ApiClient implements IApiClient {
     return {} as TResponse;
   }
  
-  async delete<TResponse>(path: string): Promise<TResponse> {
+  async delete<TRequest, TResponse>(
+    path: string,
+    payload: TRequest
+  ): Promise<TResponse> {
     try {
-      const response = await this.axiosInstance.delete<TResponse>(path);
+      const response = await this.axiosInstance.delete<
+        TResponse,
+        AxiosResponse<TResponse>,
+        TRequest
+      >(path, {
+        data: payload,
+      });
       return response.data;
     } catch (error) {
       this.handleErrors(error);
@@ -119,7 +144,7 @@ export default class ApiClient implements IApiClient {
   }
  
   protected handleErrors(errors: any) {
-    console.log(errors);
+    // console.log(errors);
     throw errors;
   }
 }

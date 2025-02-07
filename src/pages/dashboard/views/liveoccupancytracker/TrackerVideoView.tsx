@@ -97,11 +97,16 @@ const TrackerVideoView: React.FC = () => {
     };  
 
     occupancyTracker.addSetupDetails(payload).then((response) => {
-      console.log(response);
+      if (response)
+        navigate("/dashboard/occupancy-tracker/overview", {
+          state: {
+            videoSources,
+            alertMessage,
+            capacityOfPeople,
+            coordinates,
+          },
+        });
     });
-    console.log("Payload to send to backend:", payload);
-
-    navigate("/dashboard/occupancy-tracker/overview");
   };
 
   const handleBackClick = () => {
@@ -201,7 +206,7 @@ const TrackerVideoView: React.FC = () => {
               <Button
                 variant="contained"
                 onClick={handleCloseModal}
-                sx={{bgcolor:"#00D1A3"}}
+                sx={{ bgcolor: "#00D1A3" }}
               >
                 Save
               </Button>
