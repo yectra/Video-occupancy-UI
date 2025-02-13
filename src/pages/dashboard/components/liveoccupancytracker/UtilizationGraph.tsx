@@ -38,6 +38,19 @@ const UtilizationGraph: React.FC = () => {
   const [data, setData] = useState<GraphModel[]>([])
   const [graphData, setGraphData] = useState<GraphDataModel[]>([])
 
+  if (process.env.NODE_ENV === "development") {
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      if (
+        typeof args[0] === "string" &&
+        args[0].includes("Support for defaultProps will be removed")
+      ) {
+        return; // Ignore this specific warning
+      }
+      originalConsoleError(...args);
+    };
+  }
+
   useEffect(() => {
     if (!data.length)
       occupancyTracker.getGraphDetails().then((response: GraphResponseModel) => {

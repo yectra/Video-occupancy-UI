@@ -9,8 +9,8 @@ export const apiClient = () => {
     });
   };
  
-  const httpDelete = <T>(path: string): Promise<T> => {
-    return apiService.delete(path).then((response) => {
+  const httpDelete = <T>(path: string, payload?: any): Promise<T> => {
+    return apiService.delete(path, payload).then((response) => {
       return response as T;
     });
   };

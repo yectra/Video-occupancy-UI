@@ -74,8 +74,7 @@ export default class ApiClient implements IApiClient {
 
   async post<TRequest, TResponse>(
     path: string,
-    payload: TRequest,
-    config?: any
+    payload: TRequest
   ): Promise<TResponse> {
     try {
       const response = await this.axiosInstance.post<
