@@ -1,19 +1,19 @@
 import Axios, { AxiosResponse, AxiosInstance, AxiosRequestConfig } from "axios";
- 
+
 export interface IApiClient {
   get<TResponse>(path: string): Promise<TResponse>;
- 
+
   post<TRequest, TResponse>(
     path: string,
     payload: TRequest,
     config?: AxiosRequestConfig
   ): Promise<TResponse>;
- 
+
   patch<TRequest, TResponse>(
     path: string,
     payload: TRequest
   ): Promise<TResponse>;
- 
+
   put<TRequest, TResponse>(path: string, payload: TRequest): Promise<TResponse>;
 }
 export default class ApiClient implements IApiClient {
@@ -58,7 +58,7 @@ export default class ApiClient implements IApiClient {
 
     return axiosInstance;
   }
- 
+
   async get<TResponse>(path: string): Promise<TResponse> {
     try {
       const response = await this.axiosInstance.get<
@@ -71,7 +71,7 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   async post<TRequest, TResponse>(
     path: string,
     payload: TRequest,
@@ -89,7 +89,7 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   async patch<TRequest, TResponse>(
     path: string,
     payload: TRequest
@@ -106,7 +106,7 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   async put<TRequest, TResponse>(
     path: string,
     payload: TRequest
@@ -142,7 +142,7 @@ export default class ApiClient implements IApiClient {
     }
     return {} as TResponse;
   }
- 
+
   protected handleErrors(errors: any) {
     // console.log(errors);
     throw errors;
