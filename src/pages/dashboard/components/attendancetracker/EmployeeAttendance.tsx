@@ -48,8 +48,8 @@ const EmployeeAttendance: React.FC = () => {
   useEffect(() => {
     if (date) {
       setLoading(true);
-      attendanceDetails.getAllEmployeeAttendanceDetails(date)
-        .then((response) => {
+      attendanceDetails.getAllEmployeeAttendanceDetails('',date)
+        .then((response:any) => {
           if (Array.isArray(response)) {
             const filteredRows = response.filter(record => record.date === date);
             setRows(filteredRows);
@@ -70,8 +70,8 @@ const EmployeeAttendance: React.FC = () => {
   const fetchAttendanceRecords = useCallback(() => {
     if (date) {
       setLoading(true);
-      attendanceDetails.getAllEmployeeAttendanceDetails(date)
-        .then((response) => {
+      attendanceDetails.getAllEmployeeAttendanceDetails('', date)
+        .then((response:any) => {
           if (Array.isArray(response)) {
             const filteredRows = response.filter(record => record.date === date);
             setRows(filteredRows);

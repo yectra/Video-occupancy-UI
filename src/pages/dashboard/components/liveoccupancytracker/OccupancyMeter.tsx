@@ -6,24 +6,19 @@ import Alert from "@mui/material/Alert";
 
 // Services
 import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
-interface IProps {
-  capacity: number;
-}
-const OccupancyMeter: React.FC<IProps> = ({ capacity }) => {
+
+const OccupancyMeter: React.FC = () => {
   const [percentage, setPercentage] = useState<number>(0);
 
   const occupancyTracker = new OccupancyTracker();
 
   useEffect(() => {
+    if(percentage == 0)
     occupancyTracker.getAllCounts().then((response: any) => {
-      // const data:any=response;
-      //  let counts = Number(data.total.entry)-Number(data.total.exist)
-      //  console.log('countscountscounts',counts)   
-      //  let percentage = (counts*100)/capacity;
-      //  setPercentage(percentage)
-      console.log('capacity1', capacity, response)
+      const data:any=response;       
+       setPercentage(data.total.percentage)        
     })
-  }, [location])
+  }, [])
 
   return (
     <Box sx={{ width: "100%", height: "390px", borderRadius: 3, boxShadow: 3, display: "flex", flexDirection: "column", alignContent: "center", alignItems: "center" }}>

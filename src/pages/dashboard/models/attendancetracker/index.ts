@@ -9,6 +9,27 @@ export class AttendanceData {
   overTime: string;
 }
 
+export class AttendanceDataResponseModel {
+  attendanceList: AttendanceListModel[];
+  employeeId: string;
+  date: string;
+  break: string;
+  overTime: string;
+  email: string;
+  employeeName: string;
+  firstPunchIn: string;
+  id: string;
+  imageUrl: string;
+  lastPunchOut: string;
+  organizationId: string;
+  totalWorkingHours: string;
+}
+
+export class AttendanceListModel {
+  punchIn: string;
+  punchOut: string;
+}
+
 export interface CircularProgressWithTextProps extends CircularProgressProps {
   value: number;
   text: string;
@@ -49,7 +70,7 @@ export class Row {
   overTime: string;
 }
 
-export class IndividualTimesheet{
+export class IndividualTimesheet {
   attendanceList: {
     punchIn: string;
     punchOut: string;
@@ -64,34 +85,34 @@ export class IndividualTimesheet{
   imageUrl: string;
   lastPunchOut: string;
   overTime: string;
-  }
-
-
-
-export class AddEmployeeDetails{
-  employeeId:string;
-  employeeName:string;
-  role:string;
-  email:string;
-  dateOfJoining:string;
-  imageBase64:string;
 }
 
-export class ManageEmployeeDetails{
-  employeeId:string;
-  employeeName?:string;
-  dateOfJoining?:string;
-  role?:string;
-  email?:string;
-  imageUrl?:string;
+
+
+export class AddEmployeeDetails {
+  employeeId: string;
+  employeeName: string;
+  role: string;
+  email: string;
+  dateOfJoining: string;
+  imageBase64: string;
 }
 
-export class OrganizationSetup{
-  organizationName:string;
-  phoneNumber:string;
-  websiteUrl:string;
-  domainName:string;
-  address:string;
+export class ManageEmployeeDetails {
+  employeeId: string;
+  employeeName?: string;
+  dateOfJoining?: string;
+  role?: string;
+  email?: string;
+  imageUrl?: string;
+}
+
+export class OrganizationSetup {
+  organizationName: string;
+  phoneNumber: string;
+  websiteUrl: string;
+  domainName: string;
+  address: string;
 }
 
 export class CameraurlSetup {

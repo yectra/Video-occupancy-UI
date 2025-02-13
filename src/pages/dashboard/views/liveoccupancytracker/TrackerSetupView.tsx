@@ -25,6 +25,7 @@ const TrackerSetupView: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const [capacity, setCapacity] = useState<string>("");
   const [alertMessage, setAlertMessage] = useState<string>("");
+  const [isDisable, setIsDisable] = useState<boolean>(false)
   const [cameraSetups, setCameraSetups] = useState<any[]>([
     { entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" },
   ]);
@@ -61,6 +62,13 @@ const TrackerSetupView: React.FC = () => {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    if (step === 2 && cameraSetups.find((i) => i.entranceName === '' || i.videoSource === ''))
+      setIsDisable(true)
+    else
+      setIsDisable(false)
+  }, [step, cameraSetups])
+
   const handleStepChange = (newStep: number) => {
     if (newStep === 2 && !validateStep1()) return;
     setStep(newStep as 1 | 2);
@@ -73,14 +81,14 @@ const TrackerSetupView: React.FC = () => {
 
   const handleChangeTextField =
     (index: number, field: any) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCameraSetups((prev) => {
-        const updated = [...prev];
-        updated[index][field] = event.target.value;
-        return updated;
-      });
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    };
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCameraSetups((prev) => {
+          const updated = [...prev];
+          updated[index][field] = event.target.value;
+          return updated;
+        });
+        setErrors((prev) => ({ ...prev, [field]: "" }));
+      };
 
   const handleChangeSelectField =
     (index: number, field: any) => (event: SelectChangeEvent<string>) => {
@@ -359,6 +367,7 @@ const TrackerSetupView: React.FC = () => {
                 />
                 <Button
                   variant="outlined"
+                  disabled={isDisable}
                   sx={{
                     color: "#00D1A3",
                     border: "2px dashed #00D1A3",
@@ -388,6 +397,7 @@ const TrackerSetupView: React.FC = () => {
               <Button
                 variant="contained"
                 color="primary"
+                disabled={isDisable}
                 onClick={() =>
                   step === 2 ? handlePreview() : handleStepChange(2)
                 }

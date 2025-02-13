@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from "react";
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,9 +10,11 @@ import Paper from '@mui/material/Paper';
 import { Box, TextField, Typography, InputAdornment, Popper, IconButton } from '@mui/material';
 import TodayIcon from '@mui/icons-material/Today';
 import Calendar, { CalendarProps } from 'react-calendar';
-import { useState } from 'react';
-import 'react-calendar/dist/Calendar.css'; 
+import 'react-calendar/dist/Calendar.css';
 import '@/styles/core/components/CalendarStyles.css';
+
+// Services
+import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -35,30 +37,13 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   }
 }));
 
-function createData(
-  employeeId: number,
-  date: string,
-  punchIn: string,
-  punchOut: string,
-  breakTime: string,
-  overTime: string,
-) {
-  return { employeeId, date, punchIn, punchOut, breakTime, overTime };
-}
-
-const rows = [
-  createData(1840, '13/01/24', '8AM', '5:30 PM', '1hrs', '2hrs'),
-  createData(1840, '14/01/24', '8AM', '5:30 PM', '1hrs', '1hrs'),
-  createData(1840, '15/01/24', '8AM', '5:30 PM', '1hrs', '3hrs'),
-  createData(1840, '16/01/24', '8AM', '5:30 PM', '1hrs', '0hrs'),
-  createData(1840, '17/01/24', '8AM', '5:30 PM', '1hrs', '1hrs'),
-  createData(1840, '20/01/24', '8AM', '5:30 PM', '1hrs', '1hrs'),
-];
-
 const UserAttendance: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [attendance, setAttendance] = useState<any[]>([])
+
+  const attendanceDetails = new AttendanceDetails();
 
   const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -73,6 +58,17 @@ const UserAttendance: React.FC = () => {
     }
     setCalendarOpen(false);
   };
+
+  useEffect(() => {
+    attendanceDetails.getAllEmployeeAttendanceDetails('1')
+      .then((response) => {
+        let attendanceResponse = response;
+        const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+          employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+        }));
+        setAttendance(attendance)
+      })
+  }, [])
 
   return (
     <Paper>
@@ -115,13 +111,13 @@ const UserAttendance: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {attendance.map((row) => (
               <StyledTableRow key={row.date}>
                 <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
                 <StyledTableCell align="center">{row.date}</StyledTableCell>
-                <StyledTableCell align="center">{row.punchIn}</StyledTableCell>
-                <StyledTableCell align="center">{row.punchOut}</StyledTableCell>
-                <StyledTableCell align="center">{row.breakTime}</StyledTableCell>
+                <StyledTableCell align="center">{row.firstPunchIn}</StyledTableCell>
+                <StyledTableCell align="center">{row.lastPunchOut}</StyledTableCell>
+                <StyledTableCell align="center">{row.break}</StyledTableCell>
                 <StyledTableCell align="center">{row.overTime}</StyledTableCell>
               </StyledTableRow>
             ))}

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography, Divider, TextField } from '@mui/material';
 import { styled } from '@mui/system';
+import { AttendanceDataResponseModel } from '@/pages/dashboard/models/attendancetracker';
 
 const GaugeChart = styled('div')<{
   angle: number;
@@ -18,10 +19,26 @@ const GaugeChart = styled('div')<{
   fontWeight: 'bold',
 }));
 
-const UserTimesheet: React.FC = () => {
+interface IProps {
+  todayPunchDetail: AttendanceDataResponseModel
+}
+
+const UserTimesheet: React.FC<IProps> = ({ todayPunchDetail }) => {
+  const [todayPunch, setTodayPunch] = useState<string>('-')
+  const [todayTimeWorks, setTodayTimeWorks] = useState<number>(0)
+  const [angle, setAngle] = useState<number>(0)
   const [] = useSearchParams();
-  const time = 9;
-  const angle = (time / 24) * 200;
+
+  useEffect(() => {
+    if (todayPunchDetail && todayPunchDetail.date) {
+      setTodayPunch(`${todayPunchDetail.date} ${todayPunchDetail.firstPunchIn}`)
+      const [hours, minutes, seconds] = todayPunchDetail.totalWorkingHours.split(":").map(Number);
+      const totalHours = hours + minutes / 60 + seconds / 3600;
+      setTodayTimeWorks(totalHours)
+      setAngle((todayTimeWorks / 24) * 200)
+    }
+
+  }, [todayPunchDetail])
 
   return (
     <Box sx={{ height: "305px", width: "540px", boxShadow: 3, padding: 3, borderRadius: 3, position: 'relative' }}>
@@ -34,7 +51,7 @@ const UserTimesheet: React.FC = () => {
             variant="outlined"
             size="medium"
             label="PUNCH IN at"
-            value="13 March 2024 8am"
+            value={todayPunch}
             InputProps={{
               readOnly: true,
             }}
@@ -42,18 +59,18 @@ const UserTimesheet: React.FC = () => {
           />
         </Box>
         <GaugeChart angle={angle}>
-          {time.toFixed(2)} hrs
+          {todayTimeWorks.toFixed(2)} hrs
         </GaugeChart>
       </Box>
       <Divider sx={{ mt: 3, width: "100%" }} />
       <Box sx={{ display: 'flex', justifyContent: 'center', textAlign: 'center', gap: 30, mt: 2 }}>
         <Box>
           <Typography sx={{ fontWeight: "bold", color: "#7D7D7D" }}>Break</Typography>
-          <Typography variant='body1'>1hrs</Typography>
+          <Typography variant='body1'>{todayPunchDetail.overTime}</Typography>
         </Box>
         <Box>
           <Typography sx={{ fontWeight: "bold", color: "#7D7D7D" }}>Over Time</Typography>
-          <Typography variant='body1'>3hrs</Typography>
+          <Typography variant='body1'>{todayPunchDetail.overTime}</Typography>
         </Box>
       </Box>
     </Box>
