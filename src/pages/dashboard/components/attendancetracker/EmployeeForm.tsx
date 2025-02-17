@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import {Box,TextField,Typography,Autocomplete,Avatar,Button,Snackbar,Alert,Grid,} from "@mui/material";
+import { Box, TextField, Typography, Autocomplete, Avatar, Button, Snackbar, Alert, Grid, Popper, InputAdornment, IconButton, } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import Calendar, { CalendarProps } from 'react-calendar';
+import TodayIcon from '@mui/icons-material/Today';
 
 const EmployeeForm: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -9,10 +11,12 @@ const EmployeeForm: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [role, setRole] = useState<string>("");
-  const [dateOfJoining, setDateOfJoining] = useState<string>("");
+  const [selectedDate, setselectedDate] = useState<Date | null>(null);
   const [avatarSrc, setAvatarSrc] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const attendanceDetails = new AttendanceDetails();
   const roleOptions = ["Employee", "Manager"];
@@ -35,6 +39,21 @@ const EmployeeForm: React.FC = () => {
     }
   };
 
+  const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setCalendarOpen((prev) => !prev);
+  };
+
+  const handleDateChange: CalendarProps['onChange'] = (date: any) => {
+    if (Array.isArray(date)) {
+      setselectedDate(date.length > 0 ? date[0] : null);   
+    } else {
+      setselectedDate(date);
+    }
+
+    setCalendarOpen(false);
+  };
+
   const handlePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type === "image/jpeg") {
@@ -52,6 +71,7 @@ const EmployeeForm: React.FC = () => {
   };
 
   const handleSubmit = () => {
+    let dateOfJoining: string = selectedDate ? selectedDate.toISOString().split("T")[0] : ''
     const request: AddEmployeeDetails = {
       dateOfJoining,
       role,
@@ -67,7 +87,7 @@ const EmployeeForm: React.FC = () => {
       .then((response) => {
         console.log(response);
         setSnackbarOpen(true);
-        
+
         setTimeout(() => {
           window.location.reload();
         }, 1000);
@@ -94,7 +114,7 @@ const EmployeeForm: React.FC = () => {
       email.trim() &&
       !emailError &&
       role &&
-      dateOfJoining &&
+      selectedDate &&
       imageBase64
     );
   };
@@ -122,15 +142,16 @@ const EmployeeForm: React.FC = () => {
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} container justifyContent="center">
-            <Avatar sx={{ width: 60, height: 60,mt:2 }} src={avatarSrc} />
+            <Avatar sx={{ width: 60, height: 60, mt: 2 }} src={avatarSrc} />
           </Grid>
           <Grid item xs={12} container justifyContent="center">
             <Button
               variant="contained"
               component="label"
-              sx={{  bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
+              sx={{ bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
             >
               Upload Picture
+              <Typography component="span" sx={{ pl: 1 }}>*</Typography>
               <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
             </Button>
           </Grid>
@@ -142,6 +163,7 @@ const EmployeeForm: React.FC = () => {
               fullWidth
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -152,6 +174,7 @@ const EmployeeForm: React.FC = () => {
               fullWidth
               value={employeeId}
               onChange={(e) => setEmployeeId(e.target.value)}
+              required
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -164,17 +187,35 @@ const EmployeeForm: React.FC = () => {
               onChange={handleEmailChange}
               error={!!emailError}
               helperText={emailError}
+              required
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
+              variant="outlined"
               id="dateOfJoining"
               label="Date of Joining"
-              variant="outlined"
               fullWidth
-              value={dateOfJoining}
-              onChange={(e) => setDateOfJoining(e.target.value)}
+              value={selectedDate ? selectedDate.toLocaleDateString() : ''}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <IconButton onClick={handleIconClick}>
+                      <TodayIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+            <Popper id={"dateOfJoining"} open={calendarOpen} anchorEl={anchorEl} placement="bottom">
+              <Box sx={{ position: "absolute", border: '1px solid #ccc', borderRadius: '8px', padding: '20px', backgroundColor: 'white', zIndex: 1000 }}>
+                <Calendar
+                  onChange={handleDateChange}
+                  value={selectedDate || new Date()}
+                  className="custom-calendar"
+                />
+              </Box>
+            </Popper>
           </Grid>
           <Grid item xs={12}>
             <Autocomplete
@@ -185,7 +226,7 @@ const EmployeeForm: React.FC = () => {
                 setRole(newValue || "");
               }}
               renderInput={(params) => (
-                <TextField {...params} label="Role" variant="outlined" fullWidth />
+                <TextField {...params} label="Role *" variant="outlined" fullWidth />
               )}
             />
           </Grid>

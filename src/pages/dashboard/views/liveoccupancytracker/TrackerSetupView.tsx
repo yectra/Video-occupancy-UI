@@ -13,6 +13,7 @@ import {
   Popper,
   Paper,
   Grid,
+  FormHelperText,
 } from "@mui/material";
 import ArrowCircleLeftOutlinedIcon from "@mui/icons-material/ArrowCircleLeftOutlined";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
@@ -265,7 +266,11 @@ const TrackerSetupView: React.FC = () => {
                   }}
                   fullWidth
                   error={!!errors.capacity}
-                  helperText={errors.capacity}
+                  helperText={
+                    errors.capacity ? (
+                      <Typography sx={{ fontSize: "12px" }}>{errors.capacity}</Typography>
+                    ) : null
+                  }
                   required
                 />
 
@@ -294,7 +299,9 @@ const TrackerSetupView: React.FC = () => {
                     ))}
                   </Select>
                   {errors.alertMessage && (
-                    <Typography color="error">{errors.alertMessage}</Typography>
+                    <FormHelperText sx={{ fontSize: "12px" }}>
+                      {errors.alertMessage}
+                    </FormHelperText>
                   )}
                 </FormControl>
               </>

@@ -13,10 +13,9 @@ const OccupancyMeter: React.FC = () => {
   const occupancyTracker = new OccupancyTracker();
 
   useEffect(() => {
-    if(percentage == 0)
     occupancyTracker.getAllCounts().then((response: any) => {
-      const data:any=response;       
-       setPercentage(data.total.percentage)        
+      const data: any = response;
+      setPercentage(data.total.percentage)
     })
   }, [])
 

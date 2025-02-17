@@ -6,7 +6,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, Responsi
 import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
 
 // Models
-import { GraphModel, GraphResponseModel, GraphDataModel } from "../../models/liveoccupanytracker";
+import { GraphResponseModel, GraphDataModel } from "../../models/liveoccupanytracker";
 
 // const data = [
 //   { time_interval : "0hrs", count: 0 },
@@ -35,7 +35,6 @@ const CustomTooltip: React.FC<any> = ({ active, payload }) => (
 const UtilizationGraph: React.FC = () => {
   const occupancyTracker = new OccupancyTracker();
 
-  const [data, setData] = useState<GraphModel[]>([])
   const [graphData, setGraphData] = useState<GraphDataModel[]>([])
 
   if (process.env.NODE_ENV === "development") {
@@ -52,15 +51,13 @@ const UtilizationGraph: React.FC = () => {
   }
 
   useEffect(() => {
-    if (!data.length)
-      occupancyTracker.getGraphDetails().then((response: GraphResponseModel) => {
-        setData(response.data);
-        const graphData: GraphDataModel[] = response.data.map((item, index) => ({
-          time_interval: `${index + 1} hrs`,
-          percentage: item.percentage,
-        }));
-        setGraphData(graphData);
-      })
+    occupancyTracker.getGraphDetails().then((response: GraphResponseModel) => { 
+      const graphData: GraphDataModel[] = response.data.map((item, index) => ({
+        time_interval: `${index + 1} hrs`,
+        percentage: item.percentage,
+      }));
+      setGraphData(graphData);
+    })
   }, [])
 
   return (

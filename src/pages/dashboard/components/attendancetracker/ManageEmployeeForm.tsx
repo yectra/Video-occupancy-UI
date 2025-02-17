@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { debounce } from 'lodash';
-import {styled,Box,Typography,IconButton,InputAdornment,InputBase,Dialog,DialogTitle,DialogContent,DialogActions,TextField,Table,TableBody,TableCell,tableCellClasses,TableHead,TableRow,MenuItem,Button,Avatar,CircularProgress,Backdrop} from "@mui/material";
+import { styled, Box, Typography, IconButton, InputAdornment, InputBase, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, MenuItem, Button, Avatar, CircularProgress, Backdrop } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
@@ -26,6 +26,8 @@ const DialogTextField = ({
   onChange,
   disabled = false,
   select = false,
+  error,
+  helperText,
   children,
 }: any) => (
   <TextField
@@ -38,6 +40,8 @@ const DialogTextField = ({
     onChange={onChange}
     disabled={disabled}
     select={select}
+    error={error}
+    helperText={helperText}
   >
     {children}
   </TextField>
@@ -52,9 +56,15 @@ const ManageEmployeeForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
-  const [imageBase64, setImageBase64] = useState<string>(""); 
-  const [noUserFound, setNoUserFound] = useState(false);  
+  const [imageBase64, setImageBase64] = useState<string>("");
+  const [noUserFound, setNoUserFound] = useState(false);
+  const [isDisable, setIsDisable] = useState<boolean>(false)
+  const [emailError, setEmailError] = useState<string>("");
   const attendanceDetails = new AttendanceDetails();
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+
+  const openConfirmDialog = () => setConfirmDialogOpen(true);
+  const closeConfirmDialog = () => setConfirmDialogOpen(false);
 
   const fetchEmployeeDetails = useCallback(() => {
     setLoading(true);
@@ -62,14 +72,10 @@ const ManageEmployeeForm: React.FC = () => {
       .getManageEmployeeDetails()
       .then((response) => {
         setEmployeeForm(response);
-        setNoUserFound(response.length === 0);  
+        setNoUserFound(response.length === 0);
       })
       .finally(() => setLoading(false));
   }, []);
-
-  useEffect(() => {
-    fetchEmployeeDetails();
-  }, [fetchEmployeeDetails]);
 
   const debouncedSearch = useCallback(
     debounce((searchValue: string) => {
@@ -77,21 +83,20 @@ const ManageEmployeeForm: React.FC = () => {
         attendanceDetails.searchAllEmployeeDetails(searchValue)
           .then((response) => {
             setEmployeeForm(response);
-            setNoUserFound(response.length === 0); 
+            setNoUserFound(response.length === 0);
           })
           .catch((error) => console.error("Error fetching search results:", error));
       } else {
-        fetchEmployeeDetails(); 
+        fetchEmployeeDetails();
       }
-    }, 300), 
-    [attendanceDetails, fetchEmployeeDetails]
+    }, 300),
+    []
   );
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setSearchTerm(value);
     debouncedSearch(value);
-
   };
 
   const handleDialogClose = () => {
@@ -103,7 +108,7 @@ const ManageEmployeeForm: React.FC = () => {
     setImageDialogOpen(false);
     setImageUrl(null);
     setNewImage(null);
-    setImageBase64(""); 
+    setImageBase64("");
   };
 
   const handleEditClick = (employee: ManageEmployeeDetails) => {
@@ -114,6 +119,11 @@ const ManageEmployeeForm: React.FC = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setSelectedEmployee((prev) => (prev ? { ...prev, [name]: value } : null));
+    if (name == 'email' && !validateEmail(value)) {
+      setEmailError("Invalid email format");
+    } else {
+      setEmailError("");
+    }
   };
 
   const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -139,6 +149,8 @@ const ManageEmployeeForm: React.FC = () => {
   };
 
   const handleDelete = () => {
+    closeConfirmDialog();
+
     if (selectedEmployee) {
       setLoading(true);
       attendanceDetails
@@ -161,10 +173,10 @@ const ManageEmployeeForm: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setNewImage(file); 
+      setNewImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageBase64(reader.result as string); 
+        setImageBase64(reader.result as string);
         setImageUrl(reader.result as string)
       };
       reader.readAsDataURL(file);
@@ -176,7 +188,7 @@ const ManageEmployeeForm: React.FC = () => {
       console.log("Sending Base64 image to the backend:", imageBase64);
       const data = {
         employeeId: selectedEmployee?.employeeId,
-        newImageBase64: imageBase64, 
+        newImageBase64: imageBase64,
       };
       setLoading(true);
       attendanceDetails
@@ -189,9 +201,26 @@ const ManageEmployeeForm: React.FC = () => {
           console.error("Error updating employee details:", error)
         )
         .finally(() => setLoading(false));
-      handleImageDialogClose(); 
+      handleImageDialogClose();
     }
   };
+
+  const validateEmail = (email: any): boolean => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  useEffect(() => {
+    fetchEmployeeDetails();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedEmployee?.email || !selectedEmployee.employeeName || !selectedEmployee.role || emailError)
+      setIsDisable(true)
+    else
+      setIsDisable(false)
+  }, [handleInputChange])
+
 
   return (
     <Box sx={{ padding: 2 }}>
@@ -219,7 +248,10 @@ const ManageEmployeeForm: React.FC = () => {
             endAdornment={
               searchTerm && (
                 <InputAdornment position="end">
-                  <IconButton edge="end" size="large" onClick={() => setSearchTerm("")}>
+                  <IconButton edge="end" size="large" onClick={() => {
+                    setSearchTerm("")
+                    fetchEmployeeDetails()
+                  }}>
                     <ClearIcon />
                   </IconButton>
                 </InputAdornment>
@@ -245,8 +277,8 @@ const ManageEmployeeForm: React.FC = () => {
       ) : (
         <Box>
           <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
-        <CircularProgress color={"primary"}/>
-      </Backdrop>
+            <CircularProgress color={"primary"} />
+          </Backdrop>
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
@@ -276,7 +308,7 @@ const ManageEmployeeForm: React.FC = () => {
                   <StyledTableCell align="center">{row.role}</StyledTableCell>
                   <StyledTableCell align="center">{row.email}</StyledTableCell>
                   <StyledTableCell align="center">
-                    <IconButton sx={{ bgcolor: "#00D1A3", color: "white",'&:hover':{bgcolor:"#00A387"} }} onClick={() => handleEditClick(row)}>
+                    <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" } }} onClick={() => handleEditClick(row)}>
                       <EditOutlinedIcon />
                     </IconButton>
                   </StyledTableCell>
@@ -284,44 +316,46 @@ const ManageEmployeeForm: React.FC = () => {
               ))}
             </TableBody>
           </Table>
-          </Box>
+        </Box>
       )}
       {noUserFound && (
-   <Typography variant="body2" color="error">{noUserFound}</Typography>
-)}
+        <Typography variant="body2" color="error">{noUserFound}</Typography>
+      )}
 
 
       <Dialog open={editDialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Edit Employee</DialogTitle>
         <DialogContent>
           <DialogTextField
-            label="Employee ID"
+            label="Employee ID *"
             value={selectedEmployee?.employeeId || ""}
             name="employeeId"
             onChange={handleInputChange}
             disabled
           />
           <DialogTextField
-            label="Name"
+            label="Name *"
             value={selectedEmployee?.employeeName || ""}
             name="employeeName"
             onChange={handleInputChange}
           />
           <DialogTextField
-            label="Email"
+            label="Email *"
             value={selectedEmployee?.email || ""}
             name="email"
             onChange={handleInputChange}
+            error={!!emailError}
+            helperText={emailError}
           />
           <DialogTextField
-            label="Date of Joining"
+            label="Date of Joining *"
             value={selectedEmployee?.dateOfJoining || ""}
             name="dateOfJoining"
             onChange={handleInputChange}
             disabled
           />
           <DialogTextField
-            label="Role"
+            label="Role *"
             value={selectedEmployee?.role || ""}
             name="role"
             onChange={handleRoleChange}
@@ -333,11 +367,11 @@ const ManageEmployeeForm: React.FC = () => {
           </DialogTextField>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDelete} color="error">
+          <Button onClick={() => { openConfirmDialog(); }} color="error">
             Delete
           </Button>
           <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={handleSave} color="primary">
+          <Button disabled={isDisable} color="primary" onClick={handleSave}>
             Save
           </Button>
         </DialogActions>
@@ -348,7 +382,7 @@ const ManageEmployeeForm: React.FC = () => {
         <DialogContent>
           <Box sx={{ textAlign: 'center', marginBottom: 2 }}>
             <Avatar
-              src={imageUrl||undefined}
+              src={imageUrl || undefined}
               alt="Employee Image"
               sx={{ width: 100, height: 100, margin: '0 auto' }}
             />
@@ -377,6 +411,27 @@ const ManageEmployeeForm: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog open={confirmDialogOpen} onClose={closeConfirmDialog}>
+        <DialogTitle sx={{ bgcolor: "green", color: "white" }}>Confirm</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ pt: 2 }}>
+            Are you sure want to delete {selectedEmployee?.employeeName}?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeConfirmDialog} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            color="error"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </Box>
   );
 };
