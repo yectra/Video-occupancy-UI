@@ -10,6 +10,7 @@ import Paper from '@mui/material/Paper';
 import { Box, TextField, Typography, InputAdornment, Popper, IconButton } from '@mui/material';
 import TodayIcon from '@mui/icons-material/Today';
 import Calendar, { CalendarProps } from 'react-calendar';
+import moment from 'moment';
 import 'react-calendar/dist/Calendar.css';
 import '@/styles/core/components/CalendarStyles.css';
 
@@ -56,6 +57,14 @@ const UserAttendance: React.FC = () => {
     } else {
       setSelectedDate(date);
     }
+    attendanceDetails.getAllEmployeeAttendanceDetails('1',moment(date).format('YYYY-MM-DD'))
+    .then((response) => {
+      let attendanceResponse = response;
+      const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+        employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+      }));
+      setAttendance(attendance)
+    })
     setCalendarOpen(false);
   };
 
@@ -77,7 +86,7 @@ const UserAttendance: React.FC = () => {
         <TextField
           variant="outlined"
           label="Date"
-          value={selectedDate ? selectedDate.toLocaleDateString() : ''}
+          value={selectedDate ? selectedDate.toLocaleDateString() : 'Select Date'}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -94,6 +103,7 @@ const UserAttendance: React.FC = () => {
               onChange={handleDateChange}
               value={selectedDate || new Date()}
               className="custom-calendar"
+              maxDate={new Date()}
             />
           </div>
         </Popper>

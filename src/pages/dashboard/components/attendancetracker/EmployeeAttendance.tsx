@@ -126,6 +126,23 @@ const EmployeeAttendance: React.FC = () => {
     const formattedDate = new Date(date).toLocaleDateString("en-CA");
     setDate(formattedDate);
     setSelectedDate(date);
+    setLoading(true);
+    attendanceDetails.getAllEmployeeAttendanceDetails('',formattedDate)   
+      .then((response:any) => {
+        if (Array.isArray(response)) {
+          const filteredRows = response.filter(record => record.date === date);
+          setRows(filteredRows);
+          setNoRecordsMessage(filteredRows.length ? null : "No records found.");
+        } else if (response?.message) {
+          setRows([]);
+          setNoRecordsMessage(response.message);
+        } else {
+          setRows([]);
+          setNoRecordsMessage("Unexpected response format.");
+        }
+      })
+      .catch(() => setError("Failed to fetch data."))
+      .finally(() => setLoading(false));
     setCalendarOpen(false);
   };
 

@@ -8,6 +8,8 @@ import {
   Card,
   CardContent,
   IconButton,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { VideoPlayer } from "@/pages/dashboard/components/liveoccupancytracker/VideoPlayer";
@@ -33,6 +35,7 @@ const TrackerVideoView: React.FC = () => {
   const [coordinates, setCoordinates] = useState<Coordinates>({});
   const [capacityOfPeople, setCapacityOfPeople] = useState<number>(50);
   const [alertMessage, setAlertMessage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -85,6 +88,7 @@ const TrackerVideoView: React.FC = () => {
   };
 
   const handleFinish = () => {
+    setLoading(true);
     const payload: BackendPayload = {
       capacityOfPeople: capacityOfPeople,
       alertMessage: alertMessage,
@@ -106,7 +110,7 @@ const TrackerVideoView: React.FC = () => {
             coordinates,
           },
         });
-    });
+    }).finally(() => setLoading(false));
   };
 
   const handleBackClick = () => {
@@ -123,6 +127,9 @@ const TrackerVideoView: React.FC = () => {
 
   return (
     <Grid container spacing={3}>
+      <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
+        <CircularProgress color={"primary"}/>
+      </Backdrop>
       <Grid item xs={12}>
         <IconButton onClick={handleBackClick}>
           <ArrowBackIcon />

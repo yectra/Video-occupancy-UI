@@ -44,59 +44,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const decodeTokenManually = (token: string) => {
-    try {
-      const payload = token.split(".")[1]; // Get the payload (second part)
-      const decoded = JSON.parse(atob(payload)); // Base64 decode
-      return decoded;
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return null;
-    }
-  };
-
-  const checkTokenExpiryAndLogout = (token: string) => {
-    const decodedToken = decodeTokenManually(token);
-
-    if (decodedToken) {
-      const expiryTime = decodedToken.exp * 1000;
-      const currentTime = Date.now();
-
-      const logoutThreshold = expiryTime - 60000;
-
-      const timeDifference = logoutThreshold - currentTime;
-
-      if (timeDifference <= 0) {
-        handleSignOutUser();
-      }
-    }
-  };
-
-
-  useEffect(() => {
-    const handleRedirect = async () => {
-      try {
-        const response = await instance.handleRedirectPromise();
-        if (response) {
-          const accessToken = response.accessToken;
-
-          localStorage.setItem("accessToken", accessToken);
-          checkTokenExpiryAndLogout(accessToken);
-
-          const intervalId = setInterval(() => {
-            checkTokenExpiryAndLogout(accessToken);
-          }, 60000);
-
-          return () => clearInterval(intervalId);
-        }
-      } catch (error) {
-        console.error("Error handling redirect response", error);
-      }
-    };
-
-    // Call the function to handle the redirect response
-    handleRedirect();
-  }, []);
 
   useEffect(() => {
     if (accounts.length > 0) {

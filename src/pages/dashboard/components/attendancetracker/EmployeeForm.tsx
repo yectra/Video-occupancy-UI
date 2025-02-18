@@ -1,11 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Typography, Autocomplete, Avatar, Button, Snackbar, Alert, Grid, Popper, InputAdornment, IconButton, } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import Calendar, { CalendarProps } from 'react-calendar';
 import TodayIcon from '@mui/icons-material/Today';
+import moment from 'moment';
 
 const EmployeeForm: React.FC = () => {
+  const navigate = useNavigate();
+
   const [name, setName] = useState<string>("");
   const [employeeId, setEmployeeId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -15,6 +19,8 @@ const EmployeeForm: React.FC = () => {
   const [avatarSrc, setAvatarSrc] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -46,7 +52,7 @@ const EmployeeForm: React.FC = () => {
 
   const handleDateChange: CalendarProps['onChange'] = (date: any) => {
     if (Array.isArray(date)) {
-      setselectedDate(date.length > 0 ? date[0] : null);   
+      setselectedDate(date.length > 0 ? date[0] : null);
     } else {
       setselectedDate(date);
     }
@@ -71,7 +77,7 @@ const EmployeeForm: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    let dateOfJoining: string = selectedDate ? selectedDate.toISOString().split("T")[0] : ''
+    let dateOfJoining: string = selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : ''
     const request: AddEmployeeDetails = {
       dateOfJoining,
       role,
@@ -80,20 +86,19 @@ const EmployeeForm: React.FC = () => {
       employeeName: name,
       imageBase64,
     };
-    console.log("Request payload: ", request);
 
     attendanceDetails
       .addEmployeeDetails(request)
-      .then((response) => {
-        console.log(response);
+      .then(() => {
+        setSnackbarMessage('Employee added successfully!');
+        setSnackbarSeverity('success');
         setSnackbarOpen(true);
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        navigate('/dashboard/occupancy-tracker/emp-form');
       })
       .catch((error) => {
-        console.error("Error adding employee:", error);
+        setSnackbarMessage(error.response.data.Warn);
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
       });
   };
 
@@ -213,6 +218,7 @@ const EmployeeForm: React.FC = () => {
                   onChange={handleDateChange}
                   value={selectedDate || new Date()}
                   className="custom-calendar"
+                  maxDate={new Date()}
                 />
               </Box>
             </Popper>
@@ -251,12 +257,12 @@ const EmployeeForm: React.FC = () => {
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={2000}
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: "100%" }}>
-          Employee added successfully!
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>
