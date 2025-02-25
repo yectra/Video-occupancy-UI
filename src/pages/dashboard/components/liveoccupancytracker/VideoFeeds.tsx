@@ -3,27 +3,31 @@ import Box from "@mui/material/Box";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { Card, CardContent, Grid, MenuItem, Typography } from "@mui/material";
 import { VideoPlayer } from "@/pages/dashboard/components/liveoccupancytracker/VideoPlayer";
-import { CameraSetup } from "../../models/liveoccupanytracker";
 
-interface IProps {
-  videoSources: CameraSetup[];
-}
+// Services
+import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
 
-const VideoFeeds: React.FC<IProps> = ({ videoSources }) => {
+const VideoFeeds: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [entranceNames, setEntranceNames] = useState<string[]>([])
   const [videoSource, setVideoSource] = useState<string>('')
+  const [cameraDetails, setCameraDetails] = useState<any[]>([])
+
+  const occupancyTracker = new OccupancyTracker();
 
   useEffect(() => {
-    const entranceNames = videoSources.map(video => video.entranceName)
-    setEntranceNames(entranceNames);
-    setSelectedOption(entranceNames[0])
-    setVideoSource(videoSources[0].videoSource)
+    occupancyTracker.getCameraUrls().then((response: any) => {
+      setCameraDetails(response.cameraDetails)
+      const entranceNames = response.cameraDetails.map((video: any) => video.entranceName)
+      setEntranceNames(entranceNames);
+      setSelectedOption(entranceNames[0])
+      setVideoSource(response.cameraDetails[0].videoUrl)
+    })
   }, [])
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedOption(event.target.value as string);
-    setVideoSource(videoSources.find((video) => video.entranceName === event.target.value as string)?.videoSource as string)
+    setVideoSource(cameraDetails.find((video) => video.entranceName === event.target.value as string)?.videoUrl as string)
   };
 
   return (
@@ -70,7 +74,7 @@ const VideoFeeds: React.FC<IProps> = ({ videoSources }) => {
             </Select>
           </Grid>
 
-          <Grid item xs={12} sm={12} md={12} sx={{ p: 4, ml:10}}>
+          <Grid item xs={12} sm={12} md={12} sx={{ p: 4, ml: 10 }}>
             <Card>
               <CardContent>
                 <VideoPlayer source={videoSource} />

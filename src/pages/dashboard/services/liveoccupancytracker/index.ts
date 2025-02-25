@@ -6,6 +6,7 @@ const { httpPost, httpGet } = apiClient();
 
 interface IOccupancyTracker {
     addSetupDetails(setupDetails: BackendPayload): Promise<any>;
+    getCameraUrls(): Promise<any>;
     getAllCounts(): Promise<any>;
     getGraphDetails(): Promise<GraphResponseModel>
 }
@@ -13,6 +14,10 @@ interface IOccupancyTracker {
 export class OccupancyTracker implements IOccupancyTracker {
     addSetupDetails(setupDetails: BackendPayload): Promise<any> {
         return httpPost("/api/saveData", setupDetails).then((response) => response)
+    }
+
+    getCameraUrls(): Promise<any> {        
+        return httpGet("/api/getCameraUrls").then((response) => response)
     }
 
     getAllCounts(): Promise<any> {        

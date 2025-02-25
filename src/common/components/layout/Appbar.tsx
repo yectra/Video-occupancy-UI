@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, ListItemIcon, Box } from "@mui/material";
-import { LightModeOutlined, NotificationsOutlined, AccountCircle, Logout, Menu as MenuIcon } from "@mui/icons-material";
+import { NotificationsOutlined, AccountCircle, Logout, Menu as MenuIcon } from "@mui/icons-material";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { getUserDetailsFromMsal } from "@/common/services/AuthHelper";
 
@@ -11,8 +11,7 @@ interface AppbarProps {
 }
 
 const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
-  const { signOutUser} = useAuth();
-  
+  const { signOutUser } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [email, setEmail] = useState<string>("");
 
@@ -50,9 +49,9 @@ const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
         <Box sx={{ flexGrow: 1 }} />
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton color="inherit">
+          {/* <IconButton color="inherit">
             <LightModeOutlined />
-          </IconButton>
+          </IconButton> */}
           <IconButton color="inherit">
             <NotificationsOutlined />
           </IconButton>

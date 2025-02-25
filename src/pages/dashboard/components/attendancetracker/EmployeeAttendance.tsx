@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import {Table,TableBody,TableCell,TableHead,TableRow,Box,Typography,InputAdornment,IconButton,Popper,tableCellClasses,InputBase,Backdrop,CircularProgress} from "@mui/material";
-import {Search as SearchIcon,Clear as ClearIcon,Today as TodayIcon} from "@mui/icons-material";
+import { Table, TableBody, TableCell, TableHead, TableRow, Box, Typography, InputAdornment, IconButton, Popper, tableCellClasses, InputBase, Backdrop, CircularProgress } from "@mui/material";
+import { Search as SearchIcon, Clear as ClearIcon, Today as TodayIcon } from "@mui/icons-material";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "@/styles/core/components/CalendarStyles.css";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import { debounce } from "lodash";
+import { useSearchParams } from 'react-router-dom';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -26,54 +27,87 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const EmployeeAttendance: React.FC = () => {
+interface IProps {
+  date: string;
+}
+
+
+const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const [rows, setRows] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentDate, setCurrentDate] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [date, setDate] = useState<string>();
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlDate = searchParams.get('date');
 
   const navigate = useNavigate();
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
-    const today = new Date();
-    setDate(today.toLocaleDateString("en-CA"));
+    let currentDate: string = ''
+    setLoading(true);
+    if (urlDate) {
+      setCurrentDate(urlDate)
+      currentDate = urlDate;
+    } else if (date) {
+      setCurrentDate(date)
+      currentDate = date;
+    }
+
+    attendanceDetails.getAllEmployeeAttendanceDetails('', currentDate)
+      .then((response: any) => {
+        if (Array.isArray(response.data)) {
+          const filteredRows = response.data;
+          setRows(filteredRows);
+          setNoRecordsMessage(filteredRows.length ? null : "No records found.");
+        } else if (response?.message) {
+          setRows([]);
+          setNoRecordsMessage(response.message);
+        } else {
+          setRows([]);
+          setNoRecordsMessage("Unexpected response format.");
+        }
+      })
+      .catch(() => setError("Failed to fetch data."))
+      .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (date) {
-      setLoading(true);
-      attendanceDetails.getAllEmployeeAttendanceDetails('',date)
-        .then((response:any) => {
-          if (Array.isArray(response)) {
-            const filteredRows = response.filter(record => record.date === date);
-            setRows(filteredRows);
-            setNoRecordsMessage(filteredRows.length ? null : "No records found.");
-          } else if (response?.message) {
-            setRows([]);
-            setNoRecordsMessage(response.message);
-          } else {
-            setRows([]);
-            setNoRecordsMessage("Unexpected response format.");
-          }
-        })
-        .catch(() => setError("Failed to fetch data."))
-        .finally(() => setLoading(false));
-    }
-  }, [date]);
+  // useEffect(() => {
+  //   if (date) {
+  //     setLoading(true);
+  //     attendanceDetails.getAllEmployeeAttendanceDetails('',date)
+  //       .then((response:any) => {
+  //         if (Array.isArray(response)) {
+  //           const filteredRows = response.filter(record => record.date === date);
+  //           setRows(filteredRows);
+  //           setNoRecordsMessage(filteredRows.length ? null : "No records found.");
+  //           console.log('useEffect')
+  //         } else if (response?.message) {
+  //           setRows([]);
+  //           setNoRecordsMessage(response.message);
+  //         } else {
+  //           setRows([]);
+  //           setNoRecordsMessage("Unexpected response format.");
+  //         }
+  //       })
+  //       .catch(() => setError("Failed to fetch data."))
+  //       .finally(() => setLoading(false));
+  //   }
+  // }, [date]);
 
   const fetchAttendanceRecords = useCallback(() => {
-    if (date) {
+    if (currentDate) {
       setLoading(true);
-      attendanceDetails.getAllEmployeeAttendanceDetails('', date)
-        .then((response:any) => {
-          if (Array.isArray(response)) {
-            const filteredRows = response.filter(record => record.date === date);
+      attendanceDetails.getAllEmployeeAttendanceDetails('', currentDate)
+        .then((response: any) => {
+          if (Array.isArray(response.data)) {
+            const filteredRows = response.data;
             setRows(filteredRows);
             setNoRecordsMessage(filteredRows.length ? null : "No records found.");
           } else if (response?.message) {
@@ -87,16 +121,16 @@ const EmployeeAttendance: React.FC = () => {
         .catch(() => setError("Failed to fetch data."))
         .finally(() => setLoading(false));
     }
-  }, [date]);
+  }, [currentDate]);
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       if (value) {
-        attendanceDetails.searchEmployeeDetails(date || "",value)
+        attendanceDetails.searchEmployeeDetails(currentDate || "", value)
           .then(setRows)
-          .catch(err=>{
+          .catch(err => {
             console.log(err)
-            setRows([]) 
+            setRows([]);
             setNoRecordsMessage("No user found");
 
           });
@@ -114,7 +148,7 @@ const EmployeeAttendance: React.FC = () => {
   };
 
   const handleRowClick = (row: any) => {
-    navigate(`/dashboard/attendance/emp-details?name=${row.employeeName}&id=${row.employeeId}`);
+    navigate(`/dashboard/attendance/emp-details?date=${row.date}&id=${row.employeeId}`);
   };
 
   const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -123,14 +157,19 @@ const EmployeeAttendance: React.FC = () => {
   };
 
   const handleDateChange = (date: any) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("date");
+    setSearchParams(newParams);
+
     const formattedDate = new Date(date).toLocaleDateString("en-CA");
-    setDate(formattedDate);
     setSelectedDate(date);
+    setCurrentDate(formattedDate);
     setLoading(true);
-    attendanceDetails.getAllEmployeeAttendanceDetails('',formattedDate)   
-      .then((response:any) => {
-        if (Array.isArray(response)) {
-          const filteredRows = response.filter(record => record.date === date);
+
+    attendanceDetails.getAllEmployeeAttendanceDetails('', formattedDate)
+      .then((response: any) => {
+        if (Array.isArray(response.data)) {
+          const filteredRows = response.data;
           setRows(filteredRows);
           setNoRecordsMessage(filteredRows.length ? null : "No records found.");
         } else if (response?.message) {
@@ -146,20 +185,19 @@ const EmployeeAttendance: React.FC = () => {
     setCalendarOpen(false);
   };
 
- 
   if (error) return <Typography>{error}</Typography>;
 
   return (
     <Box>
       <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
-        <CircularProgress color={"primary"}/>
+        <CircularProgress color={"primary"} />
       </Backdrop>
 
-      <Box sx={{ display: "flex", alignItems: "center",justifyContent:"space-between",marginBottom: "10px" }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
         <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">
           Attendance List
         </Typography>
-        <Box sx={{width:"350px" }}>
+        <Box sx={{ width: "350px" }}>
           <InputBase
             placeholder="Search"
             value={searchTerm}
@@ -208,7 +246,7 @@ const EmployeeAttendance: React.FC = () => {
             <StyledTableCell align="center">Break</StyledTableCell>
             <StyledTableCell align="center">Over time</StyledTableCell>
           </TableRow>
-          {noRecordsMessage && rows.length==0 && (
+          {noRecordsMessage && rows.length == 0 && (
             <TableRow>
               <TableCell colSpan={7} align="center">
                 <Typography variant="body2" color="error">{noRecordsMessage}</Typography>
@@ -231,7 +269,7 @@ const EmployeeAttendance: React.FC = () => {
           ))}
         </TableBody>
       </Table>
-      </Box>
+    </Box>
   );
 };
 

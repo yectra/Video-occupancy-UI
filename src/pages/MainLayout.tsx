@@ -7,12 +7,12 @@ import { Outlet } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
 
 const MainLayout = () => {
-  const { isAuthenticated ,signInUser, signOutUser} = useAuth();
+  const { isAuthenticated, signInUser, signOutUser } = useAuth();
   const { instance } = useMsal();
 
   if (!isAuthenticated) {
     signInUser();
-    return; 
+    return;
   }
 
   const decodeTokenManually = (token: string) => {
@@ -28,14 +28,14 @@ const MainLayout = () => {
 
   const checkTokenExpiryAndLogout = (token: string) => {
     const decodedToken = decodeTokenManually(token);
-console.log('checkTokenExpiryAndLogout decodedToken',decodedToken)
+
     if (decodedToken) {
       const expiryTime = decodedToken.exp * 1000;
       const currentTime = Date.now();
 
       const logoutThresholdTime = expiryTime - 60000;
       const timeDifference = logoutThresholdTime - currentTime;
-      console.log('checkTokenExpiryAndLogout inside if',timeDifference)
+
       if (timeDifference <= 0) {
         signOutUser();
       }
@@ -47,19 +47,21 @@ console.log('checkTokenExpiryAndLogout decodedToken',decodedToken)
     const handleRedirect = async () => {
       try {
         const response = await instance.handleRedirectPromise();
+        let accessToken: any
         if (response) {
-          const accessToken = response.accessToken;
+          accessToken = response.accessToken;
 
           localStorage.setItem("accessToken", accessToken);
-
-          checkTokenExpiryAndLogout(accessToken);
-
-          const intervalId = setInterval(() => {
-            checkTokenExpiryAndLogout(accessToken);
-          }, 60000);
-
-          return () => clearInterval(intervalId);
+        } else if (localStorage.getItem("accessToken")) {
+          accessToken = localStorage.getItem("accessToken");
         }
+        checkTokenExpiryAndLogout(accessToken);
+
+        const intervalId = setInterval(() => {
+          checkTokenExpiryAndLogout(accessToken);
+        }, 60000);
+
+        return () => clearInterval(intervalId);
       } catch (error) {
         console.error("Error handling redirect response", error);
       }

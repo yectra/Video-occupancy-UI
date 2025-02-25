@@ -134,6 +134,7 @@ const ManageEmployeeForm: React.FC = () => {
 
   const handleSave = () => {
     if (selectedEmployee) {
+      selectedEmployee.imageUrl = '';
       setLoading(true);
       attendanceDetails
         .updateEmployeeDetails(selectedEmployee)

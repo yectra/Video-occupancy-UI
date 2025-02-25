@@ -26,16 +26,17 @@ const EmployeeTimesheet: React.FC = () => {
   const navigate = useNavigate();
 
   const id = searchParams.get("id");
-  const name = searchParams.get("name");
-  const [getEmployeeTimesheet, setEmployeeTimesheet] = useState<IndividualTimesheet[]>();
+  const date = searchParams.get("date");
+  const [employeeTimesheet, setEmployeeTimesheet] = useState<IndividualTimesheet>()
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
     if (id) {
       attendanceDetails
         .getIndividualEmployeeDetails(id)
-        .then((res) => {
-          setEmployeeTimesheet(res);
+        .then((response: any) => {
+          let currentTimeSheet = response.data.find((employee: IndividualTimesheet) => employee.date === date)
+          setEmployeeTimesheet(currentTimeSheet)
         })
         .catch((err) => {
           console.log(err);
@@ -47,7 +48,7 @@ const EmployeeTimesheet: React.FC = () => {
   const angle = (time / 24) * 200;
 
   const handleBackClick = () => {
-    navigate("/dashboard/attendance");
+    navigate(`/dashboard/attendance?date=${date}`);
   };
 
   return (
@@ -92,12 +93,12 @@ const EmployeeTimesheet: React.FC = () => {
         >
           <Avatar
             alt="Employee Avatar"
-            src={getEmployeeTimesheet?.[0].imageUrl}
+            src={employeeTimesheet?.imageUrl}
             sx={{ width: 70, height: 70 }}
           />
           <Box sx={{ ml: 2 }}>
             <Typography sx={{ fontWeight: "bold" }} variant="h6">
-              {name}
+              {employeeTimesheet?.employeeName}
             </Typography>
             <Typography variant="body2">Employee Id: {id}</Typography>
           </Box>
@@ -118,13 +119,13 @@ const EmployeeTimesheet: React.FC = () => {
           <Typography sx={{ fontWeight: "bold", color: "#7D7D7D" }}>
             Break
           </Typography>
-          <Typography variant="body1">{getEmployeeTimesheet?.[0]?.break}</Typography>
+          <Typography variant="body1">{employeeTimesheet?.break}</Typography>
         </Box>
         <Box>
           <Typography sx={{ fontWeight: "bold", color: "#7D7D7D" }}>
             Over Time
           </Typography>
-          <Typography variant="body1">{getEmployeeTimesheet?.[0]?.overTime}</Typography>
+          <Typography variant="body1">{employeeTimesheet?.overTime}</Typography>
         </Box>
       </Box>
     </Box>

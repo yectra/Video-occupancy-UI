@@ -7,16 +7,18 @@ import { useSearchParams } from 'react-router-dom';
 const EmployeeActivity: React.FC = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
-  const [getEmployeeActivity, setEmployeeActivity] = useState<IndividualTimesheet[]>([]);
+  const date = searchParams.get('date');
+  
+  const [employeeActivity, setEmployeeActivity] = useState<IndividualTimesheet>()
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
     if (id) {
       attendanceDetails
         .getIndividualEmployeeDetails(id)
-        .then((res) => {
-          setEmployeeActivity(res);
-          console.log(res);
+        .then((response: any) => {
+          let employeeActivity = response.data.find((employee: IndividualTimesheet) => employee.date === date)
+          setEmployeeActivity(employeeActivity)
         })
         .catch((err) => {
           console.log(err);
@@ -45,19 +47,19 @@ const EmployeeActivity: React.FC = () => {
           flexWrap: 'wrap',
           gap: 2,
           mt: 2,
-          overflowY: 'auto', 
+          overflowY: 'auto',
           height: '100%',
         }}
       >
-        {getEmployeeActivity &&
-          getEmployeeActivity[0]?.attendanceList?.map((map, index) => (
+        {employeeActivity &&
+          employeeActivity.attendanceList?.map((timeSheet, index) => (
             <Box
               key={index}
               sx={{
                 display: 'flex',
                 flexDirection: 'row',
-                width: '100%', 
-                justifyContent: 'space-between', 
+                width: '100%',
+                justifyContent: 'space-between',
                 gap: 2,
               }}
             >
@@ -73,7 +75,7 @@ const EmployeeActivity: React.FC = () => {
               >
                 Punched In at:
                 <Typography component="span" sx={{ fontWeight: 'bold' }}>
-                  {map.punchIn}
+                  {timeSheet.punchIn}
                 </Typography>
               </Box>
               <Box
@@ -88,7 +90,7 @@ const EmployeeActivity: React.FC = () => {
               >
                 Punched Out at:
                 <Typography component="span" sx={{ fontWeight: 'bold' }}>
-                  {map.punchOut}
+                  {timeSheet.punchOut}
                 </Typography>
               </Box>
             </Box>
