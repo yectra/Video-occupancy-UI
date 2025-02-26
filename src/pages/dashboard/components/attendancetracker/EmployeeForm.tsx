@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { Box, TextField, Typography, Autocomplete, Avatar, Button, Snackbar, Alert, Grid, Popper, InputAdornment, IconButton, } from "@mui/material";
+import { Box, TextField, Typography, Autocomplete, Avatar, Button, Snackbar, Alert, Grid } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
-import Calendar, { CalendarProps } from 'react-calendar';
-import TodayIcon from '@mui/icons-material/Today';
-import moment from 'moment';
 
 const EmployeeForm: React.FC = () => {
   const navigate = useNavigate();
@@ -15,17 +12,14 @@ const EmployeeForm: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [role, setRole] = useState<string>("");
-  const [selectedDate, setselectedDate] = useState<Date | null>(null);
   const [avatarSrc, setAvatarSrc] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-  const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const attendanceDetails = new AttendanceDetails();
-  const roleOptions = ["Employee", "Manager"];
+  const roleOptions = ["Admin", "Employee"];
 
   const validateEmail = (email: string): boolean => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,21 +39,6 @@ const EmployeeForm: React.FC = () => {
     }
   };
 
-  const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-    setCalendarOpen((prev) => !prev);
-  };
-
-  const handleDateChange: CalendarProps['onChange'] = (date: any) => {
-    if (Array.isArray(date)) {
-      setselectedDate(date.length > 0 ? date[0] : null);
-    } else {
-      setselectedDate(date);
-    }
-
-    setCalendarOpen(false);
-  };
-
   const handlePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type === "image/jpeg") {
@@ -77,9 +56,7 @@ const EmployeeForm: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    let dateOfJoining: string = selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : ''
     const request: AddEmployeeDetails = {
-      dateOfJoining,
       role,
       email,
       employeeId,
@@ -119,7 +96,6 @@ const EmployeeForm: React.FC = () => {
       email.trim() &&
       !emailError &&
       role &&
-      selectedDate &&
       imageBase64
     );
   };
@@ -143,7 +119,7 @@ const EmployeeForm: React.FC = () => {
         }}
       >
         <Typography sx={{ color: "#1C214F", fontWeight: "bold", textAlign: "center" }} variant="h6">
-          Add Employee
+          Add User
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} container justifyContent="center">
@@ -174,7 +150,7 @@ const EmployeeForm: React.FC = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               id="employeeId"
-              label="Employee ID"
+              label="User ID"
               variant="outlined"
               fullWidth
               value={employeeId}
@@ -196,35 +172,7 @@ const EmployeeForm: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              variant="outlined"
-              id="dateOfJoining"
-              label="Date of Joining"
-              fullWidth
-              value={selectedDate ? selectedDate.toLocaleDateString() : ''}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton onClick={handleIconClick}>
-                      <TodayIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Popper id={"dateOfJoining"} open={calendarOpen} anchorEl={anchorEl} placement="bottom">
-              <Box sx={{ position: "absolute", border: '1px solid #ccc', borderRadius: '8px', padding: '20px', backgroundColor: 'white', zIndex: 1000 }}>
-                <Calendar
-                  onChange={handleDateChange}
-                  value={selectedDate || new Date()}
-                  className="custom-calendar"
-                  maxDate={new Date()}
-                />
-              </Box>
-            </Popper>
-          </Grid>
-          <Grid item xs={12}>
-            <Autocomplete
+          <Autocomplete
               id="role"
               options={roleOptions}
               value={role}
@@ -241,7 +189,7 @@ const EmployeeForm: React.FC = () => {
               sx={{
                 width: 200,
                 height: 50,
-                mb: 2,
+                my: 2,
                 bgcolor: "#00D1A3",
                 '&:hover': { bgcolor: "#00A387" },
               }}
@@ -249,7 +197,7 @@ const EmployeeForm: React.FC = () => {
               onClick={handleSubmit}
               disabled={!isFormValid()}
             >
-              Add Employee
+              Add User
             </Button>
           </Grid>
         </Grid>

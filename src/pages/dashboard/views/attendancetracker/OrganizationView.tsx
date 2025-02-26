@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import LinkIcon from '@mui/icons-material/Link';
-import DomainIcon from '@mui/icons-material/Domain';
 import HomeIcon from '@mui/icons-material/Home';
 import { AttendanceDetails } from '@/pages/dashboard/services/attendancetracker';
 import { OrganizationSetup } from '@/pages/dashboard/models/attendancetracker';
@@ -182,24 +181,6 @@ const OrganizationView: React.FC = () => {
             startAdornment: (
               <InputAdornment position="start">
                 <LinkIcon sx={{ color: 'black' }} />
-              </InputAdornment>
-            ),
-          }}
-          InputLabelProps={{
-            style: { color: 'black', fontWeight: 'bold' },
-          }}
-        />
-        <TextField
-          label="Domain Name"
-          variant="outlined"
-          fullWidth
-          name="domainName"
-          value={formData.domainName}
-          onChange={handleChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <DomainIcon sx={{ color: 'black' }} />
               </InputAdornment>
             ),
           }}

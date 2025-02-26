@@ -94,14 +94,12 @@ export class AddEmployeeDetails {
   employeeName: string;
   role: string;
   email: string;
-  dateOfJoining: string;
   imageBase64: string;
 }
 
 export class ManageEmployeeDetails {
   employeeId: string;
   employeeName?: string;
-  dateOfJoining?: string;
   role?: string;
   email?: string;
   imageUrl?: string;

@@ -281,11 +281,11 @@ const TrackerSetupView: React.FC = () => {
                   required
                 >
                   <InputLabel id="alert-message-label">
-                    Alert message
+                    Alert when capacity reaches
                   </InputLabel>
                   <Select
                     labelId="alert-message-label"
-                    label="Alert message"
+                    label="Alert when capacity reaches"
                     value={alertMessage}
                     onChange={(e: SelectChangeEvent<string>) => {
                       setAlertMessage(e.target.value);

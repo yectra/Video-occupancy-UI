@@ -135,7 +135,7 @@ const Sidebar: React.FC = () => {
                       <Box sx={{ display: "flex" }}>
                         <GroupsIcon sx={{ marginRight: 1, fontSize: 23 }} />
                         <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
-                          Add Employee
+                          Add User
                         </Typography>
                       </Box>
                     </ListItemText>
@@ -152,7 +152,7 @@ const Sidebar: React.FC = () => {
                       <Box sx={{ display: "flex" }}>
                         <PeopleAltIcon sx={{ marginRight: 1, fontSize: 21 }} />
                         <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
-                          Manage Employee
+                          Manage User
                         </Typography>
                       </Box>
                     </ListItemText>

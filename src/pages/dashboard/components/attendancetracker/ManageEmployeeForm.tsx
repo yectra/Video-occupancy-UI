@@ -234,7 +234,7 @@ const ManageEmployeeForm: React.FC = () => {
         }}
       >
         <Typography sx={{ fontWeight: "bold", color: "#1C214F" }} variant="h5">
-          Employee Registry
+          User Registry
         </Typography>
         <Box sx={{ position: "relative", width: "350px" }}>
           <InputBase
@@ -283,7 +283,7 @@ const ManageEmployeeForm: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                {["ID", "PROFILE", "NAME", "DATE OF JOINING", "ROLE", "EMAIL", "EDIT"].map(
+                {["ID", "PROFILE", "NAME", "ROLE", "EMAIL", "EDIT"].map(
                   (header) => (
                     <StyledTableCell key={header} align={header === "Employee Id" ? "left" : "center"}>
                       {header}
@@ -304,8 +304,7 @@ const ManageEmployeeForm: React.FC = () => {
                       <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 50, height: 50 }} />
                     </Box>
                   </StyledTableCell>
-                  <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
-                  <StyledTableCell align="center">{row.dateOfJoining}</StyledTableCell>
+                  <StyledTableCell align="center">{row.employeeName}</StyledTableCell>                  
                   <StyledTableCell align="center">{row.role}</StyledTableCell>
                   <StyledTableCell align="center">{row.email}</StyledTableCell>
                   <StyledTableCell align="center">
@@ -325,10 +324,10 @@ const ManageEmployeeForm: React.FC = () => {
 
 
       <Dialog open={editDialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>Edit Employee</DialogTitle>
+        <DialogTitle>Edit User</DialogTitle>
         <DialogContent>
           <DialogTextField
-            label="Employee ID *"
+            label="User ID *"
             value={selectedEmployee?.employeeId || ""}
             name="employeeId"
             onChange={handleInputChange}
@@ -349,22 +348,14 @@ const ManageEmployeeForm: React.FC = () => {
             helperText={emailError}
           />
           <DialogTextField
-            label="Date of Joining *"
-            value={selectedEmployee?.dateOfJoining || ""}
-            name="dateOfJoining"
-            onChange={handleInputChange}
-            disabled
-          />
-          <DialogTextField
             label="Role *"
             value={selectedEmployee?.role || ""}
             name="role"
             onChange={handleRoleChange}
             select
           >
-            <MenuItem value="Manager">Manager</MenuItem>
-            <MenuItem value="Employee">Employee</MenuItem>
-            <MenuItem value="Admin">Admin</MenuItem>
+             <MenuItem value="Admin">Admin</MenuItem>
+            <MenuItem value="Employee">Employee</MenuItem>           
           </DialogTextField>
         </DialogContent>
         <DialogActions>
