@@ -19,7 +19,7 @@ const UserTrackerView: React.FC = () => {
     setLoading(true);
     attendanceDetails.getAllEmployeeAttendanceDetails('1', '2024-12-19')
       .then((response: any) => {
-        setTodayPunchDetail(response[0])
+        setTodayPunchDetail(response.data[0])
 
       }).finally(() => setLoading(false));
   }, [])

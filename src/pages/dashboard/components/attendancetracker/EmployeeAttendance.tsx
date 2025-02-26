@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { Table, TableBody, TableCell, TableHead, TableRow, Box, Typography, InputAdornment, IconButton, Popper, tableCellClasses, InputBase, Backdrop, CircularProgress } from "@mui/material";
@@ -39,9 +39,10 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
+  const calenderRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLDivElement>;
 
   const [searchParams, setSearchParams] = useSearchParams();
   const urlDate = searchParams.get('date');
@@ -77,6 +78,20 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
       .catch(() => setError("Failed to fetch data."))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
+  const handleOutsideClick = (event: MouseEvent) => {
+    const targetNode = event.target as Node | null;
+    if (!calenderRef.current?.contains(targetNode)) {
+      setCalendarOpen(false);
+    }
+  };
 
   // useEffect(() => {
   //   if (date) {
@@ -232,9 +247,11 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
             <StyledTableCell align="center">Email</StyledTableCell>
             <StyledTableCell align="center">
               Date
+              <span ref={calenderRef}> 
               <IconButton onClick={handleIconClick}>
                 <TodayIcon style={{ color: "white" }} />
               </IconButton>
+              </span>              
               <Popper open={calendarOpen} anchorEl={anchorEl} placement="bottom">
                 <div style={{ border: "1px solid #ccc", borderRadius: "8px", padding: "10px", backgroundColor: "white" }}>
                   <Calendar onChange={handleDateChange} value={selectedDate || new Date()} className="custom-calendar" maxDate={new Date()} />

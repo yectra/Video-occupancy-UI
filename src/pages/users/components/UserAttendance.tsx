@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,6 +16,7 @@ import '@/styles/core/components/CalendarStyles.css';
 
 // Services
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import { AttendanceDataResponseModel } from "@/pages/dashboard/models/attendancetracker";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -43,6 +44,7 @@ const UserAttendance: React.FC = () => {
   const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [attendance, setAttendance] = useState<any[]>([])
+  const calenderRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLDivElement>;
 
   const attendanceDetails = new AttendanceDetails();
 
@@ -57,21 +59,35 @@ const UserAttendance: React.FC = () => {
     } else {
       setSelectedDate(date);
     }
-    attendanceDetails.getAllEmployeeAttendanceDetails('1',moment(date).format('YYYY-MM-DD'))
-    .then((response) => {
-      let attendanceResponse = response;
-      const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
-        employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
-      }));
-      setAttendance(attendance)
-    })
+    attendanceDetails.getAllEmployeeAttendanceDetails('1', moment(date).format('YYYY-MM-DD'))
+      .then((response) => {
+        let attendanceResponse = response;
+        const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+          employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+        }));
+        setAttendance(attendance)
+      })
     setCalendarOpen(false);
   };
 
+  const handleOutsideClick = (event: MouseEvent) => {
+    const targetNode = event.target as Node | null;
+    if (!calenderRef.current?.contains(targetNode)) {
+      setCalendarOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
   useEffect(() => {
     attendanceDetails.getAllEmployeeAttendanceDetails('1')
-      .then((response) => {
-        let attendanceResponse = response;
+      .then((response:any) => {
+        let attendanceResponse: AttendanceDataResponseModel[]= response.data;
         const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
           employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
         }));
@@ -90,9 +106,11 @@ const UserAttendance: React.FC = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <IconButton onClick={handleIconClick}>
-                  <TodayIcon />
-                </IconButton>
+                <span ref={calenderRef}>
+                  <IconButton onClick={handleIconClick}>
+                    <TodayIcon />
+                  </IconButton>
+                </span>
               </InputAdornment>
             ),
           }}
