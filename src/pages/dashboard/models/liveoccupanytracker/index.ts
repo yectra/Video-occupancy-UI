@@ -4,15 +4,17 @@ export class CameraSetup {
   videoSource: string;
 }
 
-export interface BackendPayload {
+export class BackendPayload {
   capacityOfPeople: number;
   alertMessage: string;
-  cameraDetails: {
-    entranceName: string;
-    cameraPosition: string;
-    videoUrl: string;
-    doorCoordinates: number[][] | undefined;
-  }[];
+  cameraDetails: CameraDetailsModel[];
+}
+
+export class CameraDetailsModel {
+  entranceName: string;
+  cameraPosition: string;
+  videoUrl: string;
+  doorCoordinates: number[][] | undefined;
 }
 
 export class GraphResponseModel {

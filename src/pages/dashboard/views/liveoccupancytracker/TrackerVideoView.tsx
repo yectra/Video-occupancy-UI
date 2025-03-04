@@ -21,6 +21,7 @@ interface CameraSetup {
   entranceName: string;
   cameraPosition: string;
   videoSource: string;
+  doorCoordinates?: number[][];
 }
 
 interface Coordinates {
@@ -53,6 +54,19 @@ const TrackerVideoView: React.FC = () => {
         initialCoordinates[camera.videoSource] = [];
       });
       setCoordinates(initialCoordinates);
+    } else if (location.state && location.state.cameraResponse) {
+      const formattedData: CameraSetup[] = location.state.cameraResponse.cameraDetails.map((camera: any) => ({
+        entranceName: camera.entranceName,
+        cameraPosition: camera.cameraPosition,
+        videoSource: camera.videoUrl,
+        doorCoordinates: camera.doorCoordinates,
+      }));
+      setVideoSources(formattedData);
+      const initialCoordinates: Coordinates = {};
+      formattedData.forEach((camera: CameraSetup) => {
+        initialCoordinates[camera.videoSource] = camera.doorCoordinates ?? [];
+      });
+      setCoordinates(initialCoordinates);
     }
   }, [location.state]);
 
@@ -66,7 +80,7 @@ const TrackerVideoView: React.FC = () => {
   };
 
   const handleCloseModal = () => {
-    setFullScreenVideo(null); 
+    setFullScreenVideo(null);
     if (settingCoordinates) {
       setSettingCoordinates(false);
       setSelectedVideo(null);
@@ -79,7 +93,7 @@ const TrackerVideoView: React.FC = () => {
 
   const handleCoordinateCapture = (
     source: string,
-    newCoordinates: number[][] 
+    newCoordinates: number[][]
   ) => {
     setCoordinates((prevCoordinates) => ({
       ...prevCoordinates,
@@ -89,28 +103,46 @@ const TrackerVideoView: React.FC = () => {
 
   const handleFinish = () => {
     setLoading(true);
-    const payload: BackendPayload = {
-      capacityOfPeople: capacityOfPeople,
-      alertMessage: alertMessage,
-      cameraDetails: videoSources.map((camera) => ({
-        entranceName: camera.entranceName,
-        cameraPosition: camera.cameraPosition.toLowerCase(),
-        videoUrl: camera.videoSource,
-        doorCoordinates: coordinates[camera.videoSource] || [],
-      })),
-    };  
+    if (location.state && location.state.cameraSetups) {
+      const payload: BackendPayload = {
+        capacityOfPeople: capacityOfPeople,
+        alertMessage: alertMessage,
+        cameraDetails: videoSources.map((camera) => ({
+          entranceName: camera.entranceName,
+          cameraPosition: camera.cameraPosition.toLowerCase(),
+          videoUrl: camera.videoSource,
+          doorCoordinates: coordinates[camera.videoSource] || [],
+        })),
+      };
 
-    occupancyTracker.addSetupDetails(payload).then((response) => {
-      if (response)
-        navigate("/dashboard/occupancy-tracker/overview", {
-          state: {
-            videoSources,
-            alertMessage,
-            capacityOfPeople,
-            coordinates,
-          },
-        });
-    }).finally(() => setLoading(false));
+      occupancyTracker.addSetupDetails(payload).then((response) => {
+        if (response)
+          navigate("/dashboard/occupancy-tracker/overview", {
+            state: {
+              videoSources,
+              alertMessage,
+              capacityOfPeople,
+              coordinates,
+            },
+          });
+      }).finally(() => setLoading(false));
+    } else if (location.state && location.state.cameraResponse) {
+      const payload: BackendPayload = {
+        capacityOfPeople: location.state.cameraResponse.capacityOfPeople,
+        alertMessage: location.state.cameraResponse.alertMessage,
+        cameraDetails: videoSources.map((camera) => ({
+          entranceName: camera.entranceName,
+          cameraPosition: camera.cameraPosition.toLowerCase(),
+          videoUrl: camera.videoSource,
+          doorCoordinates: coordinates[camera.videoSource] || [],
+        })),
+      };
+      navigate("/dashboard/tracker-setup", {
+        state: {
+          payload
+        },
+      });
+    }
   };
 
   const handleBackClick = () => {
@@ -128,12 +160,12 @@ const TrackerVideoView: React.FC = () => {
   return (
     <Grid container spacing={3}>
       <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
-        <CircularProgress color={"primary"}/>
+        <CircularProgress color={"primary"} />
       </Backdrop>
       <Grid item xs={12}>
-        <IconButton onClick={handleBackClick}>
+        {location.state && location.state.cameraSetups && <IconButton onClick={handleBackClick}>
           <ArrowBackIcon />
-        </IconButton>
+        </IconButton>}
         <Typography
           sx={{ fontWeight: "bold" }}
           variant="h4"
@@ -204,9 +236,9 @@ const TrackerVideoView: React.FC = () => {
               bgcolor: "background.paper",
               boxShadow: 24,
               p: 4,
-              position: "absolute", 
-              maxWidth: "100%", 
-              maxHeight: "100%" 
+              position: "absolute",
+              maxWidth: "100%",
+              maxHeight: "100%"
             }}
           >
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

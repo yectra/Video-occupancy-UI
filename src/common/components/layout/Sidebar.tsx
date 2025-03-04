@@ -32,10 +32,10 @@ const Sidebar: React.FC = () => {
   return (
     <Drawer
       sx={{
-        width: "220px",
+        width: "15%",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: "220px",
+          width: "15%",
           bgcolor: "#1C214F",
           color: "white",
           overflow: "hidden",
@@ -162,7 +162,7 @@ const Sidebar: React.FC = () => {
             </Collapse>
 
             <Link
-              to="/dashboard/occupancy-tracker"
+              to="/dashboard/tracker-setup"
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <ListItem

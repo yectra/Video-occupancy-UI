@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 
 const TrackerSetupView: React.FC = () => {
     const [capacity, setCapacity] = useState<string>("");
-    const [alertMessage, setAlertMessage] = useState<string>("");
+    const [alertMessage, setAlertMessage] = useState<string>("20%");
     const [sliderValue, setSliderValue] = useState<number>(20);
     const [isDisable, setIsDisable] = useState<boolean>(false)
     const [cameraSetups, setCameraSetups] = useState<any[]>([
@@ -34,6 +34,20 @@ const TrackerSetupView: React.FC = () => {
     const [coordinates] = useState<any>({});
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [tooltipContent, setTooltipContent] = useState<string>("");
+    const marks = [
+        {
+          value: 0,
+          label: '0%',
+        },
+        {
+          value: 50,
+          label: '50%',
+        },
+        {
+          value: 100,
+          label: '100%',
+        }
+      ];
 
     const navigate = useNavigate();
 
@@ -72,7 +86,7 @@ const TrackerSetupView: React.FC = () => {
                     if (isDuplicate) {
                         setErrors((prevErrors) => ({
                             ...prevErrors,
-                            [`${field}${index}`]: "URL Already Exist",
+                            [`${field}${index}`]: `${field}Already Exist`,
                         }));
                         return prev;
                     }
@@ -232,6 +246,7 @@ const TrackerSetupView: React.FC = () => {
                         step={5}
                         valueLabelDisplay="auto"
                         valueLabelFormat={(value) => `${value}%`}
+                        marks={marks}
                     />
                     {/* <FormControl
                   variant="outlined"

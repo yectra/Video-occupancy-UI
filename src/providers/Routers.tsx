@@ -51,6 +51,12 @@ const UsersDetails = React.lazy(() => import("@/pages/users/index"));
 //UserTracker
 const UserTrackerView = React.lazy(() => import("@/pages/users/views/UserTrackerView"));
 
+//Setup
+const TrackerSetup = React.lazy(()=> import("@/pages/dashboard/views/liveoccupancytracker/TrackerSetup"))
+
+//Setup List
+const TrackerSetupListView = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/TrackerSetupListView"));
+
 const route = [
   {
     path: "/",
@@ -105,6 +111,16 @@ const route = [
                 ],
               },
             ],
+          },
+          {
+            path:"dashboard/tracker-setup",
+            element: <TrackerSetup />,
+            children: [
+              {
+                path: "",
+                element: <TrackerSetupListView />,
+              }
+            ]
           },
           {
             path: "dashboard/attendance",

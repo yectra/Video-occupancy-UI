@@ -7,27 +7,30 @@ import { VideoPlayer } from "@/pages/dashboard/components/liveoccupancytracker/V
 // Services
 import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
 
+//Models
+import { BackendPayload } from "../../models/liveoccupanytracker";
+
 const VideoFeeds: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [entranceNames, setEntranceNames] = useState<string[]>([])
   const [videoSource, setVideoSource] = useState<string>('')
-  const [cameraDetails, setCameraDetails] = useState<any[]>([])
+  const [cameraDetails, setCameraDetails] = useState<BackendPayload>(new BackendPayload())
 
   const occupancyTracker = new OccupancyTracker();
 
   useEffect(() => {
     occupancyTracker.getCameraUrls().then((response: any) => {
-      setCameraDetails(response.cameraDetails)
-      const entranceNames = response.cameraDetails.map((video: any) => video.entranceName)
+      setCameraDetails(response.data)
+      const entranceNames = response.data.cameraDetails.map((video: any) => video.entranceName)
       setEntranceNames(entranceNames);
       setSelectedOption(entranceNames[0])
-      setVideoSource(response.cameraDetails[0].videoUrl)
+      setVideoSource(response.data.cameraDetails[0].videoUrl)
     })
   }, [])
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedOption(event.target.value as string);
-    setVideoSource(cameraDetails.find((video) => video.entranceName === event.target.value as string)?.videoUrl as string)
+    setVideoSource(cameraDetails.cameraDetails.find((video) => video.entranceName === event.target.value as string)?.videoUrl as string)
   };
 
   return (
