@@ -7,6 +7,8 @@ import {
   InputAdornment,
   Snackbar,
   Alert,
+  Backdrop,
+  CircularProgress,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
@@ -30,7 +32,8 @@ const OrganizationView: React.FC = () => {
   });
 
   const [phoneError, setPhoneError] = useState(false);
-  const [isNextEnabled, setIsNextEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  // const [isNextEnabled, setIsNextEnabled] = useState(false);
 
   // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -58,28 +61,42 @@ const OrganizationView: React.FC = () => {
       setSnackbarOpen(true);
       return;
     }
+    setLoading(true);
+    attendanceService.organizationDetails(formData)
+      .then(() => {
+        setSnackbarMessage('Organization details saved successfully!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        navigate('/dashboard/attendance/attendance-setup');
+      }).catch(() => {
+        setSnackbarMessage('Failed to save organization details.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true)
+      }).finally(() => setLoading(false));
 
-    try {
-      const response = await attendanceService.organizationDetails(formData);
-      setSnackbarMessage('Organization details saved successfully!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
-      console.log(response);
-      setIsNextEnabled(true);
+    // try {
+    //   const response = await attendanceService.organizationDetails(formData);
+    //   setSnackbarMessage('Organization details saved successfully!');
+    //   setSnackbarSeverity('success');
+    //   setSnackbarOpen(true);
+    //   console.log(response);
+    //   // setIsNextEnabled(true);
+    //   navigate('/dashboard/attendance/attendance-setup');
 
-    } catch (error) {
-      console.error('Error saving organization details:', error);
-      setSnackbarMessage('Failed to save organization details.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
+    // } catch (error) {
+    //   console.error('Error saving organization details:', error);
+    //   setSnackbarMessage('Failed to save organization details.');
+    //   setSnackbarSeverity('error');
+    //   setSnackbarOpen(true);
+    // }
   };
 
-  const handleNext = () => {
-    if (isNextEnabled) {
-      navigate('/dashboard/occupancy-tracker/attendance-setup');
-    }
-  };
+  // const handleNext = () => {
+  //   if (isNextEnabled) {
+  //     // navigate('/dashboard/occupancy-tracker/attendance-setup');
+  //     navigate('/dashboard/attendance/attendance-setup');
+  //   }
+  // };
 
   const handleSnackbarClose = (
     _event?: React.SyntheticEvent | Event,
@@ -104,6 +121,9 @@ const OrganizationView: React.FC = () => {
         padding: 4,
       }}
     >
+      <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
+        <CircularProgress color={"primary"} />
+      </Backdrop>
       <Box sx={{ textAlign: 'center', mb: 4 }}>
         <Typography sx={{ fontWeight: 'bold', color: '#00D1A3' }} variant="h4">
           Attendance Tracking Setup
@@ -219,25 +239,23 @@ const OrganizationView: React.FC = () => {
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
           }}
         >
           <Button
             type="submit"
-            variant="outlined"
+            variant="contained"
             sx={{
               fontWeight: 'bold',
               padding: 1,
               width: '200px',
-              borderColor: '#00D1A3',
-              color: '#00D1A3',
-              '&:hover': { borderColor: '#00B089', color: '#00B089' },
+              bgcolor: "#00D1A3", '&:hover': { bgcolor: '#00D1A3' }
             }}
           >
             <Typography>Submit</Typography>
           </Button>
-          <Button
+          {/* <Button
             variant="contained"
             sx={{
               fontWeight: 'bold',
@@ -252,7 +270,7 @@ const OrganizationView: React.FC = () => {
             disabled={!isNextEnabled}
           >
             <Typography>Next</Typography>
-          </Button>
+          </Button> */}
         </Box>
       </Box>
       {/* Snackbars */}

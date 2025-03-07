@@ -13,56 +13,52 @@ const DashboardSetupView = React.lazy(() => import("@/pages/dashboard/views/Dash
 const Dashboard = React.lazy(() => import("@/pages/dashboard/index"));
 
 //LiveOccupancyTracker
-const LiveOccupancyTrackerView = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/LiveOccupancyTrackerView"));
+const LiveOccupancyTrackerView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/LiveOccupancyTrackerView"));
 
 //Setup
-const TrackerSetupView = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/TrackerSetupView"));
+const TrackerSetupView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/TrackerSetupView"));
 
 //Preview
 const TrackerVideoView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/TrackerVideoView"));
 
 //Overview
-const TrackerOverview = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/TrackerOverview"));
+const TrackerOverview = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/TrackerOverview"));
 
 //Add Employee
 const EmployeeForm = React.lazy(() => import("@/pages/dashboard/components/attendancetracker/EmployeeForm"));
 
 //EmployeeForm
-const ManageEmployeeForm = React.lazy(() => import ("@/pages/dashboard/components/attendancetracker/ManageEmployeeForm"));
+const ManageEmployeeForm = React.lazy(() => import("@/pages/dashboard/components/attendancetracker/ManageEmployeeForm"));
 
 //Attendance
-const AttendanceView = React.lazy(() => import("@/pages/dashboard/views/attendancetracker/AttendanceView"));
+const AttendanceTrackerView = React.lazy(() => import("@/pages/dashboard/views/attendancetracker/AttendanceTrackerView"))
 
 //AttendanceList
-const AttendanceListView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/AttendanceListView"));
+const AttendanceListView = React.lazy(() => import("@/pages/dashboard/views/attendancetracker/AttendanceListView"));
 
 //AttendanceSetupView
-const AttendanceSetupView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/AttendanceSetupView"))
+const AttendanceSetupView = React.lazy(() => import("@/pages/dashboard/views/attendancetracker/AttendanceSetupView"))
 
 //OrganizationView
-const OrganizationView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/OrganizationView"))
+const OrganizationView = React.lazy(() => import("@/pages/dashboard/views/attendancetracker/OrganizationView"))
 
 //EmployeeDetails
-const EmployeeDetailsView = React.lazy(() =>import("@/pages/dashboard/views/attendancetracker/EmployeeDetailsView"));
-
-//users
-const UsersDetails = React.lazy(() => import("@/pages/users/index"));
+const EmployeeDetailsView = React.lazy(() => import("@/pages/dashboard/views/attendancetracker/EmployeeDetailsView"));
 
 //UserTracker
 const UserTrackerView = React.lazy(() => import("@/pages/users/views/UserTrackerView"));
 
-//Setup
-const TrackerSetup = React.lazy(()=> import("@/pages/dashboard/views/liveoccupancytracker/TrackerSetup"))
-
 //Setup List
-const TrackerSetupListView = React.lazy(() =>import("@/pages/dashboard/views/liveoccupancytracker/TrackerSetupListView"));
+const TrackerSetupListView = React.lazy(() => import("@/pages/dashboard/components/liveoccupancytracker/TrackerSetupUpdateView"));
+
+//Occupancy List
+const OccupancyList = React.lazy(() => import("@/pages/dashboard/components/liveoccupancytracker/OccupancyList"));
 
 const route = [
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      
       {
         path: "",
         element: <Dashboard />,
@@ -76,20 +72,12 @@ const route = [
             element: <LiveOccupancyTrackerView />,
             children: [
               {
-                path:"",
-                element:<TrackerSetupView/>
+                path: "",
+                element: <TrackerSetupView />
               },
               {
-                path:"preview",
-                element:<TrackerVideoView/>
-              },
-              {
-                path:"organization",
-                element:<OrganizationView/>
-              },
-              {
-                path:"attendance-setup",
-                element:<AttendanceSetupView/>,
+                path: "preview",
+                element: <TrackerVideoView />
               },
               {
                 path: "",
@@ -101,52 +89,58 @@ const route = [
                     element: <TrackerOverview />,
                   },
                   {
-                    path:"add-emp",
-                    element:<EmployeeForm/>,
+                    path: "add-emp",
+                    element: <EmployeeForm />,
                   },
                   {
-                    path:"emp-form",
-                    element:<ManageEmployeeForm />,
+                    path: "emp-form",
+                    element: <ManageEmployeeForm />,
                   },
+                  {
+                    path: "tracker-setup",
+                    element: <TrackerSetupListView />,
+                  },
+                  {
+                    path: "occupancy",
+                    element: <OccupancyList />,
+                  }
                 ],
               },
             ],
           },
           {
-            path:"dashboard/tracker-setup",
-            element: <TrackerSetup />,
-            children: [
-              {
-                path: "",
-                element: <TrackerSetupListView />,
-              }
-            ]
-          },
-          {
             path: "dashboard/attendance",
-            element: <AttendanceView />,
+            element: <AttendanceTrackerView />,
             children: [
               {
                 path: "",
-                element: <AttendanceListView />,
+                element: <OrganizationView />,
               },
               {
-                path:"emp-details",
-                element: <EmployeeDetailsView />
+                path: "attendance-setup",
+                element: <AttendanceSetupView />,
+              },
+              {
+                path: "",
+                element: <Layout />,
+                children: [
+                  {
+                    path: "emp-attendance",
+                    element: <AttendanceListView />
+                  },
+                  {
+                    path: "user-details",
+                    element: <UserTrackerView />
+                  },
+                  {
+                    path: "attendance-details",
+                    element: <EmployeeDetailsView />
+                  },
+                ],
               },
             ],
           },
         ],
-      },
-      {
-        path:"user-details",
-        element:<UsersDetails/>,
-        children:[
-          {
-            path:"",
-            element:<UserTrackerView/>
-          }
-        ]
       } 
     ],
   },

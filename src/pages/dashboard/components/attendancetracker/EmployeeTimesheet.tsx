@@ -48,7 +48,7 @@ const EmployeeTimesheet: React.FC = () => {
   const angle = (time / 24) * 200;
 
   const handleBackClick = () => {
-    navigate(`/dashboard/attendance?date=${date}`);
+    navigate(`/dashboard/attendance/emp-attendance?date=${date}`);
   };
 
   return (

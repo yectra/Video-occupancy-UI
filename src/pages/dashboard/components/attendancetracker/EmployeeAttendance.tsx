@@ -149,7 +149,7 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   };
 
   const handleRowClick = (row: any) => {
-    navigate(`/dashboard/attendance/emp-details?date=${row.date}&id=${row.employeeId}`);
+    navigate(`/dashboard/attendance/attendance-details?date=${row.date}&id=${row.employeeId}`);
   };
 
   const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {

@@ -40,7 +40,7 @@ const AttendanceSetupView = () => {
         setSnackbarMessage('Camera setup details saved successfully!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
-        navigate("/dashboard/occupancy-tracker/overview")
+        navigate("/dashboard/attendance/emp-attendance")
       })
       .catch((error) => {
         setSnackbarMessage('Failed to save camera setup details.');
@@ -110,14 +110,24 @@ const AttendanceSetupView = () => {
             onChange={(e) => handleInputChange(0, 'punchoutUrl', e.target.value)}
           />
         </Box>
-        <Button
+        <Box sx={{ display: "flex", justifyContent: "end", mt: 2 }}>
+          <Button
+            variant='contained'
+            sx={{ bgcolor: "#00D1A3", '&:hover': { bgcolor: '#00D1A3' }, width: "200px" }}
+            onClick={handleSave}
+            disabled={isLoading}
+          >
+            {isLoading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Save"}
+          </Button>
+        </Box>
+        {/* <Button
           variant='contained'
           sx={{ bgcolor: "#00D1A3", '&:hover': { bgcolor: '#00D1A3' } }}
           onClick={handleSave}
           disabled={isLoading} // Disable the button when loading
         >
           {isLoading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Save"}
-        </Button>
+        </Button> */}
       </Grid>
 
       <Snackbar

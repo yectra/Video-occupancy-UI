@@ -27,7 +27,7 @@ const Sidebar: React.FC = () => {
   };
 
   const isActive = (path: string) => location.pathname === path;
-  const isUserDetailsPage = location.pathname === "/user-details";
+  const isAttendanceTracker = location.pathname.startsWith("/dashboard/attendance");
 
   return (
     <Drawer
@@ -53,28 +53,55 @@ const Sidebar: React.FC = () => {
           </ListItemText>
         </ListItem>
         <ListItem />
-        {isUserDetailsPage ? (
+        {isAttendanceTracker ? (
           <>
-
-            <ListItem
-              sx={{
-                cursor: "pointer",
-                backgroundColor: "#00D1A3",
-              }}
+            <Link
+              to="/dashboard/attendance/emp-attendance"
+              style={{ textDecoration: "none", color: "inherit" }}
             >
-              <Box sx={{ display: "flex" }}>
-                <EventAvailableIcon sx={{ mt: 1 }} />
+              <ListItem
+                sx={{
+                  cursor: "pointer",
+                  backgroundColor: isActive(
+                    "/dashboard/attendance/emp-attendance"
+                  )
+                    ? "#00D1A3"
+                    : "inherit",
+                }}
+              >
+                <Box sx={{ display: "flex" }}>
+                  <PreviewIcon sx={{ mt: 1 }} />
+                  <ListItemText sx={{ ml: 2 }}>
+                    <Typography sx={{ fontSize: 19 }} variant="h6">
+                      Employee Attendace
+                    </Typography>
+                  </ListItemText>
+                </Box>
+              </ListItem>
+            </Link>
+            <Link
+              to="/dashboard/attendance/user-details"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <ListItem
+                sx={{
+                  cursor: "pointer",
+                  backgroundColor: isActive("/dashboard/attendance/user-details")
+                    ? "#00D1A3"
+                    : "inherit",
+                }}
+              >
+                <SettingsIcon />
                 <ListItemText sx={{ ml: 2 }}>
                   <Typography sx={{ fontSize: 19 }} variant="h6">
-                    User Attendance
+                    User Details
                   </Typography>
                 </ListItemText>
-              </Box>
-            </ListItem>
+              </ListItem>
+            </Link>
           </>
         ) : (
           <>
-          
             <Link
               to="/dashboard/occupancy-tracker/overview"
               style={{ textDecoration: "none", color: "inherit" }}
@@ -106,11 +133,6 @@ const Sidebar: React.FC = () => {
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                backgroundColor: location.pathname.startsWith(
-                  "/dashboard/occupancy-tracker/overview/"
-                )
-                  ? "#00D1A3"
-                  : "inherit",
               }}
             >
               <div style={{ display: "flex", alignItems: "center" }}>
@@ -124,7 +146,14 @@ const Sidebar: React.FC = () => {
             </ListItem>
             <Collapse in={openUserManagement} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItem sx={{ ml: 4 }}>
+                <ListItem sx={{
+                  ml: 4,
+                  backgroundColor: isActive(
+                    "/dashboard/occupancy-tracker/add-emp"
+                  )
+                    ? "#00D1A3"
+                    : "inherit",
+                }}>
                   <Link
                     to="/dashboard/occupancy-tracker/add-emp"
                     style={{ textDecoration: "none", color: "inherit" }}
@@ -141,7 +170,14 @@ const Sidebar: React.FC = () => {
                     </ListItemText>
                   </Link>
                 </ListItem>
-                <ListItem sx={{ ml: 4 }}>
+                <ListItem sx={{
+                  ml: 4,
+                  backgroundColor: isActive(
+                    "/dashboard/occupancy-tracker/emp-form"
+                  )
+                    ? "#00D1A3"
+                    : "inherit",
+                }}>
                   <Link
                     to="/dashboard/occupancy-tracker/emp-form"
                     style={{ textDecoration: "none", color: "inherit" }}
@@ -162,12 +198,15 @@ const Sidebar: React.FC = () => {
             </Collapse>
 
             <Link
-              to="/dashboard/tracker-setup"
+              to="/dashboard/occupancy-tracker/tracker-setup"
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <ListItem
                 sx={{
                   cursor: "pointer",
+                  backgroundColor: isActive("/dashboard/occupancy-tracker/tracker-setup")
+                    ? "#00D1A3"
+                    : "inherit",
                 }}
               >
                 <SettingsIcon />
@@ -179,13 +218,13 @@ const Sidebar: React.FC = () => {
               </ListItem>
             </Link>
             <Link
-              to="/dashboard/attendance"
+              to="/dashboard/occupancy-tracker/occupancy"
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <ListItem
                 sx={{
                   cursor: "pointer",
-                  backgroundColor: isActive("/dashboard/attendance")
+                  backgroundColor: isActive("/dashboard/occupancy-tracker/occupancy")
                     ? "#00D1A3"
                     : "inherit",
                 }}
@@ -194,7 +233,7 @@ const Sidebar: React.FC = () => {
                   <EventAvailableIcon sx={{ mt: 1 }} />
                   <ListItemText sx={{ ml: 2 }}>
                     <Typography sx={{ fontSize: 19 }} variant="h6">
-                      Attendance
+                      Occupancy
                     </Typography>
                   </ListItemText>
                 </Box>

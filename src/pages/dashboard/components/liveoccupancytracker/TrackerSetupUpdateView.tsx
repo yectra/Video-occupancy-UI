@@ -254,7 +254,14 @@ const TrackerSetupUpdateView: React.FC = () => {
     }
 
     return (
-        <Box sx={{ padding: 2 }}>
+        <Box sx={{
+            mt: 4,
+            height: "auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+          }}>
             <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
                 <CircularProgress color={"primary"} />
             </Backdrop>
@@ -356,7 +363,7 @@ const TrackerSetupUpdateView: React.FC = () => {
                             ))}
                         </TableBody>
                     </Table>
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", my: 3 }}>
                         <Button
                             sx={{
                                 bgcolor: "#00D1A3",

@@ -141,7 +141,7 @@ const TrackerVideoView: React.FC = () => {
           doorCoordinates: coordinates[camera.videoSource] || [],
         })),
       };
-      navigate("/dashboard/tracker-setup", {
+      navigate("/dashboard/occupancy-tracker/tracker-setup", {
         state: {
           payload
         },
