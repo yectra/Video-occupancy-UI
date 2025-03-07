@@ -159,7 +159,7 @@ const TrackerSetupView: React.FC = () => {
     };
 
     return (
-        <Grid container sx={{ width: "100vw", height: "100vh" }} spacing={0}>
+        <Grid container sx={{ maxWidth: "100vw", maxHeight: "100vh" }} spacing={0}>
             <Grid
                 item
                 xs={12}
@@ -391,7 +391,7 @@ const TrackerSetupView: React.FC = () => {
                         }}
                         onClick={handleAddCameraClick}
                     >
-                        + Add another camera
+                        <Typography>+ Add another camera</Typography>
                     </Button>
                     <Box
                         sx={{
@@ -413,7 +413,7 @@ const TrackerSetupView: React.FC = () => {
                                 display: "block",
                             }}
                         >
-                            Preview
+                            <Typography>Preview</Typography>
                         </Button>
                     </Box>
                 </Box>

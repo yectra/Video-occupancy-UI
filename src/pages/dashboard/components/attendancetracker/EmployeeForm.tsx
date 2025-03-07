@@ -131,7 +131,7 @@ const EmployeeForm: React.FC = () => {
               component="label"
               sx={{ bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
             >
-              Upload Picture
+              <Typography>Upload Picture</Typography>
               <Typography component="span" sx={{ pl: 1 }}>*</Typography>
               <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
             </Button>
@@ -197,7 +197,7 @@ const EmployeeForm: React.FC = () => {
               onClick={handleSubmit}
               disabled={!isFormValid()}
             >
-              Add User
+              <Typography>Add User</Typography>
             </Button>
           </Grid>
         </Grid>

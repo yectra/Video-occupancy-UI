@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -44,7 +44,6 @@ const UserAttendance: React.FC = () => {
   const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [attendance, setAttendance] = useState<any[]>([])
-  const calenderRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLDivElement>;
 
   const attendanceDetails = new AttendanceDetails();
 
@@ -70,19 +69,6 @@ const UserAttendance: React.FC = () => {
     setCalendarOpen(false);
   };
 
-  const handleOutsideClick = (event: MouseEvent) => {
-    const targetNode = event.target as Node | null;
-    if (!calenderRef.current?.contains(targetNode)) {
-      setCalendarOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
 
   useEffect(() => {
     attendanceDetails.getAllEmployeeAttendanceDetails('1')
@@ -106,7 +92,7 @@ const UserAttendance: React.FC = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <span ref={calenderRef}>
+                <span>
                   <IconButton onClick={handleIconClick}>
                     <TodayIcon />
                   </IconButton>

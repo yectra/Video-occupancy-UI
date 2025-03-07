@@ -61,7 +61,6 @@ const TrackerSetupUpdateView: React.FC = () => {
     const [rowIndex, setRowIndex] = useState<number>(0);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [isDisableSave, setIsDisableSave] = useState<boolean>(false);
-    const [isDisableSetup, setIsDisableSetup] = useState<boolean>(true);
     const [loading, setLoading] = useState(true);
     const marks = [
         {
@@ -129,7 +128,6 @@ const TrackerSetupUpdateView: React.FC = () => {
             .updateCameraDetails(updatedData)
             .then(() => {
                 getCameraDetails();
-                setIsDisableSetup(true);
             })
             .catch((error) =>
                 console.error("Error updating employee details:", error)
@@ -265,32 +263,19 @@ const TrackerSetupUpdateView: React.FC = () => {
                 <Typography variant="h4" gutterBottom sx={{ color: "#00D1A3", fontWeight: "bold" }}>
                     LIVE OCCUPANCY TRACKER
                 </Typography>
-                <Box component="div" display="flex" flexDirection="row" sx={{ my: 2 }}>
-                    <Typography variant="h6" sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10 }}>
+                <Box component="div" display="flex" flexDirection="row">
+                    <Typography variant="h6" sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 5 }}>
                         Setup details
                     </Typography>
-                    <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" }, marginRight: 10 }}
-                        onClick={() => setIsDisableSetup(prev => !prev)}
-                    >
-                        <EditOutlinedIcon />
-                    </IconButton>
-                    {!isDisableSetup && <Button
-                        sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" } }}
-                        variant="contained"
-                        onClick={saveSetupDetails}
-                    >
-                        Save
-                    </Button>}
                 </Box>
                 <Box component="div" display="flex" flexDirection="column" justifyContent="center"
-                    sx={{ gap: 4, width: "40%", pl: 6 }}>
+                    sx={{ gap: 2, width: "40%", pl: 6 }}>
                     <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
                         Capacity of people *
                     </Typography>
                     <TextField
                         variant="outlined"
                         value={cameraResponse.capacityOfPeople}
-                        disabled={isDisableSetup}
                         onChange={(e) => {
                             const value = e.target.value;
                             if (/^\d*$/.test(value) && value.length <= 8) {
@@ -311,34 +296,35 @@ const TrackerSetupUpdateView: React.FC = () => {
                         valueLabelDisplay="auto"
                         valueLabelFormat={(value) => `${value}%`}
                         marks={marks}
-                        disabled={isDisableSetup}
                     />
                 </Box>
                 <Box>
-                    <Box component="div" display="flex" flexDirection="row" sx={{ my: 2 }}>
+                    <Box component="div" display="flex" flexDirection="row" justifyContent="space-between" sx={{ my: 2 }}>
                         <Typography
                             variant="h6"
                             sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10 }}
                         >
                             Camera details
                         </Typography>
-                        <Button
-                            sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" }, marginRight: 10 }}
-                            variant="contained"
-                            onClick={handleAddCameraClick}
-                        >
-                            + Add another camera
-                        </Button>
-                        <Button
-                            sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" } }}
-                            variant="contained"
-                            onClick={updateSetCoordinates}
-                        >
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                <EditOutlinedIcon />
-                                <Typography>Edit Set Coordinates</Typography>
-                            </Box>
-                        </Button>
+                        <Box sx={{ display: "flex", gap: 2 }}>
+                            <Button
+                                sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" }, marginRight: 5 }}
+                                variant="contained"
+                                onClick={handleAddCameraClick}
+                            >
+                                <Typography> + Add another camera</Typography>
+                            </Button>
+                            <Button
+                                sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" } }}
+                                variant="contained"
+                                onClick={updateSetCoordinates}
+                            >
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <EditOutlinedIcon />
+                                    <Typography>Edit Set Coordinates</Typography>
+                                </Box>
+                            </Button>
+                        </Box>
                     </Box>
                     <Table sx={{ minWidth: 700 }} aria-label="customized table">
                         <TableHead>
@@ -346,7 +332,7 @@ const TrackerSetupUpdateView: React.FC = () => {
                                 {["Camera Identifier", "Camera Position", "videoUrl", "EDIT"].map(
                                     (header) => (
                                         <StyledTableCell key={header} align="center">
-                                            {header}
+                                            {header.toUpperCase()}
                                         </StyledTableCell>
                                     )
                                 )}
@@ -370,6 +356,19 @@ const TrackerSetupUpdateView: React.FC = () => {
                             ))}
                         </TableBody>
                     </Table>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                        <Button
+                            sx={{
+                                bgcolor: "#00D1A3",
+                                "&:hover": { bgcolor: "#00D1A3" },
+                                minWidth: "200px"
+                            }}
+                            variant="contained"
+                            onClick={saveSetupDetails}
+                        >
+                            <Typography>Save</Typography>
+                        </Button>
+                    </Box>
                 </Box>
                 <Dialog open={editDialogOpen} onClose={handleDialogClose}>
                     <DialogTitle>Edit Camera Location Details</DialogTitle>
@@ -403,11 +402,11 @@ const TrackerSetupUpdateView: React.FC = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => { openConfirmDialog() }} color="error">
-                            Delete
+                        <Typography>Delete</Typography>
                         </Button>
-                        <Button onClick={handleDialogClose}>Cancel</Button>
+                        <Button onClick={handleDialogClose}><Typography>Cancel</Typography></Button>
                         <Button disabled={isDisableSave} color="primary" onClick={handleSave}>
-                            Save
+                        <Typography>Save</Typography>
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -420,13 +419,13 @@ const TrackerSetupUpdateView: React.FC = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={closeConfirmDialog} color="primary">
-                            Cancel
+                        <Typography>Cancel</Typography>
                         </Button>
                         <Button
                             onClick={handleDelete}
                             color="error"
                         >
-                            Delete
+                            <Typography>Delete</Typography>
                         </Button>
                     </DialogActions>
                 </Dialog>

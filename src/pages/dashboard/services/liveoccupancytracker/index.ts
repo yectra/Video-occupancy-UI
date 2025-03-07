@@ -10,6 +10,7 @@ interface IOccupancyTracker {
     getAllCounts(): Promise<any>;
     getGraphDetails(): Promise<GraphResponseModel>;
     updateCameraDetails(cameraDetails: BackendPayload): Promise<any>;
+    checkUserExists(): Promise<any>;
 }
 
 export class OccupancyTracker implements IOccupancyTracker {
@@ -32,5 +33,9 @@ export class OccupancyTracker implements IOccupancyTracker {
     updateCameraDetails(cameraDetails: BackendPayload): Promise<any> {
         return httpPut(`/api/editData`, cameraDetails)
             .then((response) => response)
+    }
+
+    checkUserExists(): Promise<any> {
+        return httpGet(`/api/checkUserExists`).then((response) => response)
     }
 }

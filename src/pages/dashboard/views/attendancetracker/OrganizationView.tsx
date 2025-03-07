@@ -235,7 +235,7 @@ const OrganizationView: React.FC = () => {
               '&:hover': { borderColor: '#00B089', color: '#00B089' },
             }}
           >
-            Submit
+            <Typography>Submit</Typography>
           </Button>
           <Button
             variant="contained"
@@ -251,7 +251,7 @@ const OrganizationView: React.FC = () => {
             onClick={handleNext}
             disabled={!isNextEnabled}
           >
-            Next
+            <Typography>Next</Typography>
           </Button>
         </Box>
       </Box>

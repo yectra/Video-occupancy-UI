@@ -354,17 +354,17 @@ const ManageEmployeeForm: React.FC = () => {
             onChange={handleRoleChange}
             select
           >
-             <MenuItem value="Admin">Admin</MenuItem>
+            <MenuItem value="Admin">Admin</MenuItem>
             <MenuItem value="Employee">Employee</MenuItem>           
           </DialogTextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => { openConfirmDialog(); }} color="error">
-            Delete
+            <Typography>Delete</Typography>
           </Button>
-          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleDialogClose}><Typography>Cancel</Typography></Button>
           <Button disabled={isDisable} color="primary" onClick={handleSave}>
-            Save
+            <Typography>Save</Typography>
           </Button>
         </DialogActions>
       </Dialog>
@@ -385,7 +385,7 @@ const ManageEmployeeForm: React.FC = () => {
             fullWidth
             sx={{ marginBottom: 2 }}
           >
-            Upload New Image
+            <Typography>Upload New Image</Typography>           
             <input
               type="file"
               hidden
@@ -396,10 +396,10 @@ const ManageEmployeeForm: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleImageDialogClose} color="primary">
-            Cancel
+          <Typography>Cancel</Typography>
           </Button>
           <Button onClick={handleImageSave} color="primary">
-            Save
+          <Typography>Save</Typography>
           </Button>
         </DialogActions>
       </Dialog>
@@ -413,13 +413,13 @@ const ManageEmployeeForm: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeConfirmDialog} color="primary">
-            Cancel
+          <Typography>Cancel</Typography>
           </Button>
           <Button
             onClick={handleDelete}
             color="error"
           >
-            Delete
+            <Typography>Delete</Typography>
           </Button>
         </DialogActions>
       </Dialog>

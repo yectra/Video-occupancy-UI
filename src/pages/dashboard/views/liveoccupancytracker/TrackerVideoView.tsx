@@ -14,7 +14,11 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { VideoPlayer } from "@/pages/dashboard/components/liveoccupancytracker/VideoPlayer";
 import { useLocation, useNavigate } from "react-router-dom";
+
+//Models
 import { BackendPayload } from "@/pages/dashboard/models/liveoccupanytracker";
+
+//Services
 import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
 
 interface CameraSetup {
@@ -204,22 +208,22 @@ const TrackerVideoView: React.FC = () => {
       ))}
 
       <Grid item xs={12}>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex" }}>
           <Button
             sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" } }}
             variant="contained"
             onClick={handleSetCoordinates}
           >
-            {settingCoordinates
+            <Typography>{settingCoordinates
               ? "Stop Setting Coordinates"
-              : "Set Coordinates"}
+              : "Set Coordinates"}</Typography>
           </Button>
           <Button
-            sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" } }}
+            sx={{ bgcolor: "#00D1A3", "&:hover": { bgcolor: "#00D1A3" }, marginLeft: 5, minWidth: "200px" }}
             variant="contained"
             onClick={handleFinish}
           >
-            Finish
+            <Typography>Finish</Typography>
           </Button>
         </Box>
       </Grid>
@@ -247,7 +251,7 @@ const TrackerVideoView: React.FC = () => {
                 onClick={handleCloseModal}
                 sx={{ bgcolor: "#00D1A3" }}
               >
-                Save
+                <Typography>Save</Typography>
               </Button>
             </Box>
 

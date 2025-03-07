@@ -3,9 +3,11 @@ import { Box, Grid, Typography, TextField, Button, Snackbar, Alert, CircularProg
 import { AttendanceDetails } from '../../services/attendancetracker';
 import { useState } from 'react';
 import { CameraurlSetup } from '../../models/attendancetracker';
+import { useNavigate } from "react-router-dom";
 
 const AttendanceSetupView = () => {
   const attendanceDetails = new AttendanceDetails();
+  const navigate = useNavigate();
   const [cameraurlData, setCameraurlData] = useState<CameraurlSetup>({
     cameraDetails1: [
       {
@@ -31,14 +33,14 @@ const AttendanceSetupView = () => {
   };
 
   const handleSave = () => {
-    setIsLoading(true); // Set loading to true before starting the API call
+    setIsLoading(true);
     attendanceDetails
       .cameraurlDetails(cameraurlData)
-      .then((response) => {
+      .then(() => {
         setSnackbarMessage('Camera setup details saved successfully!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
-        console.log(response);
+        navigate("/dashboard/occupancy-tracker/overview")
       })
       .catch((error) => {
         setSnackbarMessage('Failed to save camera setup details.');
