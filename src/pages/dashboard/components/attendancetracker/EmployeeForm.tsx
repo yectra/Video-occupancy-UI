@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, TextField, Typography, Autocomplete, Avatar, Button, Snackbar, Alert, Grid } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 
 const EmployeeForm: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [name, setName] = useState<string>("");
   const [employeeId, setEmployeeId] = useState<string>("");
@@ -17,9 +18,18 @@ const EmployeeForm: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const [roleOptions, setRoleOptions] = useState<string[]>([]);
 
   const attendanceDetails = new AttendanceDetails();
-  const roleOptions = ["Admin", "Employee"];
+
+  const pathName = location.pathname;
+
+  useEffect(() => {
+    if (pathName && pathName === '/dashboard/attendance/add-emp')
+      setRoleOptions(['Admin', 'Employee']);
+    else if (pathName && pathName === '/dashboard/occupancy-tracker/add-emp')
+      setRoleOptions(['Admin', 'User']);
+  }, [pathName])
 
   const validateEmail = (email: string): boolean => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -119,7 +129,7 @@ const EmployeeForm: React.FC = () => {
         }}
       >
         <Typography sx={{ color: "#1C214F", fontWeight: "bold", textAlign: "center" }} variant="h6">
-          Add User
+          {(pathName && pathName === '/dashboard/attendance/add-emp') ? 'Add Employee' : 'Add User'}
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} container justifyContent="center">
@@ -150,7 +160,7 @@ const EmployeeForm: React.FC = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               id="employeeId"
-              label="User ID"
+              label={(pathName && pathName === '/dashboard/attendance/add-emp') ? 'Employee ID' : 'User ID'}
               variant="outlined"
               fullWidth
               value={employeeId}
@@ -172,7 +182,7 @@ const EmployeeForm: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-          <Autocomplete
+            <Autocomplete
               id="role"
               options={roleOptions}
               value={role}
@@ -197,7 +207,7 @@ const EmployeeForm: React.FC = () => {
               onClick={handleSubmit}
               disabled={!isFormValid()}
             >
-              <Typography>Add User</Typography>
+              <Typography>{(pathName && pathName === '/dashboard/attendance/add-emp') ? 'Add Employee' : 'Add User'}</Typography>
             </Button>
           </Grid>
         </Grid>

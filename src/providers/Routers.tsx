@@ -136,6 +136,14 @@ const route = [
                     path: "attendance-details",
                     element: <EmployeeDetailsView />
                   },
+                  {
+                    path: "add-emp",
+                    element: <EmployeeForm />,
+                  },
+                  {
+                    path: "emp-form",
+                    element: <ManageEmployeeForm />,
+                  },
                 ],
               },
             ],

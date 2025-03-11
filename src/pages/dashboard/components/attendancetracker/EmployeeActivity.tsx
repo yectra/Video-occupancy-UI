@@ -39,7 +39,7 @@ const EmployeeActivity: React.FC = () => {
       }}
     >
       <Typography sx={{ color: '#1C214F', fontWeight: 'bold' }} variant='h6'>
-        Today activity
+        Activity
       </Typography>
       <Box
         sx={{

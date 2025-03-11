@@ -11,6 +11,7 @@ import { AttendanceDataResponseModel } from '@/pages/dashboard/models/attendance
 const UserTrackerView: React.FC = () => {
   const [loading, setLoading] =  useState<boolean>(false);  
   const [todayPunchDetail, setTodayPunchDetail] = useState<AttendanceDataResponseModel>(new AttendanceDataResponseModel())
+  const [attendanceList, setAttendanceList] = useState<any[]>([]);
 
   const attendanceDetails = new AttendanceDetails();
 
@@ -19,8 +20,12 @@ const UserTrackerView: React.FC = () => {
     setLoading(true);
     attendanceDetails.getAllEmployeeAttendanceDetails('1', '2024-12-19')
       .then((response: any) => {
-        setTodayPunchDetail(response.data[0])
-
+        setTodayPunchDetail(response.data[0]);
+        let attendanceResponse: AttendanceDataResponseModel[] = response.data;
+          let attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+            employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+          })) : [];
+          setAttendanceList(attendance);
       }).finally(() => setLoading(false));
   }, [])
 
@@ -33,7 +38,7 @@ const UserTrackerView: React.FC = () => {
         <UserTimesheet todayPunchDetail={todayPunchDetail} />
         <UserActivity todayPunchDetail={todayPunchDetail} />
       </Box>
-      <UserAttendance />
+      <UserAttendance attendanceList={attendanceList}/>
     </Box>
   );
 };

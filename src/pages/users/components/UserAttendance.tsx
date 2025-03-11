@@ -17,6 +17,7 @@ import '@/styles/core/components/CalendarStyles.css';
 // Services
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import { AttendanceDataResponseModel } from "@/pages/dashboard/models/attendancetracker";
+import { useSearchParams } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -39,50 +40,81 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   }
 }));
 
-const UserAttendance: React.FC = () => {
+interface IProps {
+  attendanceList?: any;
+}
+
+const UserAttendance:  React.FC<IProps> = ({ attendanceList }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [attendance, setAttendance] = useState<any[]>([])
+  const [attendance, setAttendance] = useState<any[]>([]);
+  const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
 
   const attendanceDetails = new AttendanceDetails();
+
+  const [searchParams] = useSearchParams();
+
+  const id = searchParams.get("id");
+  const date = searchParams.get("date");
 
   const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     setCalendarOpen((prev) => !prev);
   };
 
-  const handleDateChange: CalendarProps['onChange'] = (date: any) => {
-    if (Array.isArray(date)) {
-      setSelectedDate(date.length > 0 ? date[0] : null);
+  const handleDateChange: CalendarProps['onChange'] = (currentDate: any) => {
+    if (Array.isArray(currentDate)) {
+      setSelectedDate(currentDate.length > 0 ? currentDate[0] : null);
     } else {
-      setSelectedDate(date);
+      setSelectedDate(currentDate);
     }
-    attendanceDetails.getAllEmployeeAttendanceDetails('1', moment(date).format('YYYY-MM-DD'))
+    attendanceDetails.getAllEmployeeAttendanceDetails(id ? id: attendanceList.employeeId, moment(currentDate).format('YYYY-MM-DD'))
       .then((response) => {
         let attendanceResponse = response;
-        const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+        setNoRecordsMessage(attendanceResponse.length ? null : "No records found.");
+        const attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
           employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
-        }));
+        })) : [];
+        console.log('test1',attendance)
         setAttendance(attendance)
       })
     setCalendarOpen(false);
   };
 
-
   useEffect(() => {
-    attendanceDetails.getAllEmployeeAttendanceDetails('1')
-      .then((response:any) => {
-        let attendanceResponse: AttendanceDataResponseModel[]= response.data;
-        const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
-          employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
-        }));
-        setAttendance(attendance)
-      })
-  }, [])
+    if (id || attendanceList) {
+      let requestId = id ? id: attendanceList.employeeId;
+      let requestDate = date ? moment(date).format('YYYY-MM-DD') : '2024-12-19';
+      attendanceDetails
+        .getAllEmployeeAttendanceDetails(requestId, requestDate)
+        .then((response: any) => {
+          let attendanceResponse: AttendanceDataResponseModel[] = response.data;
+          setNoRecordsMessage(attendanceResponse.length ? null : "No records found.");
+          const attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+            employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+          })) : [];
+          console.log('test',attendance)
+          setAttendance(attendance)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [id]);
+  // useEffect(() => {
+  //   attendanceDetails.getAllEmployeeAttendanceDetails('1')
+  //     .then((response:any) => {
+  //       let attendanceResponse: AttendanceDataResponseModel[]= response.data;
+  //       const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+  //         employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+  //       }));
+  //       setAttendance(attendance)
+  //     })
+  // }, [])
 
   return (
-    <Paper>
+    <Paper sx={{ mt: 8 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography sx={{ fontWeight: "bold", color: "#252C58", p: 2 }} variant='h6'>Attendance List</Typography>
         <TextField
@@ -123,6 +155,13 @@ const UserAttendance: React.FC = () => {
               <StyledTableCell align="center">Break</StyledTableCell>
               <StyledTableCell align="center">Over Time</StyledTableCell>
             </TableRow>
+            {noRecordsMessage && attendance.length == 0 && (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  <Typography variant="body2" color="error">{noRecordsMessage}</Typography>
+                </TableCell>
+              </TableRow>
+            )}
           </TableHead>
           <TableBody>
             {attendance.map((row) => (

@@ -73,7 +73,7 @@ const Sidebar: React.FC = () => {
                   <PreviewIcon sx={{ mt: 1 }} />
                   <ListItemText sx={{ ml: 2 }}>
                     <Typography sx={{ fontSize: 19 }} variant="h6">
-                      Employee Attendace
+                      Attendace
                     </Typography>
                   </ListItemText>
                 </Box>
@@ -99,6 +99,75 @@ const Sidebar: React.FC = () => {
                 </ListItemText>
               </ListItem>
             </Link>
+            <ListItem
+              onClick={toggleUserManagement}
+              sx={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <PersonIcon />
+                <ListItemText sx={{ ml: 2 }}>
+                  <Typography sx={{ fontSize: 19 }} variant="h6">
+                    Employee Management
+                  </Typography>
+                </ListItemText>
+              </div>
+            </ListItem>
+            <Collapse in={openUserManagement} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItem sx={{
+                  ml: 4,
+                  backgroundColor: isActive(
+                    "/dashboard/attendance/add-emp"
+                  )
+                    ? "#00D1A3"
+                    : "inherit",
+                }}>
+                  <Link
+                    to="/dashboard/attendance/add-emp"
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    <ListItemText
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <Box sx={{ display: "flex" }}>
+                        <GroupsIcon sx={{ marginRight: 1, fontSize: 23 }} />
+                        <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
+                          Add Employee
+                        </Typography>
+                      </Box>
+                    </ListItemText>
+                  </Link>
+                </ListItem>
+                <ListItem sx={{
+                  ml: 4,
+                  backgroundColor: isActive(
+                    "/dashboard/attendance/emp-form"
+                  )
+                    ? "#00D1A3"
+                    : "inherit",
+                }}>
+                  <Link
+                    to="/dashboard/attendance/emp-form"
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    <ListItemText
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <Box sx={{ display: "flex" }}>
+                        <PeopleAltIcon sx={{ marginRight: 1, fontSize: 21 }} />
+                        <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
+                          Manage Employee
+                        </Typography>
+                      </Box>
+                    </ListItemText>
+                  </Link>
+                </ListItem>
+              </List>
+            </Collapse>
           </>
         ) : (
           <>
