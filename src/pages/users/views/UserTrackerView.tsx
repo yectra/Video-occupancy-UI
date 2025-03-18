@@ -17,6 +17,7 @@ const UserTrackerView: React.FC = () => {
 
   useEffect(() => {
     // let todayDate = moment(new Date()).format('YYYY-MM-DD'
+    // let date = new Date().toLocaleDateString("en-CA")
     setLoading(true);
     attendanceDetails.getAllEmployeeAttendanceDetails('1', '2024-12-19')
       .then((response: any) => {

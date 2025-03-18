@@ -50,6 +50,7 @@ const UserTrackerView = React.lazy(() => import("@/pages/users/views/UserTracker
 
 //Setup List
 const TrackerSetupListView = React.lazy(() => import("@/pages/dashboard/components/liveoccupancytracker/TrackerSetupUpdateView"));
+const AttendanceSetupListView = React.lazy(()=> import("@/pages/dashboard/components/attendancetracker/AttendanceSetupUpdateView"));
 
 //Occupancy List
 const OccupancyList = React.lazy(() => import("@/pages/dashboard/components/liveoccupancytracker/OccupancyList"));
@@ -144,6 +145,10 @@ const route = [
                     path: "emp-form",
                     element: <ManageEmployeeForm />,
                   },
+                  {
+                  path: "attendance-update",
+                  element: <AttendanceSetupListView />
+                },
                 ],
               },
             ],

@@ -114,11 +114,18 @@ export class OrganizationSetup {
 }
 
 export class CameraurlSetup {
-  cameraDetails1: {
-    email: string;
-    cameraI: string;
-    punchinUrl: string;
-    cameraII: string;
-    punchoutUrl: string;
-  }[];
+  email: string;
+  cameraDetails: AttendanceCameraDetailsModel[];
+}
+
+export class AttendanceCameraDetailsModel {
+  punchinCamera: string;
+  punchinUrl: string;
+  punchoutCamera: string;
+  punchoutUrl: string;
+}
+
+export class AttendanceTrackerDetailsModel {
+  cameraData : CameraurlSetup;
+  organizationData : OrganizationSetup;
 }

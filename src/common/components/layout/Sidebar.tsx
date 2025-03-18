@@ -79,7 +79,7 @@ const Sidebar: React.FC = () => {
                 </Box>
               </ListItem>
             </Link>
-            <Link
+            {/* <Link
               to="/dashboard/attendance/user-details"
               style={{ textDecoration: "none", color: "inherit" }}
             >
@@ -98,7 +98,7 @@ const Sidebar: React.FC = () => {
                   </Typography>
                 </ListItemText>
               </ListItem>
-            </Link>
+            </Link> */}
             <ListItem
               onClick={toggleUserManagement}
               sx={{
@@ -168,6 +168,26 @@ const Sidebar: React.FC = () => {
                 </ListItem>
               </List>
             </Collapse>
+            <Link
+              to="/dashboard/attendance/attendance-update"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <ListItem
+                sx={{
+                  cursor: "pointer",
+                  backgroundColor: isActive("/dashboard/attendance/attendance-update")
+                    ? "#00D1A3"
+                    : "inherit",
+                }}
+              >
+                <SettingsIcon />
+                <ListItemText sx={{ ml: 2 }}>
+                  <Typography sx={{ fontSize: 19 }} variant="h6">
+                    Setup Details
+                  </Typography>
+                </ListItemText>
+              </ListItem>
+            </Link>
           </>
         ) : (
           <>

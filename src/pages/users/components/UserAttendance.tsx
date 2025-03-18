@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Box, TextField, Typography, InputAdornment, Popper, IconButton } from '@mui/material';
+import { Box, TextField, Typography, InputAdornment, Popper, IconButton, CircularProgress, Backdrop } from '@mui/material';
 import TodayIcon from '@mui/icons-material/Today';
 import Calendar, { CalendarProps } from 'react-calendar';
 import moment from 'moment';
@@ -44,12 +44,13 @@ interface IProps {
   attendanceList?: any;
 }
 
-const UserAttendance:  React.FC<IProps> = ({ attendanceList }) => {
+const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const attendanceDetails = new AttendanceDetails();
 
@@ -69,23 +70,24 @@ const UserAttendance:  React.FC<IProps> = ({ attendanceList }) => {
     } else {
       setSelectedDate(currentDate);
     }
-    attendanceDetails.getAllEmployeeAttendanceDetails(id ? id: attendanceList.employeeId, moment(currentDate).format('YYYY-MM-DD'))
+    setLoading(true);
+    attendanceDetails.getAllEmployeeAttendanceDetails(id ? id : attendanceList.employeeId, moment(currentDate).format('YYYY-MM-DD'))
       .then((response) => {
         let attendanceResponse = response;
         setNoRecordsMessage(attendanceResponse.length ? null : "No records found.");
         const attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
           employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
         })) : [];
-        console.log('test1',attendance)
         setAttendance(attendance)
-      })
+      }).finally(() => setLoading(false));
     setCalendarOpen(false);
   };
 
   useEffect(() => {
     if (id || attendanceList) {
-      let requestId = id ? id: attendanceList.employeeId;
+      let requestId = id ? id : attendanceList.employeeId;
       let requestDate = date ? moment(date).format('YYYY-MM-DD') : '2024-12-19';
+      setLoading(true)
       attendanceDetails
         .getAllEmployeeAttendanceDetails(requestId, requestDate)
         .then((response: any) => {
@@ -94,12 +96,12 @@ const UserAttendance:  React.FC<IProps> = ({ attendanceList }) => {
           const attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
             employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
           })) : [];
-          console.log('test',attendance)
           setAttendance(attendance)
         })
         .catch((err) => {
           console.log(err);
-        });
+        })
+        .finally(() => setLoading(false));
     }
   }, [id]);
   // useEffect(() => {
@@ -115,6 +117,9 @@ const UserAttendance:  React.FC<IProps> = ({ attendanceList }) => {
 
   return (
     <Paper sx={{ mt: 8 }}>
+      <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
+        <CircularProgress color={"primary"} />
+      </Backdrop>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography sx={{ fontWeight: "bold", color: "#252C58", p: 2 }} variant='h6'>Attendance List</Typography>
         <TextField

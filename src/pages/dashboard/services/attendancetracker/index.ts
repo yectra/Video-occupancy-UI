@@ -1,6 +1,6 @@
 import { apiClient } from "@/common/hooks/useApiClient";
 
-import { AddEmployeeDetails, AttendanceDataResponseModel, CameraurlSetup, ManageEmployeeDetails, OrganizationSetup } from "@/pages/dashboard/models/attendancetracker"
+import { AddEmployeeDetails, AttendanceDataResponseModel, CameraurlSetup, ManageEmployeeDetails, OrganizationSetup, AttendanceTrackerDetailsModel } from "@/pages/dashboard/models/attendancetracker"
 
 const { httpGet, httpPost, httpPut, httpDelete } = apiClient();
 
@@ -25,6 +25,10 @@ interface IAttendanceDetails {
     organizationDetails(organizationDetails: OrganizationSetup): Promise<any>;
 
     cameraurlDetails(cameraurlDetails: CameraurlSetup): Promise<any>;
+
+    getAttendanceTrackerDetails(): Promise<AttendanceTrackerDetailsModel>;
+
+    updateAttendanceTrackerDetails(organizationDetails: AttendanceTrackerDetailsModel): Promise<any>;
 }
 
 export class AttendanceDetails implements IAttendanceDetails {
@@ -90,5 +94,15 @@ export class AttendanceDetails implements IAttendanceDetails {
     cameraurlDetails(cameraurlDetails: CameraurlSetup): Promise<any> {
         return httpPost('api/cameraUrl', cameraurlDetails)
             .then((response) => response);
+    }
+
+    getAttendanceTrackerDetails(): Promise<AttendanceTrackerDetailsModel> {
+        return httpGet<AttendanceTrackerDetailsModel>('api/organization/camera-data')
+            .then((response) => response)
+    }
+
+    updateAttendanceTrackerDetails(organizationDetails: AttendanceTrackerDetailsModel): Promise<any> {
+        return httpPut(`update_organization_camera_data`, organizationDetails)
+            .then((response) => response)
     }
 }
