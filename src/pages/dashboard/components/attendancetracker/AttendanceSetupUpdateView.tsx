@@ -5,9 +5,6 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 // Services
 import { AttendanceDetails } from "../../services/attendancetracker";
 
-//Router
-// import { useLocation } from "react-router-dom";
-
 // Models
 import { AttendanceCameraDetailsModel, AttendanceTrackerDetailsModel } from "../../models/attendancetracker";
 

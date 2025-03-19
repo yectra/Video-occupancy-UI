@@ -11,6 +11,7 @@ interface IOccupancyTracker {
     getGraphDetails(): Promise<GraphResponseModel>;
     updateCameraDetails(cameraDetails: BackendPayload): Promise<any>;
     checkUserExists(): Promise<any>;
+    getPersonCountByDate(date: string): Promise<any>
 }
 
 export class OccupancyTracker implements IOccupancyTracker {
@@ -37,5 +38,9 @@ export class OccupancyTracker implements IOccupancyTracker {
 
     checkUserExists(): Promise<any> {
         return httpGet(`/api/checkUserExists`).then((response) => response)
+    }
+
+    getPersonCountByDate(date: string): Promise<any> {
+        return httpGet(`api/getPersonCountByDate?date=${date}`).then((response) => response)
     }
 }
