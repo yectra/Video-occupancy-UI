@@ -61,6 +61,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
     const [rowIndex, setRowIndex] = useState<number>(0);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [isDisable, setIsDisable] = useState<boolean>(false);
     const [isDisableSave, setIsDisableSave] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
 
@@ -69,24 +70,27 @@ const AttendanceSetupUpdateView: React.FC = () => {
 
     const attendanceTracker = new AttendanceDetails();
 
-    // const location = useLocation();  
-
     useEffect(() => {
         getCameraDetails();
     }, []);
 
     useEffect(() => {
-        if (cameraData.punchinCamera === '' || cameraData.punchinUrl === '' || cameraData.punchoutCamera === '' || cameraData.punchoutUrl === '')
-            setIsDisableSave(true)
+        if (!organizationResponse?.organizationData?.organizationName ||
+            !organizationResponse?.organizationData?.phoneNumber ||
+            !organizationResponse?.organizationData?.websiteUrl ||
+            errors?.email || errors?.phoneNumber || errors?.websiteUrl)
+            setIsDisable(true);
         else
-            setIsDisableSave(false)
-    }, [cameraData]);
+            setIsDisable(false);
+    }, [organizationResponse]);
 
-    // useEffect(() => {
-    //     if (location.state && location.state.payload) {
-    //         updateCameraDetails(location.state.payload);
-    //     }
-    // }, [location.state]);
+
+    useEffect(() => {
+        if (!cameraData.punchinCamera || !cameraData.punchinUrl || !cameraData.punchoutCamera || !cameraData.punchoutUrl)
+            setIsDisableSave(true);
+        else
+            setIsDisableSave(false);
+    }, [cameraData]);
 
     const getCameraDetails = () => {
         setLoading(true);
@@ -114,6 +118,21 @@ const AttendanceSetupUpdateView: React.FC = () => {
         setRowIndex(0)
     }
 
+    const validateEmail = (email: string): boolean => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
+
+    const validatePhoneNumber = (value: string) => {
+        const phoneRegex = /^[0-9]{7,15}$/;
+        return phoneRegex.test(value);
+    };
+
+    const validateWebsiteURL = (value: string) => {
+        const urlRegex = /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)$/;;
+        return urlRegex.test(value);
+    };
+
     const handleEditClick = (index: any) => {
         setRowIndex(index);
         setCameraData(cameraDetails[index]);
@@ -127,6 +146,20 @@ const AttendanceSetupUpdateView: React.FC = () => {
 
     const handleOrganizationInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        if ((name === "email" && !validateEmail(value)) ||
+            (name === "phoneNumber" && !validatePhoneNumber(value)) ||
+            (name === "websiteUrl" && !validateWebsiteURL(value))
+        )
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                [`${name}`]: `Enter Valid ${name}`,
+            }));
+        else
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                [`${name}`]: '',
+            }));
+       
         setOrganizationResponse(prevState => {
             if (name === "email") {
                 return {
@@ -150,12 +183,15 @@ const AttendanceSetupUpdateView: React.FC = () => {
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;       
+        const { name, value } = event.target;
 
-        let isDuplicate = cameraDetails.some((camera: any, i) =>
-            i !== rowIndex && (camera[name] === value)
+        const allExistingUrls = cameraDetails.flatMap((setup) =>
+            [setup.punchinUrl, setup.punchoutUrl]
         );
-        if (isDuplicate) {
+
+        const isDuplicateAcrossCameras = allExistingUrls.includes(value);
+
+        if (isDuplicateAcrossCameras) {
             setErrors((prevErrors) => ({
                 ...prevErrors,
                 [`${name}`]: `${name} Already Exist`,
@@ -176,17 +212,10 @@ const AttendanceSetupUpdateView: React.FC = () => {
                     index === rowIndex ? { ...item, [name]: value } : item
                 );
             });
-
-            // setCameraDetails(prev => {
-            //     if (!Array.isArray(prev)) return [];  // Ensure prev is an array
-            //     return prev.map((item, index) =>
-            //         index === rowIndex ? { ...item, [name]: value } : item
-            //     );
-            // });
         }
     };
 
-   const handleSave = () => {
+    const handleSave = () => {
         setOrganizationResponse(prevState => {
             const updatedCameraDetails = Array.isArray(prevState.cameraData.cameraDetails)
                 ? [...prevState.cameraData.cameraDetails]
@@ -310,6 +339,8 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             onChange={handleOrganizationInputChange}
                             sx={{ width: "80%" }}
                             required
+                            error={!!errors[`phoneNumber`]}
+                            helperText={errors[`phoneNumber`]}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -323,6 +354,8 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             onChange={handleOrganizationInputChange}
                             sx={{ width: "80%" }}
                             required
+                            error={!!errors[`websiteUrl`]}
+                            helperText={errors[`websiteUrl`]}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -336,6 +369,8 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             onChange={handleOrganizationInputChange}
                             sx={{ width: "80%" }}
                             required
+                            error={!!errors[`email`]}
+                            helperText={errors[`email`]}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -412,6 +447,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             }}
                             variant="contained"
                             onClick={saveSetupDetails}
+                            disabled={isDisable}
                         >
                             <Typography>Save</Typography>
                         </Button>
