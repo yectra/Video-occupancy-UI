@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, TextField, Typography, Autocomplete, Avatar, Button, Snackbar, Alert, Grid } from "@mui/material";
+import { Box, TextField, Typography, Autocomplete, Avatar, Button, Snackbar, Alert, Grid, Dialog, DialogActions, DialogTitle, DialogContent } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 
@@ -19,8 +19,11 @@ const EmployeeForm: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [roleOptions, setRoleOptions] = useState<string[]>([]);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
 
   const attendanceDetails = new AttendanceDetails();
+
+  const closeConfirmDialog = () => setConfirmDialogOpen(false);
 
   const pathName = location.pathname;
 
@@ -84,8 +87,7 @@ const EmployeeForm: React.FC = () => {
       })
       .catch((error) => {
         setSnackbarMessage(error.response.data.Warn);
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
+        setConfirmDialogOpen(true);
       });
   };
 
@@ -212,6 +214,20 @@ const EmployeeForm: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
+
+      <Dialog open={confirmDialogOpen} onClose={closeConfirmDialog}>
+        <DialogTitle sx={{ bgcolor: "green", color: "white" }}>Error</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ pt: 2 }}>
+          {snackbarMessage}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeConfirmDialog} color="primary">
+            <Typography>OK</Typography>
+          </Button>          
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbarOpen}

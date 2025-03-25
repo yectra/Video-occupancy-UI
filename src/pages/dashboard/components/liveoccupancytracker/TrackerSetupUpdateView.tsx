@@ -336,7 +336,7 @@ const TrackerSetupUpdateView: React.FC = () => {
                     <Table sx={{ minWidth: 700 }} aria-label="customized table">
                         <TableHead>
                             <TableRow>
-                                {["Camera Identifier", "Camera Position", "videoUrl", "EDIT"].map(
+                                {["Camera Identifier", "Camera Position", "Video Url", "EDIT"].map(
                                     (header) => (
                                         <StyledTableCell key={header} align="center">
                                             {header.toUpperCase()}

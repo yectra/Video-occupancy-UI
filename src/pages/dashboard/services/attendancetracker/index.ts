@@ -17,7 +17,7 @@ interface IAttendanceDetails {
     cameraurlDetails(cameraurlDetails: CameraurlSetup): Promise<any>;
     getAttendanceTrackerDetails(): Promise<AttendanceTrackerDetailsModel>;
     updateAttendanceTrackerDetails(organizationDetails: AttendanceTrackerDetailsModel): Promise<any>;
-    getAttendance(): Promise<IndividualTimesheet[]>;
+    getAttendance(date?: string): Promise<IndividualTimesheet[]>;
 }
 
 export class AttendanceDetails implements IAttendanceDetails {
@@ -95,7 +95,7 @@ export class AttendanceDetails implements IAttendanceDetails {
             .then((response) => response)
     }
 
-    getAttendance(): Promise<IndividualTimesheet[]> {
-        return httpGet<IndividualTimesheet[]>(`/api/attendance`).then((response) => response)
+    getAttendance(date?: string): Promise<IndividualTimesheet[]> {
+        return httpGet<IndividualTimesheet[]>(date ? `/api/attendance?date=${date}` : `/api/attendance`).then((response) => response)
     }
 }

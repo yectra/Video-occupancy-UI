@@ -50,7 +50,7 @@ const DialogTextField = ({
 const ManageEmployeeForm: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  // const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [employeeForm, setEmployeeForm] = useState<ManageEmployeeDetails[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<ManageEmployeeDetails | null>(null);
   const [loading, setLoading] = useState(false);
@@ -102,17 +102,23 @@ const ManageEmployeeForm: React.FC = () => {
   const handleDialogClose = () => {
     setEditDialogOpen(false);
     setSelectedEmployee(null);
-  };
-
-  const handleImageDialogClose = () => {
-    setImageDialogOpen(false);
     setImageUrl(null);
     setNewImage(null);
     setImageBase64("");
   };
 
+  // const handleImageDialogClose = () => {
+  //   setImageDialogOpen(false);
+  //   setImageUrl(null);
+  //   setNewImage(null);
+  //   setImageBase64("");
+  // };
+
   const handleEditClick = (employee: ManageEmployeeDetails) => {
+    // setSelectedEmployee(employee)    
+    // setImageDialogOpen(true);
     setSelectedEmployee(employee);
+    setImageUrl(employee.imageUrl || "");
     setEditDialogOpen(true);
   };
 
@@ -134,7 +140,11 @@ const ManageEmployeeForm: React.FC = () => {
 
   const handleSave = () => {
     if (selectedEmployee) {
-      selectedEmployee.imageUrl = '';
+      if (newImage && imageBase64)
+        selectedEmployee.imageUrl = imageBase64;
+      else
+        selectedEmployee.imageUrl = '';
+
       setLoading(true);
       attendanceDetails
         .updateEmployeeDetails(selectedEmployee)
@@ -165,11 +175,11 @@ const ManageEmployeeForm: React.FC = () => {
     }
   };
 
-  const handleAvatarClick = (employee: ManageEmployeeDetails) => {
-    setSelectedEmployee(employee)
-    setImageUrl(employee.imageUrl || "");
-    setImageDialogOpen(true);
-  };
+  // const handleAvatarClick = (employee: ManageEmployeeDetails) => {
+  //   setSelectedEmployee(employee)
+  //   setImageUrl(employee.imageUrl || "");
+  //   setImageDialogOpen(true);
+  // };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -184,27 +194,27 @@ const ManageEmployeeForm: React.FC = () => {
     }
   };
 
-  const handleImageSave = () => {
-    if (newImage && imageBase64 && selectedEmployee) {
-      console.log("Sending Base64 image to the backend:", imageBase64);
-      const data = {
-        employeeId: selectedEmployee?.employeeId,
-        newImageBase64: imageBase64,
-      };
-      setLoading(true);
-      attendanceDetails
-        .updateEmployeeDetails(data)
-        .then(() => {
-          fetchEmployeeDetails();
-          handleDialogClose();
-        })
-        .catch((error) =>
-          console.error("Error updating employee details:", error)
-        )
-        .finally(() => setLoading(false));
-      handleImageDialogClose();
-    }
-  };
+  // const handleImageSave = () => {
+  //   if (newImage && imageBase64 && selectedEmployee) {
+  //     console.log("Sending Base64 image to the backend:", imageBase64);
+  //     const data = {
+  //       employeeId: selectedEmployee?.employeeId,
+  //       newImageBase64: imageBase64,
+  //     };
+  //     setLoading(true);
+  //     attendanceDetails
+  //       .updateEmployeeDetails(data)
+  //       .then(() => {
+  //         fetchEmployeeDetails();
+  //         handleDialogClose();
+  //       })
+  //       .catch((error) =>
+  //         console.error("Error updating employee details:", error)
+  //       )
+  //       .finally(() => setLoading(false));
+  //     handleImageDialogClose();
+  //   }
+  // };
 
   const validateEmail = (email: any): boolean => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -297,14 +307,11 @@ const ManageEmployeeForm: React.FC = () => {
                 <StyledTableRow key={row.employeeId}>
                   <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
                   <StyledTableCell align="center">
-                    <Box
-                      sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
-                      onClick={() => handleAvatarClick(row)}
-                    >
+                    <Box sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }} >
                       <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 50, height: 50 }} />
                     </Box>
                   </StyledTableCell>
-                  <StyledTableCell align="center">{row.employeeName}</StyledTableCell>                  
+                  <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
                   <StyledTableCell align="center">{row.role}</StyledTableCell>
                   <StyledTableCell align="center">{row.email}</StyledTableCell>
                   <StyledTableCell align="center">
@@ -324,7 +331,29 @@ const ManageEmployeeForm: React.FC = () => {
 
 
       <Dialog open={editDialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>Edit User</DialogTitle>
+        <Box sx={{ textAlign: 'center' }}>
+          <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem' }}>Edit User</DialogTitle>
+          <DialogTitle>Profile Picture</DialogTitle>
+        </Box>
+        <DialogContent>
+          <Box sx={{ textAlign: 'center', marginBottom: 2 }}>
+            <Avatar
+              src={imageUrl || undefined}
+              alt="Employee Image"
+              sx={{ width: 100, height: 100, margin: '0 auto' }}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
+            <Button
+              variant="contained"
+              component="label"
+              sx={{ fontSize: '0.75rem', padding: '5px 10px', minWidth: 'auto' }} // Reducing size
+            >
+              Upload New Image
+              <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+            </Button>
+          </Box>
+        </DialogContent>
         <DialogContent>
           <DialogTextField
             label="User ID *"
@@ -355,7 +384,7 @@ const ManageEmployeeForm: React.FC = () => {
             select
           >
             <MenuItem value="Admin">Admin</MenuItem>
-            <MenuItem value="Employee">Employee</MenuItem>           
+            <MenuItem value="Employee">Employee</MenuItem>
           </DialogTextField>
         </DialogContent>
         <DialogActions>
@@ -369,7 +398,7 @@ const ManageEmployeeForm: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={imageDialogOpen} onClose={handleImageDialogClose}>
+      {/* <Dialog open={imageDialogOpen} onClose={handleImageDialogClose}>
         <DialogTitle>Profile Picture</DialogTitle>
         <DialogContent>
           <Box sx={{ textAlign: 'center', marginBottom: 2 }}>
@@ -385,7 +414,7 @@ const ManageEmployeeForm: React.FC = () => {
             fullWidth
             sx={{ marginBottom: 2 }}
           >
-            <Typography>Upload New Image</Typography>           
+            <Typography>Upload New Image</Typography>
             <input
               type="file"
               hidden
@@ -396,13 +425,13 @@ const ManageEmployeeForm: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleImageDialogClose} color="primary">
-          <Typography>Cancel</Typography>
+            <Typography>Cancel</Typography>
           </Button>
           <Button onClick={handleImageSave} color="primary">
-          <Typography>Save</Typography>
+            <Typography>Save</Typography>
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
 
       <Dialog open={confirmDialogOpen} onClose={closeConfirmDialog}>
         <DialogTitle sx={{ bgcolor: "green", color: "white" }}>Confirm</DialogTitle>
@@ -413,7 +442,7 @@ const ManageEmployeeForm: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeConfirmDialog} color="primary">
-          <Typography>Cancel</Typography>
+            <Typography>Cancel</Typography>
           </Button>
           <Button
             onClick={handleDelete}
@@ -423,7 +452,6 @@ const ManageEmployeeForm: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
     </Box>
   );
 };

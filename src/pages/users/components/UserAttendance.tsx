@@ -16,7 +16,11 @@ import '@/styles/core/components/CalendarStyles.css';
 
 // Services
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+
+// Models
 import { AttendanceDataResponseModel } from "@/pages/dashboard/models/attendancetracker";
+
+//Router
 import { useSearchParams } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -64,32 +68,10 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
     setCalendarOpen((prev) => !prev);
   };
 
-  const handleDateChange: CalendarProps['onChange'] = (currentDate: any) => {
-    if (Array.isArray(currentDate)) {
-      setSelectedDate(currentDate.length > 0 ? currentDate[0] : null);
-    } else {
-      setSelectedDate(currentDate);
-    }
-    setLoading(true);
-    attendanceDetails.getAllEmployeeAttendanceDetails(id ? id : attendanceList.employeeId, moment(currentDate).format('YYYY-MM-DD'))
-      .then((response) => {
-        let attendanceResponse = response;
-        setNoRecordsMessage(attendanceResponse.length ? null : "No records found.");
-        const attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
-          employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
-        })) : [];
-        setAttendance(attendance)
-      }).finally(() => setLoading(false));
-    setCalendarOpen(false);
-  };
-
-  useEffect(() => {
-    if (id) {
-      let requestId = id;
-      let requestDate = moment(date).format('YYYY-MM-DD');
-      setLoading(true)
+  const getAttendance=(id: string, date: string)=>{
+    setLoading(true)
       attendanceDetails
-        .getAllEmployeeAttendanceDetails(requestId, requestDate)
+        .getAllEmployeeAttendanceDetails(id, date)
         .then((response: any) => {
           let attendanceResponse: AttendanceDataResponseModel[] = response.data;
           setNoRecordsMessage(attendanceResponse.length ? null : "No records found.");
@@ -102,6 +84,37 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
           console.log(err);
         })
         .finally(() => setLoading(false));
+  }
+
+  const handleDateChange: CalendarProps['onChange'] = (currentDate: any) => {
+    if (Array.isArray(currentDate)) {
+      setSelectedDate(currentDate.length > 0 ? currentDate[0] : null);
+    } else {
+      setSelectedDate(currentDate);
+    }
+    setLoading(true);
+    if (id) {
+      getAttendance(id, moment(currentDate).format('YYYY-MM-DD'));      
+    } 
+    else if (attendanceList) {
+      attendanceDetails.getAttendance(moment(currentDate).format('YYYY-MM-DD')).then((response: any) => {        
+        let employeeAttendance: AttendanceDataResponseModel[] = response;
+        setNoRecordsMessage(employeeAttendance.length ? null : "No records found.");
+              let attendance = employeeAttendance.length ? employeeAttendance.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+                employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+              })) : [];
+        setAttendance(attendance)
+      }).finally(() => setLoading(false));
+    }
+
+    setCalendarOpen(false);
+  };
+
+  useEffect(() => {
+    if (id) {
+      let requestId = id;
+      let requestDate = moment(date).format('YYYY-MM-DD');
+      getAttendance(requestId, requestDate);
       setSelectedDate(new Date(date ?? ""));
     } else if (attendanceList) {
       setAttendance(attendanceList);
