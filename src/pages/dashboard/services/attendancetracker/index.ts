@@ -1,34 +1,23 @@
 import { apiClient } from "@/common/hooks/useApiClient";
 
-import { AddEmployeeDetails, AttendanceDataResponseModel, CameraurlSetup, ManageEmployeeDetails, OrganizationSetup, AttendanceTrackerDetailsModel } from "@/pages/dashboard/models/attendancetracker"
+import { AddEmployeeDetails, AttendanceDataResponseModel, CameraurlSetup, ManageEmployeeDetails, OrganizationSetup, AttendanceTrackerDetailsModel, IndividualTimesheet } from "@/pages/dashboard/models/attendancetracker"
 
 const { httpGet, httpPost, httpPut, httpDelete } = apiClient();
 
 interface IAttendanceDetails {
-
     addEmployeeDetails(employeeDetails: AddEmployeeDetails): Promise<any>;
-
     getAllEmployeeAttendanceDetails(employeeId?: string, date?: string): Promise<AttendanceDataResponseModel[]>;
-
     getIndividualEmployeeDetails(employeeId: string): Promise<any>;
-
     getManageEmployeeDetails(): Promise<any>;
-
     updateEmployeeDetails(employeeDetails: ManageEmployeeDetails): Promise<any>;
-
     searchEmployeeDetails(date: string, employeeName: string): Promise<any>;
-
-    searchAllEmployeeDetails(searchTerm: string): Promise<any>
-
+    searchAllEmployeeDetails(searchTerm: string): Promise<any>;
     deleteEmployeeDetails(employeeId: string): Promise<any>;
-
     organizationDetails(organizationDetails: OrganizationSetup): Promise<any>;
-
     cameraurlDetails(cameraurlDetails: CameraurlSetup): Promise<any>;
-
     getAttendanceTrackerDetails(): Promise<AttendanceTrackerDetailsModel>;
-
     updateAttendanceTrackerDetails(organizationDetails: AttendanceTrackerDetailsModel): Promise<any>;
+    getAttendance(): Promise<IndividualTimesheet[]>;
 }
 
 export class AttendanceDetails implements IAttendanceDetails {
@@ -104,5 +93,9 @@ export class AttendanceDetails implements IAttendanceDetails {
     updateAttendanceTrackerDetails(organizationDetails: AttendanceTrackerDetailsModel): Promise<any> {
         return httpPut(`update_organization_camera_data`, organizationDetails)
             .then((response) => response)
+    }
+
+    getAttendance(): Promise<IndividualTimesheet[]> {
+        return httpGet<IndividualTimesheet[]>(`/api/attendance`).then((response) => response)
     }
 }

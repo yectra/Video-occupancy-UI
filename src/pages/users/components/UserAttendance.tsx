@@ -102,24 +102,15 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
           console.log(err);
         })
         .finally(() => setLoading(false));
-    } else if(attendanceList)
-    {
+      setSelectedDate(new Date(date ?? ""));
+    } else if (attendanceList) {
       setAttendance(attendanceList);
+      setSelectedDate(new Date());
     }
   }, [id, attendanceList]);
-  // useEffect(() => {
-  //   attendanceDetails.getAllEmployeeAttendanceDetails('1')
-  //     .then((response:any) => {
-  //       let attendanceResponse: AttendanceDataResponseModel[]= response.data;
-  //       const attendance = attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
-  //         employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
-  //       }));
-  //       setAttendance(attendance)
-  //     })
-  // }, [])
 
   return (
-    <Paper sx={{ mt: 8 }}>
+    <Paper sx={{ mt: 4 }}>
       <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
         <CircularProgress color={"primary"} />
       </Backdrop>
@@ -128,7 +119,7 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
         <TextField
           variant="outlined"
           label="Date"
-          value={selectedDate ? selectedDate.toLocaleDateString() : 'Select Date'}
+          value={selectedDate?.toLocaleDateString()}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -156,7 +147,7 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center">Employee Id</StyledTableCell>
+              {id && <StyledTableCell align="center">Employee Id</StyledTableCell>}
               <StyledTableCell align="center">Date</StyledTableCell>
               <StyledTableCell align="center">Punch In</StyledTableCell>
               <StyledTableCell align="center">Punch Out</StyledTableCell>
@@ -174,7 +165,7 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
           <TableBody>
             {attendance.map((row) => (
               <StyledTableRow key={row.date}>
-                <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
+                {id && <StyledTableCell align="center">{row.employeeId}</StyledTableCell>}
                 <StyledTableCell align="center">{row.date}</StyledTableCell>
                 <StyledTableCell align="center">{row.firstPunchIn}</StyledTableCell>
                 <StyledTableCell align="center">{row.lastPunchOut}</StyledTableCell>

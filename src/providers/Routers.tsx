@@ -122,16 +122,16 @@ const route = [
                 element: <AttendanceSetupView />,
               },
               {
+                path: "user-details",
+                element: <UserTrackerView />
+              },
+              {
                 path: "",
                 element: <Layout />,
                 children: [
                   {
                     path: "emp-attendance",
                     element: <AttendanceListView />
-                  },
-                  {
-                    path: "user-details",
-                    element: <UserTrackerView />
                   },
                   {
                     path: "attendance-details",

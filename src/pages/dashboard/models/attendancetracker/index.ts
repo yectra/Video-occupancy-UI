@@ -85,10 +85,10 @@ export class IndividualTimesheet {
   imageUrl: string;
   lastPunchOut: string;
   overTime: string;
+  totalWorkingHours: string;
+  userId: string;
+  organizationId: string;
 }
-
-
-
 export class AddEmployeeDetails {
   employeeId: string;
   employeeName: string;
@@ -96,7 +96,6 @@ export class AddEmployeeDetails {
   email: string;
   imageBase64: string;
 }
-
 export class ManageEmployeeDetails {
   employeeId: string;
   employeeName?: string;
@@ -104,7 +103,6 @@ export class ManageEmployeeDetails {
   email?: string;
   imageUrl?: string;
 }
-
 export class OrganizationSetup {
   organizationName: string;
   phoneNumber: string;
@@ -112,7 +110,6 @@ export class OrganizationSetup {
   domainName: string;
   address: string;
 }
-
 export class CameraurlSetup {
   email: string;
   cameraDetails: AttendanceCameraDetailsModel[];
