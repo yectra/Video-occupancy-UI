@@ -16,10 +16,10 @@ interface AppbarProps {
 }
 
 const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
-  const { signOutUser } = useAuth();
+  const { signOutUser, jobTitle } = useAuth();
   const { accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
-  
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [email, setEmail] = useState<string>("");
 
@@ -51,7 +51,14 @@ const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
           <MenuIcon />
         </IconButton>
 
-        <Box sx={{ flexGrow: 1 }} />
+        {jobTitle === 'employee' ?
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography sx={{ fontSize: 24 }} variant="h6">
+              User Attendance Details
+            </Typography>
+          </Box> :
+          <Box sx={{ flexGrow: 1 }} />
+        }
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* <IconButton color="inherit">

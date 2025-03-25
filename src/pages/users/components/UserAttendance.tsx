@@ -105,7 +105,6 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
       setSelectedDate(new Date(date ?? ""));
     } else if (attendanceList) {
       setAttendance(attendanceList);
-      setSelectedDate(new Date());
     }
   }, [id, attendanceList]);
 
@@ -119,7 +118,7 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
         <TextField
           variant="outlined"
           label="Date"
-          value={selectedDate?.toLocaleDateString()}
+          value={selectedDate ? selectedDate.toLocaleDateString() : "Select Date"}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -143,7 +142,7 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
           </div>
         </Popper>
       </Box>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ mt: '10px' }}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
             <TableRow>

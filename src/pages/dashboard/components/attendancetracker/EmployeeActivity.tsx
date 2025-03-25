@@ -29,8 +29,8 @@ const EmployeeActivity: React.FC = () => {
   return (
     <Box
       sx={{
-        height: '305px',
-        width: '540px',
+        height: '315px',
+        width: '45%',
         boxShadow: 3,
         borderRadius: 3,
         padding: 3,

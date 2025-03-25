@@ -7,7 +7,7 @@ import UserAttendance from "@/pages/users/components/UserAttendance";
 const EmployeeDetailsView = () => {
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <Box sx={{ display: "flex", gap: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <EmployeeTimesheet />
         <EmployeeActivity />
       </Box>

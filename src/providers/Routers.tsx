@@ -2,6 +2,7 @@ import React from "react";
 
 //Layout
 const Layout = React.lazy(() => import("@/common/Layout"));
+const UserLayout = React.lazy(() => import("@/common/UserLayout"));
 
 //MainLayout
 const MainLayout = React.lazy(() => import("@/pages/MainLayout"));
@@ -122,8 +123,14 @@ const route = [
                 element: <AttendanceSetupView />,
               },
               {
-                path: "user-details",
-                element: <UserTrackerView />
+                path:"",
+                element:<UserLayout />,
+                children:[
+                  {
+                    path: "user-details",
+                    element: <UserTrackerView />
+                  }
+                ]                
               },
               {
                 path: "",

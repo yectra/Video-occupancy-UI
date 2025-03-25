@@ -54,8 +54,8 @@ const EmployeeTimesheet: React.FC = () => {
   return (
     <Box
       sx={{
-        height: "305px",
-        width: "540px",
+        height: "40%",
+        width: "45%",
         boxShadow: 3,
         padding: 3,
         borderRadius: 3,
