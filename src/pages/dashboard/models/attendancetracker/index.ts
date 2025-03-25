@@ -102,6 +102,8 @@ export class ManageEmployeeDetails {
   role?: string;
   email?: string;
   imageUrl?: string;
+  newImageBase64?: string;
+
 }
 export class OrganizationSetup {
   organizationName: string;

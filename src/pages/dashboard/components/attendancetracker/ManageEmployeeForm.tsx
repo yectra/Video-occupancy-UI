@@ -141,10 +141,8 @@ const ManageEmployeeForm: React.FC = () => {
   const handleSave = () => {
     if (selectedEmployee) {
       if (newImage && imageBase64)
-        selectedEmployee.imageUrl = imageBase64;
-      else
-        selectedEmployee.imageUrl = '';
-
+        selectedEmployee.newImageBase64 = imageBase64;
+     
       setLoading(true);
       attendanceDetails
         .updateEmployeeDetails(selectedEmployee)
