@@ -1,8 +1,6 @@
 import { loginRequest } from '../../config/auth';
 import { InteractionStatus, IPublicClientApplication, AccountInfo } from '@azure/msal-browser';
 
-
-
 export const signInUser = async (
   instance: IPublicClientApplication, 
   inProgress: InteractionStatus, 

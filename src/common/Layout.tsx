@@ -1,12 +1,16 @@
-import React from "react";
+// React Dependancies
+import React, { useState } from "react";
+
 import { Box, Grid, Toolbar, Hidden, Drawer } from "@mui/material";
+
+// Router
+import { Outlet } from "react-router-dom";
+
+// Layouts
 import Appbar from "@/common/components/layout/Appbar";
 import Sidebar from "@/common/components/layout/Sidebar";
-import { Outlet } from "react-router-dom";
-import { useState } from "react";
 
 const Layout: React.FC = () => {
-
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {

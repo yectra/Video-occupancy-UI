@@ -11,7 +11,6 @@ import { useAuth } from "@/common/hooks/AuthContext";
 
 const DashboardSetupView: React.FC = () => {
   const { jobTitle, newUser } = useAuth();
-  // const jobTitle: any = 'user'
   const navigate = useNavigate();
 
   const handleVideocamClick = () => {

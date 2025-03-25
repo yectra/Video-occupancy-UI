@@ -1,4 +1,6 @@
+// React Dependancies
 import React, { useState } from "react";
+
 import {
   Drawer,
   List,
@@ -8,8 +10,6 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
-
 import GroupsIcon from "@mui/icons-material/Groups";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -17,17 +17,19 @@ import PreviewIcon from "@mui/icons-material/Preview";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import PersonIcon from "@mui/icons-material/Person";
 
+// Router
+import { Link, useLocation } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
-  const [openUserManagement, setOpenUserManagement] = useState(false);
   const location = useLocation();
+
+  const [openUserManagement, setOpenUserManagement] = useState(false);
+  const isActive = (path: string) => location.pathname === path;
+  const isAttendanceTracker = location.pathname.startsWith("/dashboard/attendance");
 
   const toggleUserManagement = () => {
     setOpenUserManagement(!openUserManagement);
   };
-
-  const isActive = (path: string) => location.pathname === path;
-  const isAttendanceTracker = location.pathname.startsWith("/dashboard/attendance");
 
   return (
     <Drawer

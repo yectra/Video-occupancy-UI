@@ -1,6 +1,7 @@
+// React Dependancies
 import React from 'react';
-import { Backdrop, CircularProgress } from '@mui/material';
 
+import { Backdrop, CircularProgress } from '@mui/material';
 interface IProps {
   isLoading: boolean;
 }

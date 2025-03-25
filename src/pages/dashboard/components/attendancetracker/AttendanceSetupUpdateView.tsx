@@ -1,4 +1,6 @@
+// React Dependancies
 import { useEffect, useState } from "react";
+
 import { Backdrop, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, styled, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
@@ -7,7 +9,6 @@ import { AttendanceDetails } from "../../services/attendancetracker";
 
 // Models
 import { AttendanceCameraDetailsModel, AttendanceTrackerDetailsModel } from "../../models/attendancetracker";
-
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -53,14 +54,14 @@ const DialogTextField = ({
 const AttendanceSetupUpdateView: React.FC = () => {
     const [cameraDetails, setCameraDetails] = useState<AttendanceCameraDetailsModel[]>([]);
     const [organizationResponse, setOrganizationResponse] = useState<AttendanceTrackerDetailsModel>(new AttendanceTrackerDetailsModel());
-    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
     const [cameraData, setCameraData] = useState<AttendanceCameraDetailsModel>(new AttendanceCameraDetailsModel())
     const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
     const [rowIndex, setRowIndex] = useState<number>(0);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [isDisable, setIsDisable] = useState<boolean>(false);
     const [isDisableSave, setIsDisableSave] = useState<boolean>(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const openConfirmDialog = () => setConfirmDialogOpen(true);
     const closeConfirmDialog = () => setConfirmDialogOpen(false);

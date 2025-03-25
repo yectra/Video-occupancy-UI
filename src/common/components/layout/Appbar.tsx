@@ -1,9 +1,14 @@
+// React Dependancies
 import React, { useEffect, useState } from "react";
+
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, ListItemIcon, Box } from "@mui/material";
 import { NotificationsOutlined, AccountCircle, Logout, Menu as MenuIcon } from "@mui/icons-material";
+
+// Azure
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { getUserDetailsFromMsal } from "@/common/services/AuthHelper";
 
+// Hooks
 import { useAuth } from "@/common/hooks/AuthContext";
 
 interface AppbarProps {
@@ -12,13 +17,13 @@ interface AppbarProps {
 
 const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
   const { signOutUser } = useAuth();
+  const { accounts } = useMsal();
+  const isAuthenticated = useIsAuthenticated();
+  
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [email, setEmail] = useState<string>("");
 
   const open = Boolean(anchorEl);
-
-  const { accounts } = useMsal();
-  const isAuthenticated = useIsAuthenticated();
 
   useEffect(() => {
     if (isAuthenticated) {

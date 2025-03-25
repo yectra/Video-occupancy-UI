@@ -50,7 +50,7 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const attendanceDetails = new AttendanceDetails();
 
@@ -84,9 +84,9 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
   };
 
   useEffect(() => {
-    if (id || attendanceList) {
-      let requestId = id ? id : attendanceList.employeeId;
-      let requestDate = date ? moment(date).format('YYYY-MM-DD') : '2024-12-19';
+    if (id) {
+      let requestId = id;
+      let requestDate = moment(date).format('YYYY-MM-DD');
       setLoading(true)
       attendanceDetails
         .getAllEmployeeAttendanceDetails(requestId, requestDate)
@@ -96,14 +96,17 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
           const attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
             employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
           })) : [];
-          setAttendance(attendance)
+          setAttendance(attendance);
         })
         .catch((err) => {
           console.log(err);
         })
         .finally(() => setLoading(false));
+    } else if(attendanceList)
+    {
+      setAttendance(attendanceList);
     }
-  }, [id]);
+  }, [id, attendanceList]);
   // useEffect(() => {
   //   attendanceDetails.getAllEmployeeAttendanceDetails('1')
   //     .then((response:any) => {

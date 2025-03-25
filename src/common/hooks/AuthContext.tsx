@@ -1,7 +1,11 @@
+// React Dependancies
 import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
+
+// Azure
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
-import { loginRequest } from '../../config/auth';
 import { InteractionStatus } from '@azure/msal-browser';
+
+import { loginRequest } from '../../config/auth';
 
 interface AuthContextType {
   accounts: any;
@@ -27,6 +31,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = useIsAuthenticated();
   const { accounts, instance, inProgress } = useMsal();
+  
   const [name, setName] = useState<string>();
   const [email, setEmail] = useState<string | undefined>();
   const [jobTitle, setJobTitle] = useState<string>();
