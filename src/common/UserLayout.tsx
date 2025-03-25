@@ -1,7 +1,7 @@
 // React Dependancies
 import React, { useState } from "react";
 
-import { Box, Grid, Toolbar, Hidden, Drawer } from "@mui/material";
+import { Box, Grid, Toolbar } from "@mui/material";
 
 // Router
 import { Outlet } from "react-router-dom";
