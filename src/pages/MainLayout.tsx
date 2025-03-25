@@ -1,19 +1,22 @@
-import { useAuth } from "@/common/hooks/AuthContext";
-
-import { Box } from "@mui/material";
 import { useEffect } from "react";
+import { Box } from "@mui/material";
+
+//Router
 import { Outlet } from "react-router-dom";
 
 import { useMsal } from "@azure/msal-react";
+
+//Hooks
+import { useAuth } from "@/common/hooks/AuthContext";
+
+//Services
+// import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
 
 const MainLayout = () => {
   const { isAuthenticated, signInUser, signOutUser } = useAuth();
   const { instance } = useMsal();
 
-  if (!isAuthenticated) {
-    signInUser();
-    return;
-  }
+  // const occupancyTracker = new OccupancyTracker();
 
   const decodeTokenManually = (token: string) => {
     try {
@@ -41,6 +44,20 @@ const MainLayout = () => {
       }
     }
   };
+
+  // const fetchUserRole = async () => {
+  //   occupancyTracker.checkUserExists().then((response) => {
+  //     localStorage.setItem("existUser", response.data.exists);
+  //   })
+  // };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      signInUser();
+      return;
+    }
+    // fetchUserRole();
+  }, [isAuthenticated]);
 
 
   useEffect(() => {
@@ -71,10 +88,9 @@ const MainLayout = () => {
     handleRedirect();
   });
 
-
   return (
     <Box>
-      <Outlet />
+      {isAuthenticated && <Outlet />}
     </Box>
   );
 };

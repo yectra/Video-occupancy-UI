@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -31,8 +31,9 @@ const OrganizationView: React.FC = () => {
     address: '',
   });
 
-  const [phoneError, setPhoneError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isDisable, setIsDisable] = useState<boolean>(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   // const [isNextEnabled, setIsNextEnabled] = useState(false);
 
   // Snackbar state
@@ -40,27 +41,47 @@ const OrganizationView: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
+  useEffect(() => {
+    if (!formData.organizationName ||
+      !formData.phoneNumber ||
+      !formData.websiteUrl ||
+      errors?.phoneNumber || errors?.websiteUrl)
+      setIsDisable(true);
+    else
+      setIsDisable(false);
+  }, [formData]);
+
   const validatePhoneNumber = (value: string) => {
     const phoneRegex = /^[0-9]{7,15}$/;
     return phoneRegex.test(value);
+  };
+
+  const validateWebsiteURL = (value: string) => {
+    const urlRegex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+)(\/[^\s]*)?$/;
+    return urlRegex.test(value);
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    if ((name === "phoneNumber" && !validatePhoneNumber(value)) ||
+      (name === "websiteUrl" && !validateWebsiteURL(value))
+    )
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [`${name}`]: `Enter Valid ${name}`,
+      }));
+    else
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [`${name}`]: '',
+      }));
     setFormData({ ...formData, [name]: value });
-    if (name === 'phoneNumber') setPhoneError(!validatePhoneNumber(value));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (phoneError) {
-      setSnackbarMessage('Please fix the errors before submitting.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
     setLoading(true);
     attendanceService.organizationDetails(formData)
       .then(() => {
@@ -174,10 +195,8 @@ const OrganizationView: React.FC = () => {
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
-          error={phoneError}
-          helperText={
-            phoneError ? 'Enter a valid phone number (7-15 digits)' : ''
-          }
+          error={!!errors[`phoneNumber`]}
+          helperText={errors[`phoneNumber`]}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -197,6 +216,8 @@ const OrganizationView: React.FC = () => {
           name="websiteUrl"
           value={formData.websiteUrl}
           onChange={handleChange}
+          error={!!errors[`websiteUrl`]}
+          helperText={errors[`websiteUrl`]}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -252,6 +273,7 @@ const OrganizationView: React.FC = () => {
               width: '200px',
               bgcolor: "#00D1A3", '&:hover': { bgcolor: '#00D1A3' }
             }}
+            disabled={isDisable}
           >
             <Typography>Submit</Typography>
           </Button>

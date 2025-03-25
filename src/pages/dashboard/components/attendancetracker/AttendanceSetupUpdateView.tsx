@@ -126,7 +126,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
     };
 
     const validateWebsiteURL = (value: string) => {
-        const urlRegex = /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)$/;;
+        const urlRegex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+)(\/[^\s]*)?$/;
         return urlRegex.test(value);
     };
 

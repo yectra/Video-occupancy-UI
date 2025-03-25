@@ -7,6 +7,8 @@ interface AuthContextType {
   accounts: any;
   name: string | undefined;
   email: string | undefined;
+  jobTitle: string | undefined;
+  newUser: boolean;
   isAuthenticated: boolean;
   signInUser: () => Promise<void>;
   signOutUser: () => void;
@@ -27,6 +29,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { accounts, instance, inProgress } = useMsal();
   const [name, setName] = useState<string>();
   const [email, setEmail] = useState<string | undefined>();
+  const [jobTitle, setJobTitle] = useState<string>();
+  const [newUser, setNewUser] = useState<boolean>(false);
 
   const handleSignInUser = async () => {
     try {
@@ -48,8 +52,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (accounts.length > 0) {
       const account = accounts[0];
+      console.log('account', account);
       setEmail(account.username as string);
       setName(account.idTokenClaims?.given_name as string | undefined);
+      setJobTitle(account.idTokenClaims?.jobTitle?.toString());
+      setNewUser(account.idTokenClaims?.newUser ? true : false);
     }
   }, [accounts]);
 
@@ -58,6 +65,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       value={{
         name,
         email,
+        jobTitle,
+        newUser,
         accounts,
         isAuthenticated,
         signInUser: handleSignInUser,
