@@ -109,8 +109,8 @@ export class OrganizationSetup {
   organizationName: string;
   phoneNumber: string;
   websiteUrl: string;
-  domainName: string;
   address: string;
+  workTiming: number | null;
 }
 export class CameraurlSetup {
   email: string;

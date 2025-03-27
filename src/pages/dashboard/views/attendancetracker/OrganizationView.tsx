@@ -13,6 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LinkIcon from '@mui/icons-material/Link';
 import HomeIcon from '@mui/icons-material/Home';
 import { AttendanceDetails } from '@/pages/dashboard/services/attendancetracker';
@@ -27,8 +28,8 @@ const OrganizationView: React.FC = () => {
     organizationName: '',
     phoneNumber: '',
     websiteUrl: '',
-    domainName: '',
     address: '',
+    workTiming: null
   });
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -45,7 +46,8 @@ const OrganizationView: React.FC = () => {
     if (!formData.organizationName ||
       !formData.phoneNumber ||
       !formData.websiteUrl ||
-      errors?.phoneNumber || errors?.websiteUrl)
+      !formData.workTiming ||
+      errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming)
       setIsDisable(true);
     else
       setIsDisable(false);
@@ -61,12 +63,18 @@ const OrganizationView: React.FC = () => {
     return urlRegex.test(value);
   };
 
+  const validateWorkingHours = (value: string) => {
+    const hoursRegex = /^(?:[1-9]|1[0-2])$/; 
+    return hoursRegex.test(value);
+};
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     if ((name === "phoneNumber" && !validatePhoneNumber(value)) ||
-      (name === "websiteUrl" && !validateWebsiteURL(value))
+      (name === "websiteUrl" && !validateWebsiteURL(value)) ||
+      (name === "workTiming" && !validateWorkingHours(value))
     )
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -191,6 +199,7 @@ const OrganizationView: React.FC = () => {
           label="Phone Number"
           variant="outlined"
           type="tel"
+          required
           fullWidth
           name="phoneNumber"
           value={formData.phoneNumber}
@@ -212,6 +221,7 @@ const OrganizationView: React.FC = () => {
           label="Website URL"
           variant="outlined"
           type="url"
+          required
           fullWidth
           name="websiteUrl"
           value={formData.websiteUrl}
@@ -222,6 +232,27 @@ const OrganizationView: React.FC = () => {
             startAdornment: (
               <InputAdornment position="start">
                 <LinkIcon sx={{ color: 'black' }} />
+              </InputAdornment>
+            ),
+          }}
+          InputLabelProps={{
+            style: { color: 'black', fontWeight: 'bold' },
+          }}
+        />
+        <TextField
+          label="Working Hours"
+          variant="outlined"         
+          required
+          fullWidth
+          name="workTiming"
+          value={formData.workTiming}
+          onChange={handleChange}
+          error={!!errors[`workTiming`]}
+          helperText={errors[`workTiming`]}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <AccessTimeIcon  sx={{ color: 'black' }} />
               </InputAdornment>
             ),
           }}

@@ -76,7 +76,8 @@ const AttendanceSetupUpdateView: React.FC = () => {
         if (!organizationResponse?.organizationData?.organizationName ||
             !organizationResponse?.organizationData?.phoneNumber ||
             !organizationResponse?.organizationData?.websiteUrl ||
-            errors?.email || errors?.phoneNumber || errors?.websiteUrl)
+            !organizationResponse?.organizationData?.workTiming ||
+            errors?.email || errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming)
             setIsDisable(true);
         else
             setIsDisable(false);
@@ -131,6 +132,11 @@ const AttendanceSetupUpdateView: React.FC = () => {
         return urlRegex.test(value);
     };
 
+    const validateWorkingHours = (value: string) => {
+        const hoursRegex = /^(?:[1-9]|1[0-2])$/;
+        return hoursRegex.test(value);
+    };
+
     const handleEditClick = (index: any) => {
         setRowIndex(index);
         setCameraData(cameraDetails[index]);
@@ -146,7 +152,8 @@ const AttendanceSetupUpdateView: React.FC = () => {
         const { name, value } = event.target;
         if ((name === "email" && !validateEmail(value)) ||
             (name === "phoneNumber" && !validatePhoneNumber(value)) ||
-            (name === "websiteUrl" && !validateWebsiteURL(value))
+            (name === "websiteUrl" && !validateWebsiteURL(value)) ||
+            (name === "workTiming" && !validateWorkingHours(value))
         )
             setErrors((prevErrors) => ({
                 ...prevErrors,
@@ -157,7 +164,6 @@ const AttendanceSetupUpdateView: React.FC = () => {
                 ...prevErrors,
                 [`${name}`]: '',
             }));
-       
         setOrganizationResponse(prevState => {
             if (name === "email") {
                 return {
@@ -358,17 +364,17 @@ const AttendanceSetupUpdateView: React.FC = () => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-                            Email
+                            Working Hours
                         </Typography>
                         <TextField
                             variant="outlined"
-                            value={organizationResponse?.cameraData?.email}
-                            name="email"
+                            value={organizationResponse?.organizationData?.workTiming}
+                            name="workTiming"
                             onChange={handleOrganizationInputChange}
                             sx={{ width: "80%" }}
                             required
-                            error={!!errors[`email`]}
-                            helperText={errors[`email`]}
+                            error={!!errors[`workTiming`]}
+                            helperText={errors[`workTiming`]}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -384,6 +390,21 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             multiline
                             rows={2}
                             required
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            Email
+                        </Typography>
+                        <TextField
+                            variant="outlined"
+                            value={organizationResponse?.cameraData?.email}
+                            name="email"
+                            onChange={handleOrganizationInputChange}
+                            sx={{ width: "80%" }}
+                            required
+                            error={!!errors[`email`]}
+                            helperText={errors[`email`]}
                         />
                     </Grid>
                 </Grid>
