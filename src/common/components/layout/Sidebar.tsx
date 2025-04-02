@@ -34,10 +34,10 @@ const Sidebar: React.FC = () => {
   return (
     <Drawer
       sx={{
-        width: "15%",
+        width: "16%",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: "15%",
+          width: "16%",
           bgcolor: "#1C214F",
           color: "white",
           overflow: "hidden",
@@ -75,7 +75,7 @@ const Sidebar: React.FC = () => {
                   <PreviewIcon sx={{ mt: 1 }} />
                   <ListItemText sx={{ ml: 2 }}>
                     <Typography sx={{ fontSize: 19 }} variant="h6">
-                      Attendace
+                      Attendance
                     </Typography>
                   </ListItemText>
                 </Box>

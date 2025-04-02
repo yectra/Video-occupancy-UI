@@ -1,8 +1,8 @@
 import { apiClient } from "@/common/hooks/useApiClient";
-import { BackendPayload, GraphResponseModel } from "@/pages/dashboard/models/liveoccupanytracker";
+import { AddUserDetails, BackendPayload, GraphResponseModel } from "@/pages/dashboard/models/liveoccupanytracker";
 
 
-const { httpPost, httpGet, httpPut } = apiClient();
+const { httpPost, httpGet, httpPut, httpDelete } = apiClient();
 
 interface IOccupancyTracker {
     addSetupDetails(setupDetails: BackendPayload): Promise<any>;
@@ -11,7 +11,12 @@ interface IOccupancyTracker {
     getGraphDetails(): Promise<GraphResponseModel>;
     updateCameraDetails(cameraDetails: BackendPayload): Promise<any>;
     checkUserExists(): Promise<any>;
-    getPersonCountByDate(date: string): Promise<any>
+    getPersonCountByDate(date: string): Promise<any>;
+    getUserDetails(): Promise<any>;
+    updateEmployeeDetails(userDetails: any): Promise<any>;
+    deleteEmployeeDetails(user: any): Promise<any>;
+    addUserDetails(useretails: AddUserDetails): Promise<any>;
+    searchAllUserDetails(searchTerm: string): Promise<any>;
 }
 
 export class OccupancyTracker implements IOccupancyTracker {
@@ -43,4 +48,30 @@ export class OccupancyTracker implements IOccupancyTracker {
     getPersonCountByDate(date: string): Promise<any> {
         return httpGet(`api/getPersonCountByDate?date=${date}`).then((response) => response)
     }
+
+    getUserDetails(): Promise<any> {
+        return httpGet('api/getAllUsers')
+            .then((response) => response)
+    }
+
+    updateEmployeeDetails(userDetails: any): Promise<any> {
+        return httpPut(`api/editUser`, userDetails)
+            .then((response) => response)
+    }
+
+    deleteEmployeeDetails(user: any): Promise<any> {
+        return httpDelete(`/api/deleteUser`, user)
+            .then((response) => (response))
+    }
+
+    addUserDetails(useretails: AddUserDetails): Promise<any> {
+        return httpPost('/api/addUser', useretails)
+            .then((response) => response)
+    }
+
+    searchAllUserDetails(searchTerm: string): Promise<any> {
+        return httpGet(`/api/searchUsers?search=${searchTerm}`)
+            .then((response) => response)
+    }
 }
+

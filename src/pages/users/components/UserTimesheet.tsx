@@ -66,11 +66,11 @@ const UserTimesheet: React.FC<IProps> = ({ todayPunchDetail }) => {
       <Box sx={{ display: 'flex', justifyContent: 'center', textAlign: 'center', gap: 30, mt: 2 }}>
         <Box>
           <Typography sx={{ fontWeight: "bold", color: "#7D7D7D" }}>Break</Typography>
-          <Typography variant='body1'>{todayPunchDetail.break}</Typography>
+          <Typography variant='body1'>{todayPunchDetail?.break}</Typography>
         </Box>
         <Box>
           <Typography sx={{ fontWeight: "bold", color: "#7D7D7D" }}>Over Time</Typography>
-          <Typography variant='body1'>{todayPunchDetail.overTime}</Typography>
+          <Typography variant='body1'>{todayPunchDetail?.overTime}</Typography>
         </Box>
       </Box>
     </Box>

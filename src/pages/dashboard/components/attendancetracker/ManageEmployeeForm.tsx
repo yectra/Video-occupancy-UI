@@ -3,8 +3,16 @@ import { debounce } from 'lodash';
 import { styled, Box, Typography, IconButton, InputAdornment, InputBase, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, MenuItem, Button, Avatar, CircularProgress, Backdrop } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import CloseIcon from "@mui/icons-material/Close";
+
+//Service
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
+
+//Models
 import { ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
+import { ManageUserDetails, userDetails } from "../../models/liveoccupanytracker";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -52,7 +60,9 @@ const ManageEmployeeForm: React.FC = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   // const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [employeeForm, setEmployeeForm] = useState<ManageEmployeeDetails[]>([]);
+  const [userForm, setUserForm] = useState<ManageUserDetails>();
   const [selectedEmployee, setSelectedEmployee] = useState<ManageEmployeeDetails | null>(null);
+  const [selectedUser, setSelectedUser] = useState<userDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
@@ -60,11 +70,16 @@ const ManageEmployeeForm: React.FC = () => {
   const [noUserFound, setNoUserFound] = useState(false);
   const [isDisable, setIsDisable] = useState<boolean>(false)
   const [emailError, setEmailError] = useState<string>("");
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
+  const [isEmployeePage, setIsEmployeePage] = useState<boolean>(false);
+
   const attendanceDetails = new AttendanceDetails();
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const occupancyTracker = new OccupancyTracker();
 
   const openConfirmDialog = () => setConfirmDialogOpen(true);
   const closeConfirmDialog = () => setConfirmDialogOpen(false);
+
+  const pathName = location.pathname;
 
   const fetchEmployeeDetails = useCallback(() => {
     setLoading(true);
@@ -77,17 +92,42 @@ const ManageEmployeeForm: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const fetchUserDetails = useCallback(() => {
+    setLoading(true);
+
+    occupancyTracker.getUserDetails().then((response) => {
+      setUserForm(response.data)
+      setNoUserFound(response.data.users.length === 0);
+    }).finally(() => setLoading(false));
+  }, []);
+
   const debouncedSearch = useCallback(
     debounce((searchValue: string) => {
       if (searchValue) {
-        attendanceDetails.searchAllEmployeeDetails(searchValue)
-          .then((response) => {
-            setEmployeeForm(response);
-            setNoUserFound(response.length === 0);
-          })
-          .catch((error) => console.error("Error fetching search results:", error));
+        if (isEmployeePage) {
+          setLoading(true);
+          attendanceDetails.searchAllEmployeeDetails(searchValue)
+            .then((response) => {
+              setEmployeeForm(response);
+              setNoUserFound(response.length === 0);
+            })
+            .catch((error) => console.error("Error fetching search results:", error))
+            .finally(() => setLoading(false));
+        } else {
+          setLoading(true);
+          occupancyTracker.searchAllUserDetails(searchValue)
+            .then((response) => {
+              setUserForm(response.data)
+              setNoUserFound(response.data.users.length === 0);
+            })
+            .catch((error) => console.error("Error fetching search results:", error))
+            .finally(() => setLoading(false));
+        }
       } else {
-        fetchEmployeeDetails();
+        if (isEmployeePage)
+          fetchEmployeeDetails();
+        else
+          fetchUserDetails();
       }
     }, 300),
     []
@@ -102,29 +142,40 @@ const ManageEmployeeForm: React.FC = () => {
   const handleDialogClose = () => {
     setEditDialogOpen(false);
     setSelectedEmployee(null);
+    setSelectedUser(null);
     setImageUrl(null);
     setNewImage(null);
     setImageBase64("");
   };
 
-  // const handleImageDialogClose = () => {
-  //   setImageDialogOpen(false);
-  //   setImageUrl(null);
-  //   setNewImage(null);
-  //   setImageBase64("");
-  // };
-
   const handleEditClick = (employee: ManageEmployeeDetails) => {
-    // setSelectedEmployee(employee)    
-    // setImageDialogOpen(true);
     setSelectedEmployee(employee);
     setImageUrl(employee.imageUrl || "");
     setEditDialogOpen(true);
   };
 
+  const handleDeleteClick = (employee: ManageEmployeeDetails) => {
+    setSelectedEmployee(employee);
+    setImageUrl(employee.imageUrl || "");
+    openConfirmDialog();
+  }
+
+  const handleUserEditClick = (user: userDetails) => {
+    setSelectedUser(user);
+    setEditDialogOpen(true);
+  };
+
+  const handleUserDeleteClick = (user: userDetails) => {
+    setSelectedUser(user);
+    openConfirmDialog();
+  }
+
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setSelectedEmployee((prev) => (prev ? { ...prev, [name]: value } : null));
+    isEmployeePage ?
+      setSelectedEmployee((prev) => (prev ? { ...prev, [name]: value } : null)) :
+      setSelectedUser((prev) => (prev ? { ...prev, [name]: value } : null));
     if (name == 'email' && !validateEmail(value)) {
       setEmailError("Invalid email format");
     } else {
@@ -132,17 +183,11 @@ const ManageEmployeeForm: React.FC = () => {
     }
   };
 
-  const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedEmployee((prev) =>
-      prev ? { ...prev, role: event.target.value as string } : null
-    );
-  };
-
   const handleSave = () => {
-    if (selectedEmployee) {
+    if (isEmployeePage && selectedEmployee) {
       if (newImage && imageBase64)
         selectedEmployee.newImageBase64 = imageBase64;
-     
+
       setLoading(true);
       attendanceDetails
         .updateEmployeeDetails(selectedEmployee)
@@ -154,13 +199,29 @@ const ManageEmployeeForm: React.FC = () => {
           console.error("Error updating employee details:", error)
         )
         .finally(() => setLoading(false));
+    } else if (selectedUser) {
+      let user: any = {
+        user_id: selectedUser.id,
+        role: selectedUser.role
+      }
+      setLoading(true);
+      occupancyTracker.
+        updateEmployeeDetails(user)
+        .then(() => {
+          fetchUserDetails();
+          handleDialogClose();
+        })
+        .catch((error) =>
+          console.error("Error updating user details:", error)
+        )
+        .finally(() => setLoading(false));
     }
   };
 
   const handleDelete = () => {
     closeConfirmDialog();
 
-    if (selectedEmployee) {
+    if (isEmployeePage && selectedEmployee) {
       setLoading(true);
       attendanceDetails
         .deleteEmployeeDetails(selectedEmployee.employeeId)
@@ -170,14 +231,18 @@ const ManageEmployeeForm: React.FC = () => {
         })
         .catch((error) => console.error("Error deleting employee:", error))
         .finally(() => setLoading(false));
+    } else if (selectedUser) {
+      let user: any = {
+        user_id: selectedUser.id
+      }
+      occupancyTracker.deleteEmployeeDetails(user).then(() => {
+        fetchUserDetails();
+        handleDialogClose();
+      })
+        .catch((error) => console.error("Error deleting employee:", error))
+        .finally(() => setLoading(false));
     }
   };
-
-  // const handleAvatarClick = (employee: ManageEmployeeDetails) => {
-  //   setSelectedEmployee(employee)
-  //   setImageUrl(employee.imageUrl || "");
-  //   setImageDialogOpen(true);
-  // };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -192,43 +257,30 @@ const ManageEmployeeForm: React.FC = () => {
     }
   };
 
-  // const handleImageSave = () => {
-  //   if (newImage && imageBase64 && selectedEmployee) {
-  //     console.log("Sending Base64 image to the backend:", imageBase64);
-  //     const data = {
-  //       employeeId: selectedEmployee?.employeeId,
-  //       newImageBase64: imageBase64,
-  //     };
-  //     setLoading(true);
-  //     attendanceDetails
-  //       .updateEmployeeDetails(data)
-  //       .then(() => {
-  //         fetchEmployeeDetails();
-  //         handleDialogClose();
-  //       })
-  //       .catch((error) =>
-  //         console.error("Error updating employee details:", error)
-  //       )
-  //       .finally(() => setLoading(false));
-  //     handleImageDialogClose();
-  //   }
-  // };
-
   const validateEmail = (email: any): boolean => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
   useEffect(() => {
-    fetchEmployeeDetails();
+    if (pathName && pathName === '/dashboard/attendance/emp-form') {
+      setIsEmployeePage(true);
+      fetchEmployeeDetails();
+    }
+    else if (pathName && pathName === '/dashboard/occupancy-tracker/emp-form') {
+      setIsEmployeePage(false);
+      fetchUserDetails();
+    }
   }, []);
 
   useEffect(() => {
-    if (!selectedEmployee?.email || !selectedEmployee.employeeName || !selectedEmployee.role || emailError)
-      setIsDisable(true)
+    if (isEmployeePage && (!selectedEmployee?.email || !selectedEmployee.employeeName || !selectedEmployee.role || emailError))
+      setIsDisable(true);
+    else if (!isEmployeePage && (!selectedUser?.email || !selectedUser.name || !selectedUser.role || emailError))
+      setIsDisable(true);
     else
-      setIsDisable(false)
-  }, [handleInputChange])
+      setIsDisable(false);
+  }, [handleInputChange]);
 
 
   return (
@@ -242,7 +294,7 @@ const ManageEmployeeForm: React.FC = () => {
         }}
       >
         <Typography sx={{ fontWeight: "bold", color: "#1C214F" }} variant="h5">
-          User Registry
+          {isEmployeePage ? 'Employee Registry' : 'User Registry'}
         </Typography>
         <Box sx={{ position: "relative", width: "350px" }}>
           <InputBase
@@ -259,7 +311,7 @@ const ManageEmployeeForm: React.FC = () => {
                 <InputAdornment position="end">
                   <IconButton edge="end" size="large" onClick={() => {
                     setSearchTerm("")
-                    fetchEmployeeDetails()
+                    isEmployeePage ? fetchEmployeeDetails() : fetchUserDetails()
                   }}>
                     <ClearIcon />
                   </IconButton>
@@ -280,7 +332,7 @@ const ManageEmployeeForm: React.FC = () => {
       {noUserFound ? (
         <Box sx={{ textAlign: "center", marginTop: 4 }}>
           <Typography variant="h6" color="textSecondary">
-            No user found
+            {isEmployeePage ? 'No Employee Found' : 'No User Found'}
           </Typography>
         </Box>
       ) : (
@@ -291,17 +343,17 @@ const ManageEmployeeForm: React.FC = () => {
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                {["ID", "PROFILE", "NAME", "ROLE", "EMAIL", "EDIT"].map(
-                  (header) => (
-                    <StyledTableCell key={header} align={header === "Employee Id" ? "left" : "center"}>
-                      {header}
-                    </StyledTableCell>
-                  )
-                )}
+                {isEmployeePage &&
+                  <><StyledTableCell align="center">ID</StyledTableCell>
+                    <StyledTableCell align="center">PROFILE</StyledTableCell></>}
+                <StyledTableCell align="center">NAME</StyledTableCell>
+                <StyledTableCell align="center">ROLE</StyledTableCell>
+                <StyledTableCell align="center">EMAIL</StyledTableCell>
+                <StyledTableCell align="center">ACTION</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {employeeForm.map((row) => (
+              {isEmployeePage ? employeeForm.map((row) => (
                 <StyledTableRow key={row.employeeId}>
                   <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
                   <StyledTableCell align="center">
@@ -312,10 +364,55 @@ const ManageEmployeeForm: React.FC = () => {
                   <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
                   <StyledTableCell align="center">{row.role}</StyledTableCell>
                   <StyledTableCell align="center">{row.email}</StyledTableCell>
-                  <StyledTableCell align="center">
+                  {/* <StyledTableCell align="center">
                     <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" } }} onClick={() => handleEditClick(row)}>
                       <EditOutlinedIcon />
                     </IconButton>
+                  </StyledTableCell> */}
+                  <StyledTableCell align="center">
+                    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                      <IconButton
+                        sx={{ color: "#00D1A3" }}
+                        onClick={() => handleEditClick(row)}
+                      >
+                        <EditOutlinedIcon />
+                      </IconButton>
+
+                      <IconButton
+                        sx={{ color: "#FF4D4D" }}
+                        onClick={() => handleDeleteClick(row)}
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </Box>
+                  </StyledTableCell>
+                </StyledTableRow>
+              )) : userForm?.users.map((row) => (
+                <StyledTableRow key={row.id}>
+                  <StyledTableCell align="center">{row.name}</StyledTableCell>
+                  <StyledTableCell align="center">{row.role}</StyledTableCell>
+                  <StyledTableCell align="center">{row.email}</StyledTableCell>
+                  {/* <StyledTableCell align="center">
+                    <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" } }} onClick={() => handleUserEditClick(row)}>
+                      <EditOutlinedIcon />
+                    </IconButton>
+                  </StyledTableCell> */}
+                  <StyledTableCell align="center">
+                    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                      <IconButton
+                        sx={{ color: "#00D1A3" }}
+                        onClick={() => handleUserEditClick(row)}
+                      >
+                        <EditOutlinedIcon />
+                      </IconButton>
+
+                      <IconButton
+                        sx={{ color: "#FF4D4D" }}
+                        onClick={() => handleUserDeleteClick(row)}
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </Box>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
@@ -327,70 +424,88 @@ const ManageEmployeeForm: React.FC = () => {
         <Typography variant="body2" color="error">{noUserFound}</Typography>
       )}
 
+      <Dialog open={editDialogOpen}>
+        <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem', position: 'relative', textAlign: 'center' }}>
+          {isEmployeePage ? 'Edit Employee' : 'Edit User'}
+          <IconButton
+            aria-label="close"
+            onClick={handleDialogClose}
+            sx={{ position: 'absolute', right: '5%', top: '50%', transform: 'translateY(-50%)' }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
 
-      <Dialog open={editDialogOpen} onClose={handleDialogClose}>
-        <Box sx={{ textAlign: 'center' }}>
-          <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem' }}>Edit User</DialogTitle>
-          <DialogTitle>Profile Picture</DialogTitle>
-        </Box>
         <DialogContent>
-          <Box sx={{ textAlign: 'center', marginBottom: 2 }}>
-            <Avatar
-              src={imageUrl || undefined}
-              alt="Employee Image"
-              sx={{ width: 100, height: 100, margin: '0 auto' }}
+          {isEmployeePage && <>
+            <DialogTitle sx={{ textAlign: 'center' }}>Profile Picture</DialogTitle>
+            <Box sx={{ textAlign: 'center', marginBottom: 1 }}>
+              <Avatar
+                src={imageUrl || undefined}
+                alt="Employee Image"
+                sx={{ width: 100, height: 100, margin: '0 auto' }}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
+              <Button
+                variant="contained"
+                component="label"
+                sx={{ fontSize: '0.75rem', padding: '5px 10px', minWidth: 'auto' }} // Reducing size
+              >
+                Upload New Image
+                <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+              </Button>
+            </Box>
+            <DialogTextField
+              label="User ID *"
+              value={selectedEmployee?.employeeId || ""}
+              name="employeeId"
+              onChange={handleInputChange}
+              disabled
             />
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-            <Button
-              variant="contained"
-              component="label"
-              sx={{ fontSize: '0.75rem', padding: '5px 10px', minWidth: 'auto' }} // Reducing size
-            >
-              Upload New Image
-              <input type="file" hidden accept="image/*" onChange={handleFileChange} />
-            </Button>
-          </Box>
-        </DialogContent>
-        <DialogContent>
-          <DialogTextField
-            label="User ID *"
-            value={selectedEmployee?.employeeId || ""}
-            name="employeeId"
-            onChange={handleInputChange}
-            disabled
-          />
+          </>
+          }
           <DialogTextField
             label="Name *"
-            value={selectedEmployee?.employeeName || ""}
+            value={isEmployeePage ? selectedEmployee?.employeeName : selectedUser?.name}
             name="employeeName"
-            onChange={handleInputChange}
+            onChange={handleInputChange}           
           />
           <DialogTextField
             label="Email *"
-            value={selectedEmployee?.email || ""}
+            value={isEmployeePage ? selectedEmployee?.email : selectedUser?.email}
             name="email"
             onChange={handleInputChange}
             error={!!emailError}
-            helperText={emailError}
+            helperText={emailError}           
           />
           <DialogTextField
             label="Role *"
-            value={selectedEmployee?.role || ""}
+            value={isEmployeePage ? selectedEmployee?.role : selectedUser?.role}
             name="role"
-            onChange={handleRoleChange}
+            onChange={handleInputChange}
             select
           >
             <MenuItem value="Admin">Admin</MenuItem>
-            <MenuItem value="Employee">Employee</MenuItem>
+            {isEmployeePage ? <MenuItem value="Employee">Employee</MenuItem> :
+              <MenuItem value="User">User</MenuItem>}
           </DialogTextField>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => { openConfirmDialog(); }} color="error">
+        <DialogActions sx={{ my: 1 }}>
+          {/* <Button onClick={() => { openConfirmDialog(); }} color="error">
             <Typography>Delete</Typography>
-          </Button>
-          <Button onClick={handleDialogClose}><Typography>Cancel</Typography></Button>
-          <Button disabled={isDisable} color="primary" onClick={handleSave}>
+          </Button> */}
+          <Button
+            sx={{
+              bgcolor: "#00D1A3",
+              "&:hover": { bgcolor: "#00D1A3" },
+              px: 4,
+              mx: 3
+            }}
+            variant="contained"
+            disabled={isDisable}
+            onClick={handleSave}
+          >
             <Typography>Save</Typography>
           </Button>
         </DialogActions>
@@ -435,7 +550,7 @@ const ManageEmployeeForm: React.FC = () => {
         <DialogTitle sx={{ bgcolor: "green", color: "white" }}>Confirm</DialogTitle>
         <DialogContent>
           <Typography sx={{ pt: 2 }}>
-            Are you sure want to delete {selectedEmployee?.employeeName}?
+            Are you sure want to delete {isEmployeePage ? selectedEmployee?.employeeName : selectedUser?.name}?
           </Typography>
         </DialogContent>
         <DialogActions>

@@ -103,7 +103,6 @@ export class ManageEmployeeDetails {
   email?: string;
   imageUrl?: string;
   newImageBase64?: string;
-
 }
 export class OrganizationSetup {
   organizationName: string;

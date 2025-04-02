@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, TextField, Typography, Autocomplete, Avatar, Button, Snackbar, Alert, Grid, Dialog, DialogActions, DialogTitle, DialogContent } from "@mui/material";
+import { Box, TextField, Typography, Autocomplete, Avatar, Button, Grid, Dialog, DialogActions, DialogTitle, DialogContent } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
+
+//Services
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
+
+//Model
+import { AddUserDetails } from "../../models/liveoccupanytracker";
 
 const EmployeeForm: React.FC = () => {
   const navigate = useNavigate();
@@ -15,23 +21,29 @@ const EmployeeForm: React.FC = () => {
   const [role, setRole] = useState<string>("");
   const [avatarSrc, setAvatarSrc] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  // const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  // const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [roleOptions, setRoleOptions] = useState<string[]>([]);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
+  const [isEmployeePage, setIsEmployeePage] = useState<boolean>(false);
 
   const attendanceDetails = new AttendanceDetails();
+  const occupancyTracker = new OccupancyTracker();
 
   const closeConfirmDialog = () => setConfirmDialogOpen(false);
 
   const pathName = location.pathname;
 
   useEffect(() => {
-    if (pathName && pathName === '/dashboard/attendance/add-emp')
+    if (pathName && pathName === '/dashboard/attendance/add-emp') {
+      setIsEmployeePage(true);
       setRoleOptions(['Admin', 'Employee']);
-    else if (pathName && pathName === '/dashboard/occupancy-tracker/add-emp')
+    }
+    else if (pathName && pathName === '/dashboard/occupancy-tracker/add-emp') {
+      setIsEmployeePage(false);
       setRoleOptions(['Admin', 'User']);
+    }
   }, [pathName])
 
   const validateEmail = (email: string): boolean => {
@@ -69,46 +81,72 @@ const EmployeeForm: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    const request: AddEmployeeDetails = {
-      role,
-      email,
-      employeeId,
-      employeeName: name,
-      imageBase64,
-    };
+    if (isEmployeePage) {
+      const request: AddEmployeeDetails = {
+        role,
+        email,
+        employeeId,
+        employeeName: name,
+        imageBase64,
+      };
 
-    attendanceDetails
-      .addEmployeeDetails(request)
-      .then(() => {
-        setSnackbarMessage('Employee added successfully!');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
+      attendanceDetails
+        .addEmployeeDetails(request)
+        .then(() => {
+          setSnackbarMessage('Employee added successfully!');
+          setConfirmDialogOpen(true);
+          // setSnackbarSeverity('success');
+          // setSnackbarOpen(true);
+          navigate('/dashboard/attendance/emp-form');
+        })
+        .catch((error) => {
+          setSnackbarMessage(error.response.data.Warn);
+          setConfirmDialogOpen(true);
+        });
+    } else {
+      const request: AddUserDetails = {
+        role,
+        email,
+        name
+      };
+
+      occupancyTracker.addUserDetails(request).then(() => {
+        setSnackbarMessage('User added successfully!');
+        setConfirmDialogOpen(true);
+        // setSnackbarSeverity('success');
+        // setSnackbarOpen(true);
         navigate('/dashboard/occupancy-tracker/emp-form');
       })
-      .catch((error) => {
-        setSnackbarMessage(error.response.data.Warn);
-        setConfirmDialogOpen(true);
-      });
+        .catch((error) => {
+          setSnackbarMessage(error.response.data.data.message);
+          setConfirmDialogOpen(true);
+        });
+    }
   };
 
-  const handleCloseSnackbar = (
-    _event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
+  // const handleCloseSnackbar = (
+  //   _event?: React.SyntheticEvent | Event,
+  //   reason?: string
+  // ) => {
+  //   if (reason === "clickaway") {
+  //     return;
+  //   }
+  //   setSnackbarOpen(false);
+  // };
 
   const isFormValid = (): boolean => {
-    return !!(
+    return isEmployeePage ? !!(
       name.trim() &&
       employeeId &&
       email.trim() &&
       !emailError &&
       role &&
       imageBase64
+    ) : !!(
+      name.trim() &&
+      email.trim() &&
+      !emailError &&
+      role
     );
   };
 
@@ -127,75 +165,130 @@ const EmployeeForm: React.FC = () => {
         sx={{
           maxWidth: "800px", border: "2px solid #7D7D7D",
           borderRadius: 3,
-          padding: 10,
+          px: 10,
+          py: 5
         }}
       >
         <Typography sx={{ color: "#1C214F", fontWeight: "bold", textAlign: "center" }} variant="h6">
-          {(pathName && pathName === '/dashboard/attendance/add-emp') ? 'Add Employee' : 'Add User'}
+          {isEmployeePage ? 'Add Employee' : 'Add User'}
         </Typography>
         <Grid container spacing={3}>
-          <Grid item xs={12} container justifyContent="center">
-            <Avatar sx={{ width: 60, height: 60, mt: 2 }} src={avatarSrc} />
-          </Grid>
-          <Grid item xs={12} container justifyContent="center">
-            <Button
-              variant="contained"
-              component="label"
-              sx={{ bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
-            >
-              <Typography>Upload Picture</Typography>
-              <Typography component="span" sx={{ pl: 1 }}>*</Typography>
-              <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="name"
-              label="Name"
-              variant="outlined"
-              fullWidth
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="employeeId"
-              label={(pathName && pathName === '/dashboard/attendance/add-emp') ? 'Employee ID' : 'User ID'}
-              variant="outlined"
-              fullWidth
-              value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="email"
-              label="Email ID"
-              variant="outlined"
-              fullWidth
-              value={email}
-              onChange={handleEmailChange}
-              error={!!emailError}
-              helperText={emailError}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Autocomplete
-              id="role"
-              options={roleOptions}
-              value={role}
-              onChange={(_, newValue) => {
-                setRole(newValue || "");
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Role *" variant="outlined" fullWidth />
-              )}
-            />
-          </Grid>
+          {isEmployeePage ? <>
+            <Grid item xs={12} container justifyContent="center">
+              <Avatar sx={{ width: 60, height: 60, my: 2 }} src={avatarSrc} />
+              <Grid item xs={12} container justifyContent="center">
+                <Button
+                  variant="contained"
+                  component="label"
+                  sx={{ bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
+                >
+                  <Typography>Upload Picture</Typography>
+                  <Typography component="span" sx={{ pl: 1 }}>*</Typography>
+                  <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
+                </Button>
+              </Grid>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="name"
+                label="Name"
+                variant="outlined"
+                fullWidth
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="employeeId"
+                label="Employee ID"
+                variant="outlined"
+                fullWidth
+                value={employeeId}
+                onChange={(e) => setEmployeeId(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                id="email"
+                label="Email ID"
+                variant="outlined"
+                fullWidth
+                value={email}
+                onChange={handleEmailChange}
+                error={!!emailError}
+                helperText={emailError}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Autocomplete
+                id="role"
+                options={roleOptions}
+                value={role}
+                onChange={(_, newValue) => {
+                  setRole(newValue || "");
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Role *" variant="outlined" fullWidth />
+                )}
+              />
+            </Grid>
+          </> : <>
+            <Grid container display="flex" direction="column" justifyContent="center" alignItems="center" spacing={3} sx={{ mt: 3 }}>
+              <Box display="flex" alignItems="center" sx={{ width: "80%", mt: 2 }}>
+                <Typography variant="subtitle1" sx={{ minWidth: 120, mr: 2 }}>
+                  Name *
+                </Typography>
+                <TextField
+                  id="name"
+                  variant="outlined"
+                  fullWidth
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </Box>
+              <Box display="flex" alignItems="center" sx={{ width: "80%", mt: 2 }}>
+                <Typography variant="subtitle1" sx={{ minWidth: 120, mr: 2 }}>
+                  Email ID *
+                </Typography>
+                <TextField
+                  id="email"
+                  variant="outlined"
+                  fullWidth
+                  value={email}
+                  onChange={handleEmailChange}
+                  error={!!emailError}
+                  helperText={emailError}
+                  required
+                />
+              </Box>
+              <Box display="flex" alignItems="center" sx={{ width: "80%", mt: 2 }}>
+                <Typography variant="subtitle1" sx={{ minWidth: 120, mr: 2 }}>
+                  Role *
+                </Typography>
+                <Autocomplete
+                  id="role"
+                  options={roleOptions}
+                  value={role}
+                  onChange={(_, newValue) => {
+                    setRole(newValue || "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="outlined"
+                      fullWidth
+                    />
+                  )}
+                  sx={{ width: "100%" }}
+                />
+              </Box>
+            </Grid>
+          </>}
           <Grid item xs={12} container justifyContent="center">
             <Button
               sx={{
@@ -209,7 +302,7 @@ const EmployeeForm: React.FC = () => {
               onClick={handleSubmit}
               disabled={!isFormValid()}
             >
-              <Typography>{(pathName && pathName === '/dashboard/attendance/add-emp') ? 'Add Employee' : 'Add User'}</Typography>
+              <Typography>{isEmployeePage ? 'Add Employee' : 'Add User'}</Typography>
             </Button>
           </Grid>
         </Grid>
@@ -219,17 +312,17 @@ const EmployeeForm: React.FC = () => {
         <DialogTitle sx={{ bgcolor: "green", color: "white" }}>Error</DialogTitle>
         <DialogContent>
           <Typography sx={{ pt: 2 }}>
-          {snackbarMessage}
+            {snackbarMessage}
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeConfirmDialog} color="primary">
             <Typography>OK</Typography>
-          </Button>          
+          </Button>
         </DialogActions>
       </Dialog>
 
-      <Snackbar
+      {/* <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={handleCloseSnackbar}
@@ -238,7 +331,7 @@ const EmployeeForm: React.FC = () => {
         <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </Box>
   );
 };

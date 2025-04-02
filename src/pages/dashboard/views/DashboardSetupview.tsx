@@ -14,14 +14,14 @@ const DashboardSetupView: React.FC = () => {
   const navigate = useNavigate();
 
   const handleVideocamClick = () => {
-    if ((jobTitle === 'admin' && !newUser) || jobTitle === 'user')
+    if ((jobTitle === 'Admin' && !newUser) || jobTitle === 'User')
       navigate("/dashboard/occupancy-tracker/overview");
     else
       navigate("/dashboard/occupancy-tracker");
   };
 
   const handleGroupClick = () => {
-    if ((jobTitle === 'admin' && !newUser) || jobTitle === 'user')
+    if ((jobTitle === 'Admin' && !newUser) || jobTitle === 'User')
       navigate("/dashboard/attendance/emp-attendance");
     else
       navigate("/dashboard/attendance");
@@ -42,7 +42,7 @@ const DashboardSetupView: React.FC = () => {
   );
 
   useEffect(() => {    
-    if (jobTitle === 'employee') {
+    if (jobTitle === 'Employee') {
       navigate("/dashboard/attendance/user-details", { replace: true });
     }
   }, [jobTitle, navigate]);

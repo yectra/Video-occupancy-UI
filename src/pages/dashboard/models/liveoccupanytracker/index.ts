@@ -31,3 +31,24 @@ export class GraphDataModel {
   percentage: number;
   time_interval: string;
 }
+
+export class ManageUserDetails {
+  organization_id: string;
+  pagination: any;
+  users: userDetails[];
+}
+
+export class userDetails {
+  created_at: string;
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+  organization_id?: string;
+}
+
+export class AddUserDetails {
+  name: string;
+  role: string;
+  email: string;
+}

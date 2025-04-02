@@ -117,6 +117,7 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
       getAttendance(requestId, requestDate);
       setSelectedDate(new Date(date ?? ""));
     } else if (attendanceList) {
+      setNoRecordsMessage(attendanceList.length ? null : "No records found.");
       setAttendance(attendanceList);
     }
   }, [id, attendanceList]);
