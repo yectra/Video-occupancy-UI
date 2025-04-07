@@ -9,14 +9,9 @@ import { useMsal } from "@azure/msal-react";
 //Hooks
 import { useAuth } from "@/common/hooks/AuthContext";
 
-//Services
-// import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
-
 const MainLayout = () => {
   const { isAuthenticated, signInUser, signOutUser } = useAuth();
   const { instance } = useMsal();
-
-  // const occupancyTracker = new OccupancyTracker();
 
   const decodeTokenManually = (token: string) => {
     try {
@@ -44,12 +39,6 @@ const MainLayout = () => {
       }
     }
   };
-
-  // const fetchUserRole = async () => {
-  //   occupancyTracker.checkUserExists().then((response) => {
-  //     localStorage.setItem("existUser", response.data.exists);
-  //   })
-  // };
 
   useEffect(() => {
     if (!isAuthenticated) {

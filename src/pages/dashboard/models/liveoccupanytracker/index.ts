@@ -52,3 +52,9 @@ export class AddUserDetails {
   role: string;
   email: string;
 }
+
+export class SetupCompleteResponse {
+  attendance: boolean;
+  occupancy: boolean;
+  message: string;
+}

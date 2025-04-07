@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Container, IconButton, Typography, Grid } from "@mui/material";
 import VideocamIcon from '@mui/icons-material/Videocam';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
@@ -9,22 +9,38 @@ import { Link, useNavigate } from "react-router-dom";
 //Hooks
 import { useAuth } from "@/common/hooks/AuthContext";
 
+//Services
+import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
+
+//Model
+import { SetupCompleteResponse } from "../models/liveoccupanytracker";
+
 const DashboardSetupView: React.FC = () => {
+  const [setupComplete, setSetupComplete] = useState<SetupCompleteResponse>(new SetupCompleteResponse());
+
   const { jobTitle, newUser } = useAuth();
   const navigate = useNavigate();
 
+  const occupancyTracker = new OccupancyTracker();
+
   const handleVideocamClick = () => {
-    if ((jobTitle === 'Admin' && !newUser) || jobTitle === 'User')
+    if ((jobTitle === 'Admin' && !newUser && setupComplete.occupancy) || jobTitle === 'User')
       navigate("/dashboard/occupancy-tracker/overview");
     else
       navigate("/dashboard/occupancy-tracker");
   };
 
   const handleGroupClick = () => {
-    if ((jobTitle === 'Admin' && !newUser) || jobTitle === 'User')
+    if ((jobTitle === 'Admin' && !newUser && setupComplete.attendance) || jobTitle === 'User')
       navigate("/dashboard/attendance/emp-attendance");
     else
       navigate("/dashboard/attendance");
+  };
+
+  const fetchUserRole = async () => {
+    occupancyTracker.checkUserExists().then((response) => {
+      setSetupComplete(response.data);
+    })
   };
 
   const Card = ({ to, onClick, icon, label, description }: { to: string, onClick: () => void, icon: React.ReactNode, label: string, description: string }) => (
@@ -41,9 +57,11 @@ const DashboardSetupView: React.FC = () => {
     </Box>
   );
 
-  useEffect(() => {    
+  useEffect(() => {
     if (jobTitle === 'Employee') {
       navigate("/dashboard/attendance/user-details", { replace: true });
+    } else if (jobTitle === 'Admin') {
+      fetchUserRole();
     }
   }, [jobTitle, navigate]);
 
