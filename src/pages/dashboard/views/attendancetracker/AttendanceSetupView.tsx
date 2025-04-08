@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import attImg from '@/assets/attendancecamera.jpg';
-import { Box, Grid, Typography, TextField, Button, Snackbar, Alert, CircularProgress, IconButton } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, Snackbar, Alert, CircularProgress, IconButton, Backdrop } from '@mui/material';
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -25,6 +25,7 @@ const AttendanceSetupView = () => {
     email: "",
     cameraDetails: [
       {
+        cameraId: null,
         punchinCamera: "",
         punchinUrl: "",
         punchoutCamera: "",
@@ -36,7 +37,7 @@ const AttendanceSetupView = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   type CameraDetailKeys = 'punchinCamera' | 'punchinUrl' | 'punchoutCamera' | 'punchoutUrl';
 
@@ -153,6 +154,7 @@ const AttendanceSetupView = () => {
     setCameraurlData(prevState => {
       const updatedCameras = [...(prevState.cameraDetails || [])];
       updatedCameras.push({
+        cameraId: null,
         punchinCamera: "",
         punchinUrl: "",
         punchoutCamera: "",
@@ -170,6 +172,9 @@ const AttendanceSetupView = () => {
 
   return (
     <Grid container sx={{ width: "100vw", height: "100vh" }} spacing={0}>
+      <Backdrop open={isLoading} style={{ zIndex: 9999, color: "#fff" }}>
+        <CircularProgress color={"primary"} />
+      </Backdrop>
       <Grid item xs={12} md={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <img src={attImg} alt="Setup" style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 10 }} />
       </Grid>
@@ -255,6 +260,7 @@ const AttendanceSetupView = () => {
 
           <TextField
             fullWidth
+            required
             label="Punchout Camera"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchoutCamera}
@@ -294,7 +300,7 @@ const AttendanceSetupView = () => {
             onClick={handleSave}
             disabled={isDisable}
           >
-            {isLoading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Save"}
+            Save
           </Button>
         </Box>
       </Grid>

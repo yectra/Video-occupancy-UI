@@ -117,6 +117,7 @@ export class CameraurlSetup {
 }
 
 export class AttendanceCameraDetailsModel {
+  cameraId: number | null;
   punchinCamera: string;
   punchinUrl: string;
   punchoutCamera: string;

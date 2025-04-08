@@ -34,8 +34,8 @@ interface IProps {
 
 const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const [rows, setRows] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);

@@ -2,7 +2,11 @@
 import { useEffect, useState } from "react";
 
 import { Backdrop, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, styled, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, TextField, Typography } from "@mui/material";
+
+//Icons
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import CloseIcon from "@mui/icons-material/Close";
 
 // Services
 import { AttendanceDetails } from "../../services/attendancetracker";
@@ -73,6 +77,12 @@ const AttendanceSetupUpdateView: React.FC = () => {
     }, []);
 
     useEffect(() => {
+        if (!organizationResponse?.organizationData?.organizationName)
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                ['organizationName']: 'Enter Organization Name',
+            }));
+
         if (!organizationResponse?.organizationData?.organizationName ||
             !organizationResponse?.organizationData?.phoneNumber ||
             !organizationResponse?.organizationData?.websiteUrl ||
@@ -143,6 +153,12 @@ const AttendanceSetupUpdateView: React.FC = () => {
         setEditDialogOpen(true);
     };
 
+    const handleDeleteClick = (index: any) => {
+        setRowIndex(index);
+        setCameraData(cameraDetails[index]);
+        openConfirmDialog();
+    }
+
     const handleDialogClose = () => {
         setRowIndex(0);
         setEditDialogOpen(false);
@@ -157,7 +173,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
         )
             setErrors((prevErrors) => ({
                 ...prevErrors,
-                [`${name}`]: `Enter Valid ${name}`,
+                [`${name}`]: `Enter Valid ${name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}`,
             }));
         else
             setErrors((prevErrors) => ({
@@ -270,6 +286,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
 
     const handleAddCameraClick = () => {
         const newCamera: AttendanceCameraDetailsModel = {
+            cameraId: null,
             punchinCamera: "",
             punchinUrl: "",
             punchoutCamera: "",
@@ -329,6 +346,8 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             onChange={handleOrganizationInputChange}
                             sx={{ width: "80%" }}
                             required
+                            error={!!errors[`organizationName`]}
+                            helperText={errors[`organizationName`]}
                         />
                     </Grid>
 
@@ -364,7 +383,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-                            Working Hours
+                            Working Hours *
                         </Typography>
                         <TextField
                             variant="outlined"
@@ -389,12 +408,11 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             sx={{ width: "80%" }}
                             multiline
                             rows={2}
-                            required
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-                            Email
+                            Email *
                         </Typography>
                         <TextField
                             variant="outlined"
@@ -430,7 +448,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                     <Table sx={{ minWidth: 700 }} aria-label="customized table">
                         <TableHead>
                             <TableRow>
-                                {["Punchin Camera", "Punchin Url", "Punchout Camera", "Punchout Url", "EDIT"].map(
+                                {["Punchin Camera", "Punchin Url", "Punchout Camera", "Punchout Url", "Action"].map(
                                     (header) => (
                                         <StyledTableCell key={header} align="center">
                                             {header.toUpperCase()}
@@ -447,12 +465,29 @@ const AttendanceSetupUpdateView: React.FC = () => {
                                     <StyledTableCell align="center">{row.punchoutCamera}</StyledTableCell>
                                     <StyledTableCell align="center">{row.punchoutUrl}</StyledTableCell>
                                     <StyledTableCell align="center">
+                                        <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                                            <IconButton
+                                                sx={{ color: "#00D1A3" }}
+                                                onClick={() => handleEditClick(index)}
+                                            >
+                                                <EditOutlinedIcon />
+                                            </IconButton>
+
+                                            <IconButton
+                                                sx={{ color: "#FF4D4D" }}
+                                                onClick={() => handleDeleteClick(index)}
+                                            >
+                                                <DeleteOutlineIcon />
+                                            </IconButton>
+                                        </Box>
+                                    </StyledTableCell>
+                                    {/* <StyledTableCell align="center">
                                         <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" } }}
                                             onClick={() => handleEditClick(index)}
                                         >
                                             <EditOutlinedIcon />
                                         </IconButton>
-                                    </StyledTableCell>
+                                    </StyledTableCell> */}
                                 </StyledTableRow>
                             ))}
                         </TableBody>
@@ -473,7 +508,17 @@ const AttendanceSetupUpdateView: React.FC = () => {
                     </Box>
                 </Box>
                 <Dialog open={editDialogOpen} onClose={handleDialogClose}>
-                    <DialogTitle>Edit Camera Location Details</DialogTitle>
+                    <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem', position: 'relative', textAlign: 'center' }}>
+                        {cameraData?.punchinCamera ? 'Edit Camera Location Details' : 'Add New Camera Details'}
+                        <IconButton
+                            aria-label="close"
+                            onClick={handleDialogClose}
+                            sx={{ position: 'absolute', right: '5%', top: '50%', transform: 'translateY(-50%)' }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    </DialogTitle>
+                    {/* <DialogTitle>Edit Camera Location Details</DialogTitle> */}
                     <DialogContent>
                         <DialogTextField
                             label="Punchin Camera *"
@@ -509,11 +554,25 @@ const AttendanceSetupUpdateView: React.FC = () => {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => { openConfirmDialog() }} color="error">
+                        {/* <Button onClick={() => { openConfirmDialog() }} color="error">
                             <Typography>Delete</Typography>
-                        </Button>
-                        <Button onClick={handleDialogClose}><Typography>Cancel</Typography></Button>
-                        <Button disabled={isDisableSave} color="primary" onClick={handleSave}>
+                        </Button> */}
+                        {/* <Button onClick={handleDialogClose}><Typography>Cancel</Typography></Button> */}
+                        {/* <Button disabled={isDisableSave} color="primary" onClick={handleSave}>
+                            <Typography>Save</Typography>
+                        </Button> */}
+                        <Button
+                            sx={{
+                                bgcolor: "#00D1A3",
+                                "&:hover": { bgcolor: "#00D1A3" },
+                                px: 4,
+                                mx: 3,
+                                mb: 2
+                            }}
+                            variant="contained"
+                            disabled={isDisableSave}
+                            onClick={handleSave}
+                        >
                             <Typography>Save</Typography>
                         </Button>
                     </DialogActions>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, TextField, Typography, Autocomplete, Avatar, Button, Grid, Dialog, DialogActions, DialogTitle, DialogContent } from "@mui/material";
+import { Box, TextField, Typography, Autocomplete, Avatar, Button, Grid, Dialog, DialogActions, DialogTitle, DialogContent, Backdrop, CircularProgress } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 
 //Services
@@ -21,6 +21,7 @@ const EmployeeForm: React.FC = () => {
   const [role, setRole] = useState<string>("");
   const [avatarSrc, setAvatarSrc] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   // const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   // const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
@@ -81,6 +82,7 @@ const EmployeeForm: React.FC = () => {
   };
 
   const handleSubmit = () => {
+    setLoading(true);
     if (isEmployeePage) {
       const request: AddEmployeeDetails = {
         role,
@@ -102,7 +104,7 @@ const EmployeeForm: React.FC = () => {
         .catch((error) => {
           setSnackbarMessage(error.response.data.Warn);
           setConfirmDialogOpen(true);
-        });
+        }).finally(() => setLoading(false));
     } else {
       const request: AddUserDetails = {
         role,
@@ -120,7 +122,7 @@ const EmployeeForm: React.FC = () => {
         .catch((error) => {
           setSnackbarMessage(error.response.data.data.message);
           setConfirmDialogOpen(true);
-        });
+        }).finally(() => setLoading(false));;
     }
   };
 
@@ -161,6 +163,9 @@ const EmployeeForm: React.FC = () => {
         overflow: "hidden",
       }}
     >
+      <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
+        <CircularProgress color={"primary"} />
+      </Backdrop>
       <Box
         sx={{
           maxWidth: "800px", border: "2px solid #7D7D7D",

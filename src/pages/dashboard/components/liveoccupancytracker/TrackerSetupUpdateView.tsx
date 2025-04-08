@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Backdrop, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, Slider, styled, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, TextField, Typography } from "@mui/material";
+
+//Icons
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import CloseIcon from "@mui/icons-material/Close";
 
 // Services
 import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
@@ -144,6 +148,12 @@ const TrackerSetupUpdateView: React.FC = () => {
         setEditDialogOpen(true);
     };
 
+    const handleDeleteClick = (index: any) => {
+        setRowIndex(index);
+        setVideoSource(cameraDetails[index]);
+        openConfirmDialog();
+    }
+
     const handleDialogClose = () => {
         setRowIndex(0);
         setEditDialogOpen(false);
@@ -261,7 +271,7 @@ const TrackerSetupUpdateView: React.FC = () => {
             alignItems: "center",
             justifyContent: "center",
             overflow: "hidden",
-          }}>
+        }}>
             <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
                 <CircularProgress color={"primary"} />
             </Backdrop>
@@ -336,7 +346,7 @@ const TrackerSetupUpdateView: React.FC = () => {
                     <Table sx={{ minWidth: 700 }} aria-label="customized table">
                         <TableHead>
                             <TableRow>
-                                {["Camera Identifier", "Camera Position", "Video Url", "EDIT"].map(
+                                {["Camera Identifier", "Camera Position", "Video Url", "Action"].map(
                                     (header) => (
                                         <StyledTableCell key={header} align="center">
                                             {header.toUpperCase()}
@@ -353,12 +363,29 @@ const TrackerSetupUpdateView: React.FC = () => {
                                     <StyledTableCell align="center">{row.cameraPosition}</StyledTableCell>
                                     <StyledTableCell align="center">{row.videoUrl}</StyledTableCell>
                                     <StyledTableCell align="center">
+                                        <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                                            <IconButton
+                                                sx={{ color: "#00D1A3" }}
+                                                onClick={() => handleEditClick(index)}
+                                            >
+                                                <EditOutlinedIcon />
+                                            </IconButton>
+
+                                            <IconButton
+                                                sx={{ color: "#FF4D4D" }}
+                                                onClick={() => handleDeleteClick(index)}
+                                            >
+                                                <DeleteOutlineIcon />
+                                            </IconButton>
+                                        </Box>
+                                    </StyledTableCell>
+                                    {/* <StyledTableCell align="center">
                                         <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" } }}
                                             onClick={() => handleEditClick(index)}
                                         >
                                             <EditOutlinedIcon />
                                         </IconButton>
-                                    </StyledTableCell>
+                                    </StyledTableCell> */}
                                 </StyledTableRow>
                             ))}
                         </TableBody>
@@ -378,7 +405,16 @@ const TrackerSetupUpdateView: React.FC = () => {
                     </Box>
                 </Box>
                 <Dialog open={editDialogOpen} onClose={handleDialogClose}>
-                    <DialogTitle>Edit Camera Location Details</DialogTitle>
+                    <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem', position: 'relative', textAlign: 'center' }}>
+                        {videoSource?.entranceName ? 'Edit Camera Location Details' : 'Add New Camera Details'}
+                        <IconButton
+                            aria-label="close"
+                            onClick={handleDialogClose}
+                            sx={{ position: 'absolute', right: '5%', top: '50%', transform: 'translateY(-50%)' }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    </DialogTitle>
                     <DialogContent>
                         <DialogTextField
                             label="Camera Identifier *"
@@ -408,12 +444,26 @@ const TrackerSetupUpdateView: React.FC = () => {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => { openConfirmDialog() }} color="error">
+                        {/* <Button onClick={() => { openConfirmDialog() }} color="error">
                         <Typography>Delete</Typography>
-                        </Button>
-                        <Button onClick={handleDialogClose}><Typography>Cancel</Typography></Button>
-                        <Button disabled={isDisableSave} color="primary" onClick={handleSave}>
-                        <Typography>Save</Typography>
+                        </Button> */}
+                        {/* <Button onClick={handleDialogClose}><Typography>Cancel</Typography></Button> */}
+                        {/* <Button disabled={isDisableSave} color="primary" onClick={handleSave}>
+                            <Typography>Save</Typography>
+                        </Button> */}
+                        <Button
+                            sx={{
+                                bgcolor: "#00D1A3",
+                                "&:hover": { bgcolor: "#00D1A3" },
+                                px: 4,
+                                mx: 3,
+                                mb: 2
+                            }}
+                            variant="contained"
+                            disabled={isDisableSave}
+                            onClick={handleSave}
+                        >
+                            <Typography>Save</Typography>
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -426,7 +476,7 @@ const TrackerSetupUpdateView: React.FC = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={closeConfirmDialog} color="primary">
-                        <Typography>Cancel</Typography>
+                            <Typography>Cancel</Typography>
                         </Button>
                         <Button
                             onClick={handleDelete}

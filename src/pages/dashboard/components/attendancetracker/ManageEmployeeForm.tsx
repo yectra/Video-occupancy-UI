@@ -63,11 +63,11 @@ const ManageEmployeeForm: React.FC = () => {
   const [userForm, setUserForm] = useState<ManageUserDetails>();
   const [selectedEmployee, setSelectedEmployee] = useState<ManageEmployeeDetails | null>(null);
   const [selectedUser, setSelectedUser] = useState<userDetails | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
   const [imageBase64, setImageBase64] = useState<string>("");
-  const [noUserFound, setNoUserFound] = useState(false);
+  const [noUserFound, setNoUserFound] = useState<boolean>(false);
   const [isDisable, setIsDisable] = useState<boolean>(false)
   const [emailError, setEmailError] = useState<string>("");
   const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
@@ -220,9 +220,8 @@ const ManageEmployeeForm: React.FC = () => {
 
   const handleDelete = () => {
     closeConfirmDialog();
-
+    setLoading(true);
     if (isEmployeePage && selectedEmployee) {
-      setLoading(true);
       attendanceDetails
         .deleteEmployeeDetails(selectedEmployee.employeeId)
         .then(() => {
@@ -329,100 +328,96 @@ const ManageEmployeeForm: React.FC = () => {
         </Box>
       </Box>
 
-      {noUserFound ? (
-        <Box sx={{ textAlign: "center", marginTop: 4 }}>
-          <Typography variant="h6" color="textSecondary">
-            {isEmployeePage ? 'No Employee Found' : 'No User Found'}
-          </Typography>
-        </Box>
-      ) : (
-        <Box>
-          <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
-            <CircularProgress color={"primary"} />
-          </Backdrop>
-          <Table sx={{ minWidth: 700 }} aria-label="customized table">
-            <TableHead>
+      <Box>
+        <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
+          <CircularProgress color={"primary"} />
+        </Backdrop>
+        <Table sx={{ minWidth: 700 }} >
+          <TableHead>
+            <TableRow>
+              {isEmployeePage &&
+                <><StyledTableCell align="center">ID</StyledTableCell>
+                  <StyledTableCell align="center">PROFILE</StyledTableCell></>}
+              <StyledTableCell align="center">NAME</StyledTableCell>
+              <StyledTableCell align="center">ROLE</StyledTableCell>
+              <StyledTableCell align="center">EMAIL</StyledTableCell>
+              <StyledTableCell align="center">ACTION</StyledTableCell>
+            </TableRow>
+            {noUserFound && (
               <TableRow>
-                {isEmployeePage &&
-                  <><StyledTableCell align="center">ID</StyledTableCell>
-                    <StyledTableCell align="center">PROFILE</StyledTableCell></>}
-                <StyledTableCell align="center">NAME</StyledTableCell>
-                <StyledTableCell align="center">ROLE</StyledTableCell>
-                <StyledTableCell align="center">EMAIL</StyledTableCell>
-                <StyledTableCell align="center">ACTION</StyledTableCell>
+                <TableCell colSpan={7} align="center">
+                  <Typography variant="body2" color="error"> {isEmployeePage ? 'No Employee Found' : 'No User Found'}</Typography>
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {isEmployeePage ? employeeForm.map((row) => (
-                <StyledTableRow key={row.employeeId}>
-                  <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
-                  <StyledTableCell align="center">
-                    <Box sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }} >
-                      <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 50, height: 50 }} />
-                    </Box>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
-                  <StyledTableCell align="center">{row.role}</StyledTableCell>
-                  <StyledTableCell align="center">{row.email}</StyledTableCell>
-                  {/* <StyledTableCell align="center">
+            )}
+          </TableHead>
+          <TableBody>
+            {isEmployeePage ? employeeForm.map((row) => (
+              <StyledTableRow key={row.employeeId}>
+                <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
+                <StyledTableCell align="center">
+                  <Box sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }} >
+                    <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 50, height: 50 }} />
+                  </Box>
+                </StyledTableCell>
+                <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
+                <StyledTableCell align="center">{row.role}</StyledTableCell>
+                <StyledTableCell align="center">{row.email}</StyledTableCell>
+                {/* <StyledTableCell align="center">
                     <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" } }} onClick={() => handleEditClick(row)}>
                       <EditOutlinedIcon />
                     </IconButton>
                   </StyledTableCell> */}
-                  <StyledTableCell align="center">
-                    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-                      <IconButton
-                        sx={{ color: "#00D1A3" }}
-                        onClick={() => handleEditClick(row)}
-                      >
-                        <EditOutlinedIcon />
-                      </IconButton>
+                <StyledTableCell align="center">
+                  <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                    <IconButton
+                      sx={{ color: "#00D1A3" }}
+                      onClick={() => handleEditClick(row)}
+                    >
+                      <EditOutlinedIcon />
+                    </IconButton>
 
-                      <IconButton
-                        sx={{ color: "#FF4D4D" }}
-                        onClick={() => handleDeleteClick(row)}
-                      >
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </Box>
-                  </StyledTableCell>
-                </StyledTableRow>
-              )) : userForm?.users.map((row) => (
-                <StyledTableRow key={row.id}>
-                  <StyledTableCell align="center">{row.name}</StyledTableCell>
-                  <StyledTableCell align="center">{row.role}</StyledTableCell>
-                  <StyledTableCell align="center">{row.email}</StyledTableCell>
-                  {/* <StyledTableCell align="center">
+                    <IconButton
+                      sx={{ color: "#FF4D4D" }}
+                      onClick={() => handleDeleteClick(row)}
+                    >
+                      <DeleteOutlineIcon />
+                    </IconButton>
+                  </Box>
+                </StyledTableCell>
+              </StyledTableRow>
+            )) : userForm?.users.map((row) => (
+              <StyledTableRow key={row.id}>
+                <StyledTableCell align="center">{row.name}</StyledTableCell>
+                <StyledTableCell align="center">{row.role}</StyledTableCell>
+                <StyledTableCell align="center">{row.email}</StyledTableCell>
+                {/* <StyledTableCell align="center">
                     <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" } }} onClick={() => handleUserEditClick(row)}>
                       <EditOutlinedIcon />
                     </IconButton>
                   </StyledTableCell> */}
-                  <StyledTableCell align="center">
-                    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-                      <IconButton
-                        sx={{ color: "#00D1A3" }}
-                        onClick={() => handleUserEditClick(row)}
-                      >
-                        <EditOutlinedIcon />
-                      </IconButton>
+                <StyledTableCell align="center">
+                  <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                    <IconButton
+                      sx={{ color: "#00D1A3" }}
+                      onClick={() => handleUserEditClick(row)}
+                    >
+                      <EditOutlinedIcon />
+                    </IconButton>
 
-                      <IconButton
-                        sx={{ color: "#FF4D4D" }}
-                        onClick={() => handleUserDeleteClick(row)}
-                      >
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </Box>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
-      )}
-      {noUserFound && (
-        <Typography variant="body2" color="error">{noUserFound}</Typography>
-      )}
+                    <IconButton
+                      sx={{ color: "#FF4D4D" }}
+                      onClick={() => handleUserDeleteClick(row)}
+                    >
+                      <DeleteOutlineIcon />
+                    </IconButton>
+                  </Box>
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
 
       <Dialog open={editDialogOpen}>
         <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem', position: 'relative', textAlign: 'center' }}>
@@ -437,59 +432,63 @@ const ManageEmployeeForm: React.FC = () => {
         </DialogTitle>
 
         <DialogContent>
-          {isEmployeePage && <>
-            <DialogTitle sx={{ textAlign: 'center' }}>Profile Picture</DialogTitle>
-            <Box sx={{ textAlign: 'center', marginBottom: 1 }}>
-              <Avatar
-                src={imageUrl || undefined}
-                alt="Employee Image"
-                sx={{ width: 100, height: 100, margin: '0 auto' }}
+          {isEmployeePage ?
+            <>
+              <DialogTitle sx={{ textAlign: 'center' }}>Profile Picture</DialogTitle>
+              <Box sx={{ textAlign: 'center', marginBottom: 1 }}>
+                <Avatar
+                  src={imageUrl || undefined}
+                  alt="Employee Image"
+                  sx={{ width: 100, height: 100, margin: '0 auto' }}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
+                <Button
+                  variant="contained"
+                  component="label"
+                  sx={{ fontSize: '0.75rem', padding: '5px 10px', minWidth: 'auto' }} // Reducing size
+                >
+                  Upload New Image
+                  <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+                </Button>
+              </Box>
+              <DialogTextField
+                label="User ID *"
+                value={selectedEmployee?.employeeId || ""}
+                name="employeeId"
+                onChange={handleInputChange}
+                disabled
               />
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-              <Button
-                variant="contained"
-                component="label"
-                sx={{ fontSize: '0.75rem', padding: '5px 10px', minWidth: 'auto' }} // Reducing size
+            </> :
+            <>
+              <DialogTextField
+                label="Name *"
+                value={isEmployeePage ? selectedEmployee?.employeeName : selectedUser?.name}
+                name="employeeName"
+                onChange={handleInputChange}
+                disabled
+              />
+              <DialogTextField
+                label="Email *"
+                value={isEmployeePage ? selectedEmployee?.email : selectedUser?.email}
+                name="email"
+                onChange={handleInputChange}
+                error={!!emailError}
+                helperText={emailError}
+                disabled
+              />
+              <DialogTextField
+                label="Role *"
+                value={isEmployeePage ? selectedEmployee?.role : selectedUser?.role}
+                name="role"
+                onChange={handleInputChange}
+                select
               >
-                Upload New Image
-                <input type="file" hidden accept="image/*" onChange={handleFileChange} />
-              </Button>
-            </Box>
-            <DialogTextField
-              label="User ID *"
-              value={selectedEmployee?.employeeId || ""}
-              name="employeeId"
-              onChange={handleInputChange}
-              disabled
-            />
-          </>
-          }
-          <DialogTextField
-            label="Name *"
-            value={isEmployeePage ? selectedEmployee?.employeeName : selectedUser?.name}
-            name="employeeName"
-            onChange={handleInputChange}           
-          />
-          <DialogTextField
-            label="Email *"
-            value={isEmployeePage ? selectedEmployee?.email : selectedUser?.email}
-            name="email"
-            onChange={handleInputChange}
-            error={!!emailError}
-            helperText={emailError}           
-          />
-          <DialogTextField
-            label="Role *"
-            value={isEmployeePage ? selectedEmployee?.role : selectedUser?.role}
-            name="role"
-            onChange={handleInputChange}
-            select
-          >
-            <MenuItem value="Admin">Admin</MenuItem>
-            {isEmployeePage ? <MenuItem value="Employee">Employee</MenuItem> :
-              <MenuItem value="User">User</MenuItem>}
-          </DialogTextField>
+                <MenuItem value="Admin">Admin</MenuItem>
+                {isEmployeePage ? <MenuItem value="Employee">Employee</MenuItem> :
+                  <MenuItem value="User">User</MenuItem>}
+              </DialogTextField>
+            </>}
         </DialogContent>
         <DialogActions sx={{ my: 1 }}>
           {/* <Button onClick={() => { openConfirmDialog(); }} color="error">

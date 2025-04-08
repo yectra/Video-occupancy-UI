@@ -18,20 +18,20 @@ import { SetupCompleteResponse } from "../models/liveoccupanytracker";
 const DashboardSetupView: React.FC = () => {
   const [setupComplete, setSetupComplete] = useState<SetupCompleteResponse>(new SetupCompleteResponse());
 
-  const { jobTitle, newUser } = useAuth();
+  const { jobTitle } = useAuth();
   const navigate = useNavigate();
 
   const occupancyTracker = new OccupancyTracker();
 
   const handleVideocamClick = () => {
-    if ((jobTitle === 'Admin' && !newUser && setupComplete.occupancy) || jobTitle === 'User')
+    if ((jobTitle === 'Admin' && setupComplete.occupancy) || jobTitle === 'User')
       navigate("/dashboard/occupancy-tracker/overview");
     else
       navigate("/dashboard/occupancy-tracker");
   };
 
   const handleGroupClick = () => {
-    if ((jobTitle === 'Admin' && !newUser && setupComplete.attendance) || jobTitle === 'User')
+    if ((jobTitle === 'Admin' && setupComplete.attendance) || jobTitle === 'User')
       navigate("/dashboard/attendance/emp-attendance");
     else
       navigate("/dashboard/attendance");
