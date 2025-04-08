@@ -86,7 +86,7 @@ const TrackerSetupView: React.FC = () => {
                     if (isDuplicate) {
                         setErrors((prevErrors) => ({
                             ...prevErrors,
-                            [`${field}${index}`]: `${field}Already Exist`,
+                            [`${field}${index}`]:  `${field.replace(/([A-Z])/g, ' $1').replace(/^./, (str:any) => str.toUpperCase())} Already Exist`,                            
                         }));
                         return prev;
                     }

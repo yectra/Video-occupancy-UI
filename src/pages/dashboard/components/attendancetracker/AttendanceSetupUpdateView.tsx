@@ -214,7 +214,8 @@ const AttendanceSetupUpdateView: React.FC = () => {
         if (isDuplicateAcrossCameras) {
             setErrors((prevErrors) => ({
                 ...prevErrors,
-                [`${name}`]: `${name} Already Exist`,
+                [`${name}`]: `${name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Already Exist`,
+
             }));
         } else {
             setErrors((prevErrors) => ({

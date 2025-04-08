@@ -83,8 +83,8 @@ const AttendanceSetupView = () => {
 
       if (isDuplicateAcrossCameras) {
         setErrors((prevErrors) => ({
-          ...prevErrors,
-          [`${field}${index}`]: `${field} Already Exist`,
+          ...prevErrors,         
+          [`${field}${index}`]:  `${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Already Exist`,
         }));
         return prevState;
       }
