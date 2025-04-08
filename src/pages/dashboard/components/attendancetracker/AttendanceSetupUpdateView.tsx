@@ -323,18 +323,18 @@ const AttendanceSetupUpdateView: React.FC = () => {
                 <CircularProgress color={"primary"} />
             </Backdrop>
             <Grid item xs={12} md={12}
-                sx={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 2 }}>
+                sx={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 2, mx:3 }}>
                 <Typography variant="h4" gutterBottom sx={{ color: "#00D1A3", fontWeight: "bold" }}>
                     ATTENDANCE TRACKER
                 </Typography>
-                <Box component="div" display="flex" flexDirection="row">
+                <Box component="div" display="flex" flexDirection="row" >
                     <Typography variant="h6" sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 5 }}>
                         Setup details
                     </Typography>
                 </Box>
                 {/* <Box component="div" display="flex" flexDirection="column" justifyContent="center"
                     sx={{ gap: 2, width: "40%", pl: 6 }}>         */}
-                <Grid container spacing={3}>
+                <Grid container spacing={3} >
                     <Grid item xs={12} sm={6}>
                         <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
                             Organization Name *

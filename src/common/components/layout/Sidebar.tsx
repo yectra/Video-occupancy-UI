@@ -20,8 +20,12 @@ import PersonIcon from "@mui/icons-material/Person";
 // Router
 import { Link, useLocation } from "react-router-dom";
 
+//Hooks
+import { useAuth } from "@/common/hooks/AuthContext";
+
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const { jobTitle } = useAuth();
 
   const [openUserManagement, setOpenUserManagement] = useState(false);
   const isActive = (path: string) => location.pathname === path;
@@ -217,76 +221,77 @@ const Sidebar: React.FC = () => {
                 </Box>
               </ListItem>
             </Link>
-
-            <ListItem
-              onClick={toggleUserManagement}
-              sx={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <PersonIcon />
-                <ListItemText sx={{ ml: 2 }}>
-                  <Typography sx={{ fontSize: 19 }} variant="h6">
-                    User Management
-                  </Typography>
-                </ListItemText>
-              </div>
-            </ListItem>
-            <Collapse in={openUserManagement} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem sx={{
-                  ml: 4,
-                  backgroundColor: isActive(
-                    "/dashboard/occupancy-tracker/add-emp"
-                  )
-                    ? "#00D1A3"
-                    : "inherit",
-                }}>
-                  <Link
-                    to="/dashboard/occupancy-tracker/add-emp"
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    <ListItemText
-                      sx={{ display: "flex", alignItems: "center" }}
+            {jobTitle != 'User' && <>
+              <ListItem
+                onClick={toggleUserManagement}
+                sx={{
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <PersonIcon />
+                  <ListItemText sx={{ ml: 2 }}>
+                    <Typography sx={{ fontSize: 19 }} variant="h6">
+                      User Management
+                    </Typography>
+                  </ListItemText>
+                </div>
+              </ListItem>
+              <Collapse in={openUserManagement} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  <ListItem sx={{
+                    ml: 4,
+                    backgroundColor: isActive(
+                      "/dashboard/occupancy-tracker/add-emp"
+                    )
+                      ? "#00D1A3"
+                      : "inherit",
+                  }}>
+                    <Link
+                      to="/dashboard/occupancy-tracker/add-emp"
+                      style={{ textDecoration: "none", color: "inherit" }}
                     >
-                      <Box sx={{ display: "flex" }}>
-                        <GroupsIcon sx={{ marginRight: 1, fontSize: 23 }} />
-                        <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
-                          Add User
-                        </Typography>
-                      </Box>
-                    </ListItemText>
-                  </Link>
-                </ListItem>
-                <ListItem sx={{
-                  ml: 4,
-                  backgroundColor: isActive(
-                    "/dashboard/occupancy-tracker/emp-form"
-                  )
-                    ? "#00D1A3"
-                    : "inherit",
-                }}>
-                  <Link
-                    to="/dashboard/occupancy-tracker/emp-form"
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    <ListItemText
-                      sx={{ display: "flex", alignItems: "center" }}
+                      <ListItemText
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
+                        <Box sx={{ display: "flex" }}>
+                          <GroupsIcon sx={{ marginRight: 1, fontSize: 23 }} />
+                          <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
+                            Add User
+                          </Typography>
+                        </Box>
+                      </ListItemText>
+                    </Link>
+                  </ListItem>
+                  <ListItem sx={{
+                    ml: 4,
+                    backgroundColor: isActive(
+                      "/dashboard/occupancy-tracker/emp-form"
+                    )
+                      ? "#00D1A3"
+                      : "inherit",
+                  }}>
+                    <Link
+                      to="/dashboard/occupancy-tracker/emp-form"
+                      style={{ textDecoration: "none", color: "inherit" }}
                     >
-                      <Box sx={{ display: "flex" }}>
-                        <PeopleAltIcon sx={{ marginRight: 1, fontSize: 21 }} />
-                        <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
-                          Manage User
-                        </Typography>
-                      </Box>
-                    </ListItemText>
-                  </Link>
-                </ListItem>
-              </List>
-            </Collapse>
+                      <ListItemText
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
+                        <Box sx={{ display: "flex" }}>
+                          <PeopleAltIcon sx={{ marginRight: 1, fontSize: 21 }} />
+                          <Typography variant="subtitle1" sx={{ fontSize: 16 }}>
+                            Manage User
+                          </Typography>
+                        </Box>
+                      </ListItemText>
+                    </Link>
+                  </ListItem>
+                </List>
+              </Collapse>
+            </>}
 
             <Link
               to="/dashboard/occupancy-tracker/tracker-setup"

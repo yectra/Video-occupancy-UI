@@ -432,7 +432,7 @@ const ManageEmployeeForm: React.FC = () => {
         </DialogTitle>
 
         <DialogContent>
-          {isEmployeePage ?
+          {isEmployeePage &&
             <>
               <DialogTitle sx={{ textAlign: 'center' }}>Profile Picture</DialogTitle>
               <Box sx={{ textAlign: 'center', marginBottom: 1 }}>
@@ -459,36 +459,35 @@ const ManageEmployeeForm: React.FC = () => {
                 onChange={handleInputChange}
                 disabled
               />
-            </> :
-            <>
-              <DialogTextField
-                label="Name *"
-                value={isEmployeePage ? selectedEmployee?.employeeName : selectedUser?.name}
-                name="employeeName"
-                onChange={handleInputChange}
-                disabled
-              />
-              <DialogTextField
-                label="Email *"
-                value={isEmployeePage ? selectedEmployee?.email : selectedUser?.email}
-                name="email"
-                onChange={handleInputChange}
-                error={!!emailError}
-                helperText={emailError}
-                disabled
-              />
-              <DialogTextField
-                label="Role *"
-                value={isEmployeePage ? selectedEmployee?.role : selectedUser?.role}
-                name="role"
-                onChange={handleInputChange}
-                select
-              >
-                <MenuItem value="Admin">Admin</MenuItem>
-                {isEmployeePage ? <MenuItem value="Employee">Employee</MenuItem> :
-                  <MenuItem value="User">User</MenuItem>}
-              </DialogTextField>
             </>}
+          <DialogTextField
+            label="Name *"
+            value={isEmployeePage ? selectedEmployee?.employeeName : selectedUser?.name}
+            name="employeeName"
+            onChange={handleInputChange}
+            disabled
+          />
+          <DialogTextField
+            label="Email *"
+            value={isEmployeePage ? selectedEmployee?.email : selectedUser?.email}
+            name="email"
+            onChange={handleInputChange}
+            error={!!emailError}
+            helperText={emailError}
+            disabled
+          />
+          <DialogTextField
+            label="Role *"
+            value={isEmployeePage ? selectedEmployee?.role : selectedUser?.role}
+            name="role"
+            onChange={handleInputChange}
+            select
+          >
+            <MenuItem value="Admin">Admin</MenuItem>
+            {isEmployeePage ? <MenuItem value="Employee">Employee</MenuItem> :
+              <MenuItem value="User">User</MenuItem>}
+          </DialogTextField>
+
         </DialogContent>
         <DialogActions sx={{ my: 1 }}>
           {/* <Button onClick={() => { openConfirmDialog(); }} color="error">

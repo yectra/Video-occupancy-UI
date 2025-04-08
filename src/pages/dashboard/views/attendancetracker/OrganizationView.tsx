@@ -78,7 +78,7 @@ const OrganizationView: React.FC = () => {
     )
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [`${name}`]: `Enter Valid ${name}`,
+        [`${name}`]: `Enter Valid ${name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}`,
       }));
     else
       setErrors((prevErrors) => ({
@@ -97,8 +97,8 @@ const OrganizationView: React.FC = () => {
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         navigate('/dashboard/attendance/attendance-setup');
-      }).catch(() => {
-        setSnackbarMessage('Failed to save organization details.');
+      }).catch((err) => {
+        setSnackbarMessage(err.response.data.error);
         setSnackbarSeverity('error');
         setSnackbarOpen(true)
       }).finally(() => setLoading(false));
