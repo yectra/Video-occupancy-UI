@@ -64,7 +64,7 @@ const OrganizationView: React.FC = () => {
   };
 
   const validateWorkingHours = (value: string) => {
-    const hoursRegex = /^(?:[1-9]|1[0-2])$/;
+    const hoursRegex = /^(?:[1-9]|1[0-9]|2[0-4])$/;
     return hoursRegex.test(value);
   };
 
@@ -197,7 +197,7 @@ const OrganizationView: React.FC = () => {
         <TextField
           label="Website URL"
           variant="outlined"
-          type="url"
+          type="text"
           required
           fullWidth
           name="websiteUrl"

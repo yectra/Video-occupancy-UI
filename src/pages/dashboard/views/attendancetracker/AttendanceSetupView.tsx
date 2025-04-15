@@ -238,12 +238,12 @@ const AttendanceSetupView = () => {
 
           <Box display="flex" alignItems="center" gap={1}>
             <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-              Punchin Camera
+              Punch in Camera
             </Typography>
             <Tooltip
               title={
                 <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
-                  Unique name for Punchin Camera.e.g., 'North block'.
+                  Unique name for Punch in Camera.e.g., 'North block'.
                 </Typography>
               }
               arrow
@@ -272,7 +272,7 @@ const AttendanceSetupView = () => {
                 },
                 arrow: {
                   sx: {
-                    color: '#fff', // arrow matches tooltip background
+                    color: '#fff',
                   },
                 },
               }}
@@ -294,12 +294,12 @@ const AttendanceSetupView = () => {
 
           <Box display="flex" alignItems="center" gap={1}>
             <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-              Punch-In URL
+              Punch in URL
             </Typography>
             <Tooltip
               title={
                 <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
-                  Provide the URL that streams video from this camera.
+                  URL used to record punch in time.
                 </Typography>
               }
               arrow
@@ -328,7 +328,7 @@ const AttendanceSetupView = () => {
                 },
                 arrow: {
                   sx: {
-                    color: '#fff', // arrow matches tooltip background
+                    color: '#fff',
                   },
                 },
               }}
@@ -349,12 +349,12 @@ const AttendanceSetupView = () => {
 
           <Box display="flex" alignItems="center" gap={1}>
             <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-              Punchout Camera
+              Punch out Camera
             </Typography>
             <Tooltip
               title={
                 <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
-                  Unique name for Punchout Camera.e.g., 'North block'.
+                  Unique name for Punch out Camera.e.g., 'North block'.
                 </Typography>
               }
               arrow
@@ -404,12 +404,12 @@ const AttendanceSetupView = () => {
 
           <Box display="flex" alignItems="center" gap={1}>
             <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-              Punch-Out URL
+              Punch out URL
             </Typography>
             <Tooltip
               title={
                 <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
-                  Provide the URL that streams video from this camera.
+                  URL used to record punch out time.
                 </Typography>
               }
               arrow
@@ -438,7 +438,7 @@ const AttendanceSetupView = () => {
                 },
                 arrow: {
                   sx: {
-                    color: '#fff', // arrow matches tooltip background
+                    color: '#fff',
                   },
                 },
               }}

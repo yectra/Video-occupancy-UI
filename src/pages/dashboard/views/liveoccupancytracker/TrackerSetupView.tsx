@@ -200,7 +200,7 @@ const TrackerSetupView: React.FC = () => {
                 </Typography>
                 <Typography
                     variant="h6"
-                    sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10, mb:2 }}
+                    sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10, mb: 2 }}
                 >
                     Setup details
                 </Typography>
@@ -215,7 +215,7 @@ const TrackerSetupView: React.FC = () => {
                         <Tooltip
                             title={
                                 <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
-                                   Max number of people allowed in the space.
+                                    Maximum number of people allowed.
                                 </Typography>
                             }
                             arrow
@@ -244,7 +244,7 @@ const TrackerSetupView: React.FC = () => {
                                 },
                                 arrow: {
                                     sx: {
-                                        color: '#fff', // arrow matches tooltip background
+                                        color: '#fff',
                                     },
                                 },
                             }}
@@ -287,8 +287,8 @@ const TrackerSetupView: React.FC = () => {
                         </Typography>
                         <Tooltip
                             title={
-                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace:"nowrap" }}>
-                                    Get alerted when occupancy hits this percentage.
+                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: "nowrap" }}>
+                                    Get alerted when occupancy reaches this percentage.
                                 </Typography>
                             }
                             arrow
@@ -317,7 +317,7 @@ const TrackerSetupView: React.FC = () => {
                                 },
                                 arrow: {
                                     sx: {
-                                        color: '#fff', // arrow matches tooltip background
+                                        color: '#fff',
                                     },
                                 },
                             }}
@@ -364,7 +364,7 @@ const TrackerSetupView: React.FC = () => {
                     </FormHelperText>
                   )}
                 </FormControl> */}
-                    <Box sx={{ display: "flex", alignItems: "center", my:1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", my: 1 }}>
                         <Typography
                             variant="h6"
                             sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10 }}
@@ -407,8 +407,8 @@ const TrackerSetupView: React.FC = () => {
                         </Typography>
                         <Tooltip
                             title={
-                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace:"nowrap" }}>
-                                   Unique name for this camera.e.g., 'North block'.
+                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: "nowrap" }}>
+                                    Unique name for this camera.e.g., 'North block'.
                                 </Typography>
                             }
                             arrow
@@ -437,7 +437,7 @@ const TrackerSetupView: React.FC = () => {
                                 },
                                 arrow: {
                                     sx: {
-                                        color: '#fff', // arrow matches tooltip background
+                                        color: '#fff',
                                     },
                                 },
                             }}
@@ -457,7 +457,7 @@ const TrackerSetupView: React.FC = () => {
                         helperText={errors[`entranceName${currentCameraIndex}`]}
                         required
                     />
-                    <FormControl variant="outlined" fullWidth required sx={{mt:3, mb:1}}>
+                    <FormControl variant="outlined" fullWidth required sx={{ mt: 3, mb: 1 }}>
                         {/* <Typography sx={{ color: "#1C214F", fontWeight: "Normal", mb: 2 }}>
                             Camera Position
                         </Typography> */}
@@ -505,8 +505,8 @@ const TrackerSetupView: React.FC = () => {
                         </Typography>
                         <Tooltip
                             title={
-                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace:"nowrap" }}>
-                                    Provide the URL that streams video from this camera.
+                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: "nowrap" }}>
+                                    URL that streams video from this camera.
                                 </Typography>
                             }
                             arrow
@@ -535,7 +535,7 @@ const TrackerSetupView: React.FC = () => {
                                 },
                                 arrow: {
                                     sx: {
-                                        color: '#fff', // arrow matches tooltip background
+                                        color: '#fff',
                                     },
                                 },
                             }}
@@ -563,7 +563,7 @@ const TrackerSetupView: React.FC = () => {
                             border: "2px dashed #00D1A3",
                             width: "250px",
                             "&:hover": { borderColor: "#00A685" },
-                            mt:2
+                            mt: 2
                         }}
                         onClick={handleAddCameraClick}
                     >
