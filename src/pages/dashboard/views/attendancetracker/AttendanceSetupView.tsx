@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import attImg from '@/assets/attendancecamera.jpg';
-import { Box, Grid, Typography, TextField, Button, Snackbar, Alert, CircularProgress, IconButton, Backdrop } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, Snackbar, Alert, CircularProgress, IconButton, Backdrop, Tooltip } from '@mui/material';
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import DeleteIcon from "@mui/icons-material/Delete";
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 // Services
 import { AttendanceDetails } from '../../services/attendancetracker';
@@ -83,8 +84,8 @@ const AttendanceSetupView = () => {
 
       if (isDuplicateAcrossCameras) {
         setErrors((prevErrors) => ({
-          ...prevErrors,         
-          [`${field}${index}`]:  `${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Already Exist`,
+          ...prevErrors,
+          [`${field}${index}`]: `${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Already Exist`,
         }));
         return prevState;
       }
@@ -116,10 +117,9 @@ const AttendanceSetupView = () => {
         navigate("/dashboard/attendance/emp-attendance")
       })
       .catch((error) => {
-        setSnackbarMessage('Failed to save camera setup details.');
+        setSnackbarMessage(error.response.data.warn);
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
-        console.error('Error saving camera setup details:', error);
       })
       .finally(() => setIsLoading(false)); // Set loading to false after API call finishes
   };
@@ -176,11 +176,11 @@ const AttendanceSetupView = () => {
         <CircularProgress color={"primary"} />
       </Backdrop>
       <Grid item xs={12} md={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <img src={attImg} alt="Setup" style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 10 }} />
+        <img src={attImg} alt="Setup" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }} />
       </Grid>
 
-      <Grid item xs={12} md={6} sx={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: 4, gap: 6 }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Grid item xs={12} md={6} sx={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: 4 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Typography variant="h4" gutterBottom sx={{ color: "#00D1A3", fontWeight: "bold" }}>
             ATTENDANCE TRACKER
           </Typography>
@@ -236,9 +236,53 @@ const AttendanceSetupView = () => {
             </>
           </Box>
 
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+              Punchin Camera
+            </Typography>
+            <Tooltip
+              title={
+                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
+                  Unique name for Punchin Camera.e.g., 'North block'.
+                </Typography>
+              }
+              arrow
+              PopperProps={{
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
+                  },
+                ],
+              }}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: '#fff',
+                    color: '#000',
+                    fontSize: '14px',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 'none',
+                    padding: '10px 12px',
+                    boxShadow: 3,
+                    border: '1px solid #ccc',
+                  },
+                },
+                arrow: {
+                  sx: {
+                    color: '#fff', // arrow matches tooltip background
+                  },
+                },
+              }}
+            >
+              <HelpOutlineIcon sx={{ color: "#1C214F", cursor: "pointer", fontSize: "18px" }} />
+            </Tooltip>
+          </Box>
           <TextField
             fullWidth
-            label="Punchin Camera"
+            // label="Punchin Camera"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchinCamera}
             onChange={(e) => handleInputChange(currentCameraIndex, 'punchinCamera', e.target.value)}
@@ -247,10 +291,55 @@ const AttendanceSetupView = () => {
             required
           />
 
+
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+              Punch-In URL
+            </Typography>
+            <Tooltip
+              title={
+                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
+                  Provide the URL that streams video from this camera.
+                </Typography>
+              }
+              arrow
+              PopperProps={{
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
+                  },
+                ],
+              }}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: '#fff',
+                    color: '#000',
+                    fontSize: '14px',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 'none',
+                    padding: '10px 12px',
+                    boxShadow: 3,
+                    border: '1px solid #ccc',
+                  },
+                },
+                arrow: {
+                  sx: {
+                    color: '#fff', // arrow matches tooltip background
+                  },
+                },
+              }}
+            >
+              <HelpOutlineIcon sx={{ color: "#1C214F", cursor: "pointer", fontSize: "18px" }} />
+            </Tooltip>
+          </Box>
           <TextField
             required
             fullWidth
-            label="Punch-In URL"
+            // label="Punch-In URL"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchinUrl}
             onChange={(e) => handleInputChange(currentCameraIndex, 'punchinUrl', e.target.value)}
@@ -258,10 +347,54 @@ const AttendanceSetupView = () => {
             helperText={errors[`punchinUrl${currentCameraIndex}`]}
           />
 
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+              Punchout Camera
+            </Typography>
+            <Tooltip
+              title={
+                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
+                  Unique name for Punchout Camera.e.g., 'North block'.
+                </Typography>
+              }
+              arrow
+              PopperProps={{
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
+                  },
+                ],
+              }}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: '#fff',
+                    color: '#000',
+                    fontSize: '14px',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 'none',
+                    padding: '10px 12px',
+                    boxShadow: 3,
+                    border: '1px solid #ccc',
+                  },
+                },
+                arrow: {
+                  sx: {
+                    color: '#fff', // arrow matches tooltip background
+                  },
+                },
+              }}
+            >
+              <HelpOutlineIcon sx={{ color: "#1C214F", cursor: "pointer", fontSize: "18px" }} />
+            </Tooltip>
+          </Box>
           <TextField
             fullWidth
             required
-            label="Punchout Camera"
+            // label="Punchout Camera"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchoutCamera}
             onChange={(e) => handleInputChange(currentCameraIndex, 'punchoutCamera', e.target.value)}
@@ -269,10 +402,54 @@ const AttendanceSetupView = () => {
             helperText={errors[`punchoutCamera${currentCameraIndex}`]}
           />
 
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+              Punch-Out URL
+            </Typography>
+            <Tooltip
+              title={
+                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
+                  Provide the URL that streams video from this camera.
+                </Typography>
+              }
+              arrow
+              PopperProps={{
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
+                  },
+                ],
+              }}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: '#fff',
+                    color: '#000',
+                    fontSize: '14px',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 'none',
+                    padding: '10px 12px',
+                    boxShadow: 3,
+                    border: '1px solid #ccc',
+                  },
+                },
+                arrow: {
+                  sx: {
+                    color: '#fff', // arrow matches tooltip background
+                  },
+                },
+              }}
+            >
+              <HelpOutlineIcon sx={{ color: "#1C214F", cursor: "pointer", fontSize: "18px" }} />
+            </Tooltip>
+          </Box>
           <TextField
             required
             fullWidth
-            label="Punch-Out URL"
+            // label="Punch-Out URL"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchoutUrl}
             onChange={(e) => handleInputChange(currentCameraIndex, 'punchoutUrl', e.target.value)}
@@ -287,6 +464,7 @@ const AttendanceSetupView = () => {
               border: "2px dashed #00D1A3",
               width: "250px",
               "&:hover": { borderColor: "#00A685" },
+              mt: 2
             }}
             onClick={handleAddCameraClick}
           >

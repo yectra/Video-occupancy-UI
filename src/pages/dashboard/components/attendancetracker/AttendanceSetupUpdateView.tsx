@@ -1,7 +1,7 @@
 // React Dependancies
 import { useEffect, useState } from "react";
 
-import { Backdrop, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, styled, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Alert, Backdrop, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Snackbar, styled, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, TextField, Typography } from "@mui/material";
 
 //Icons
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -66,6 +66,9 @@ const AttendanceSetupUpdateView: React.FC = () => {
     const [isDisable, setIsDisable] = useState<boolean>(false);
     const [isDisableSave, setIsDisableSave] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
+    const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
     const openConfirmDialog = () => setConfirmDialogOpen(true);
     const closeConfirmDialog = () => setConfirmDialogOpen(false);
@@ -118,14 +121,30 @@ const AttendanceSetupUpdateView: React.FC = () => {
         attendanceTracker
             .updateAttendanceTrackerDetails(updatedData)
             .then(() => {
+                setSnackbarMessage('User added successfully!');
+                setSnackbarSeverity('success');
+                setSnackbarOpen(true);
+
                 getCameraDetails();
             })
-            .catch((error) =>
-                console.error("Error updating employee details:", error)
-            )
+            .catch((error) => {
+                setSnackbarMessage(error.response.data.warn);
+                setSnackbarSeverity('error');
+                setSnackbarOpen(true);
+            })
             .finally(() => setLoading(false));
         setRowIndex(0)
     }
+
+    const handleCloseSnackbar = (
+        _event?: React.SyntheticEvent | Event,
+        reason?: string
+    ) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setSnackbarOpen(false);
+    };
 
     const validateEmail = (email: string): boolean => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -324,7 +343,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                 <CircularProgress color={"primary"} />
             </Backdrop>
             <Grid item xs={12} md={12}
-                sx={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 2, mx:3 }}>
+                sx={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 2, mx: 3 }}>
                 <Typography variant="h4" gutterBottom sx={{ color: "#00D1A3", fontWeight: "bold" }}>
                     ATTENDANCE TRACKER
                 </Typography>
@@ -598,6 +617,16 @@ const AttendanceSetupUpdateView: React.FC = () => {
                     </DialogActions>
                 </Dialog>
             </Grid>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     )
 }

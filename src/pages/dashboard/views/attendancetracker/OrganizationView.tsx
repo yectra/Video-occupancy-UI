@@ -64,9 +64,9 @@ const OrganizationView: React.FC = () => {
   };
 
   const validateWorkingHours = (value: string) => {
-    const hoursRegex = /^(?:[1-9]|1[0-2])$/; 
+    const hoursRegex = /^(?:[1-9]|1[0-2])$/;
     return hoursRegex.test(value);
-};
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -97,35 +97,12 @@ const OrganizationView: React.FC = () => {
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         navigate('/dashboard/attendance/attendance-setup');
-      }).catch((err) => {
-        setSnackbarMessage(err.response.data.error);
+      }).catch((error) => {
+        setSnackbarMessage(error.response.data.warn);
         setSnackbarSeverity('error');
         setSnackbarOpen(true)
       }).finally(() => setLoading(false));
-
-    // try {
-    //   const response = await attendanceService.organizationDetails(formData);
-    //   setSnackbarMessage('Organization details saved successfully!');
-    //   setSnackbarSeverity('success');
-    //   setSnackbarOpen(true);
-    //   console.log(response);
-    //   // setIsNextEnabled(true);
-    //   navigate('/dashboard/attendance/attendance-setup');
-
-    // } catch (error) {
-    //   console.error('Error saving organization details:', error);
-    //   setSnackbarMessage('Failed to save organization details.');
-    //   setSnackbarSeverity('error');
-    //   setSnackbarOpen(true);
-    // }
   };
-
-  // const handleNext = () => {
-  //   if (isNextEnabled) {
-  //     // navigate('/dashboard/occupancy-tracker/attendance-setup');
-  //     navigate('/dashboard/attendance/attendance-setup');
-  //   }
-  // };
 
   const handleSnackbarClose = (
     _event?: React.SyntheticEvent | Event,
@@ -241,7 +218,7 @@ const OrganizationView: React.FC = () => {
         />
         <TextField
           label="Working Hours"
-          variant="outlined"         
+          variant="outlined"
           required
           fullWidth
           name="workTiming"
@@ -252,7 +229,7 @@ const OrganizationView: React.FC = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <AccessTimeIcon  sx={{ color: 'black' }} />
+                <AccessTimeIcon sx={{ color: 'black' }} />
               </InputAdornment>
             ),
           }}

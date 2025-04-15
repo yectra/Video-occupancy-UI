@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, TextField, Typography, Autocomplete, Avatar, Button, Grid, Dialog, DialogActions, DialogTitle, DialogContent, Backdrop, CircularProgress } from "@mui/material";
+import { Box, TextField, Typography, Autocomplete, Avatar, Button, Grid, Backdrop, CircularProgress, Snackbar, Alert } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 
 //Services
@@ -18,21 +18,19 @@ const EmployeeForm: React.FC = () => {
   const [employeeId, setEmployeeId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
+  const [nameError, setNameError] = useState<string>("");
   const [role, setRole] = useState<string>("");
   const [avatarSrc, setAvatarSrc] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  // const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  // const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [roleOptions, setRoleOptions] = useState<string[]>([]);
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
   const [isEmployeePage, setIsEmployeePage] = useState<boolean>(false);
 
   const attendanceDetails = new AttendanceDetails();
   const occupancyTracker = new OccupancyTracker();
-
-  const closeConfirmDialog = () => setConfirmDialogOpen(false);
 
   const pathName = location.pathname;
 
@@ -50,6 +48,20 @@ const EmployeeForm: React.FC = () => {
   const validateEmail = (email: string): boolean => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
+  };
+
+  const validateName = (name: string): boolean => {
+    const regex = /^[A-Za-z\s]+$/;
+    return regex.test(name);
+  };
+
+  const handleNameChange = (value: string) => {
+    setName(value);
+    if (!validateName(value)) {
+      setNameError('Only alphabets and spaces are allowed');
+    } else {
+      setNameError('');
+    }
   };
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,14 +108,14 @@ const EmployeeForm: React.FC = () => {
         .addEmployeeDetails(request)
         .then(() => {
           setSnackbarMessage('Employee added successfully!');
-          setConfirmDialogOpen(true);
-          // setSnackbarSeverity('success');
-          // setSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setSnackbarOpen(true);
           navigate('/dashboard/attendance/emp-form');
         })
         .catch((error) => {
-          setSnackbarMessage(error.response.data.Warn);
-          setConfirmDialogOpen(true);
+          setSnackbarMessage(error.response.data.warn);
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true);
         }).finally(() => setLoading(false));
     } else {
       const request: AddUserDetails = {
@@ -114,31 +126,32 @@ const EmployeeForm: React.FC = () => {
 
       occupancyTracker.addUserDetails(request).then(() => {
         setSnackbarMessage('User added successfully!');
-        setConfirmDialogOpen(true);
-        // setSnackbarSeverity('success');
-        // setSnackbarOpen(true);
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
         navigate('/dashboard/occupancy-tracker/emp-form');
       })
         .catch((error) => {
-          setSnackbarMessage(error.response.data.data.message);
-          setConfirmDialogOpen(true);
+          setSnackbarMessage(error.response.data.warn);
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true);
         }).finally(() => setLoading(false));;
     }
   };
 
-  // const handleCloseSnackbar = (
-  //   _event?: React.SyntheticEvent | Event,
-  //   reason?: string
-  // ) => {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
-  //   setSnackbarOpen(false);
-  // };
+  const handleCloseSnackbar = (
+    _event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   const isFormValid = (): boolean => {
     return isEmployeePage ? !!(
       name.trim() &&
+      !nameError &&
       employeeId &&
       email.trim() &&
       !emailError &&
@@ -146,6 +159,7 @@ const EmployeeForm: React.FC = () => {
       imageBase64
     ) : !!(
       name.trim() &&
+      !nameError &&
       email.trim() &&
       !emailError &&
       role
@@ -200,8 +214,10 @@ const EmployeeForm: React.FC = () => {
                 variant="outlined"
                 fullWidth
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => handleNameChange(e.target.value)}
                 required
+                error={!!nameError}
+                helperText={nameError}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -249,11 +265,14 @@ const EmployeeForm: React.FC = () => {
                 </Typography>
                 <TextField
                   id="name"
+                  label="Name"
                   variant="outlined"
                   fullWidth
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => handleNameChange(e.target.value)}
                   required
+                  error={!!nameError}
+                  helperText={nameError}
                 />
               </Box>
               <Box display="flex" alignItems="center" sx={{ width: "80%", mt: 2 }}>
@@ -313,21 +332,7 @@ const EmployeeForm: React.FC = () => {
         </Grid>
       </Box>
 
-      <Dialog open={confirmDialogOpen} onClose={closeConfirmDialog}>
-        <DialogTitle sx={{ bgcolor: "green", color: "white" }}>Error</DialogTitle>
-        <DialogContent>
-          <Typography sx={{ pt: 2 }}>
-            {snackbarMessage}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeConfirmDialog} color="primary">
-            <Typography>OK</Typography>
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* <Snackbar
+      <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={handleCloseSnackbar}
@@ -336,7 +341,7 @@ const EmployeeForm: React.FC = () => {
         <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
-      </Snackbar> */}
+      </Snackbar>
     </Box>
   );
 };

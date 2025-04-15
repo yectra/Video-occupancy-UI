@@ -5,7 +5,6 @@ import {
     Typography,
     MenuItem,
     Select,
-    InputLabel,
     FormControl,
     SelectChangeEvent,
     IconButton,
@@ -14,17 +13,20 @@ import {
     Paper,
     Grid,
     Slider,
+    Tooltip,
+    InputLabel,
 } from "@mui/material";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import DeleteIcon from "@mui/icons-material/Delete";
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import setupImg from "@/assets/survillance.jpg";
 import { useNavigate } from "react-router-dom";
 
 const TrackerSetupView: React.FC = () => {
     const [capacity, setCapacity] = useState<string>("");
-    const [alertMessage, setAlertMessage] = useState<string>("20%");
-    const [sliderValue, setSliderValue] = useState<number>(20);
+    const [alertMessage, setAlertMessage] = useState<string>("90%");
+    const [sliderValue, setSliderValue] = useState<number>(90);
     const [isDisable, setIsDisable] = useState<boolean>(false)
     const [cameraSetups, setCameraSetups] = useState<any[]>([
         { entranceName: "", cameraPosition: "INSIDE-OUT", videoSource: "" },
@@ -36,18 +38,18 @@ const TrackerSetupView: React.FC = () => {
     const [tooltipContent, setTooltipContent] = useState<string>("");
     const marks = [
         {
-          value: 0,
-          label: '0%',
+            value: 0,
+            label: '0%',
         },
         {
-          value: 50,
-          label: '50%',
+            value: 50,
+            label: '50%',
         },
         {
-          value: 100,
-          label: '100%',
+            value: 100,
+            label: '100%',
         }
-      ];
+    ];
 
     const navigate = useNavigate();
 
@@ -68,7 +70,7 @@ const TrackerSetupView: React.FC = () => {
             setIsDisable(true)
         else
             setIsDisable(false)
-    }, [capacity, alertMessage, cameraSetups])
+    }, [capacity, alertMessage, cameraSetups]);
 
     const handleCameraIndexChange = (delta: number) =>
         setCurrentCameraIndex((prev) =>
@@ -86,7 +88,7 @@ const TrackerSetupView: React.FC = () => {
                     if (isDuplicate) {
                         setErrors((prevErrors) => ({
                             ...prevErrors,
-                            [`${field}${index}`]:  `${field.replace(/([A-Z])/g, ' $1').replace(/^./, (str:any) => str.toUpperCase())} Already Exist`,                            
+                            [`${field}${index}`]: `${field.replace(/([A-Z])/g, ' $1').replace(/^./, (str: any) => str.toUpperCase())} Already Exist`,
                         }));
                         return prev;
                     }
@@ -172,7 +174,7 @@ const TrackerSetupView: React.FC = () => {
                     style={{
                         width: "100%",
                         height: "100%",
-                        objectFit: "contain",
+                        objectFit: "cover",
                         borderRadius: 10,
                     }}
                 />
@@ -186,7 +188,7 @@ const TrackerSetupView: React.FC = () => {
                     flexDirection: "column",
                     justifyContent: "center",
                     padding: 4,
-                    gap: 6,
+                    gap: 2,
                 }}
             >
                 <Typography
@@ -198,16 +200,59 @@ const TrackerSetupView: React.FC = () => {
                 </Typography>
                 <Typography
                     variant="h6"
-                    sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10 }}
+                    sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10, mb:2 }}
                 >
                     Setup details
                 </Typography>
                 <Box
                     component="form"
-                    sx={{ display: "flex", flexDirection: "column", gap: 4 }}
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                 >
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            Capacity of people
+                        </Typography>
+                        <Tooltip
+                            title={
+                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace: 'nowrap' }}>
+                                   Max number of people allowed in the space.
+                                </Typography>
+                            }
+                            arrow
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'offset',
+                                        options: {
+                                            offset: [0, 8],
+                                        },
+                                    },
+                                ],
+                            }}
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: '#fff',
+                                        color: '#000',
+                                        fontSize: '14px',
+                                        whiteSpace: 'nowrap',
+                                        maxWidth: 'none',
+                                        padding: '10px 12px',
+                                        boxShadow: 3,
+                                        border: '1px solid #ccc',
+                                    },
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: '#fff', // arrow matches tooltip background
+                                    },
+                                },
+                            }}
+                        >
+                            <HelpOutlineIcon sx={{ color: "#1C214F", cursor: "pointer", fontSize: "18px" }} />
+                        </Tooltip>
+                    </Box>
                     <TextField
-                        label="Capacity of people"
                         variant="outlined"
                         value={capacity}
                         onChange={(e) => {
@@ -236,9 +281,50 @@ const TrackerSetupView: React.FC = () => {
                         }
                         required
                     />
-                    <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-                        Alert When Capacity Reaches
-                    </Typography>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            Alert When Capacity Reaches
+                        </Typography>
+                        <Tooltip
+                            title={
+                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace:"nowrap" }}>
+                                    Get alerted when occupancy hits this percentage.
+                                </Typography>
+                            }
+                            arrow
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'offset',
+                                        options: {
+                                            offset: [0, 8],
+                                        },
+                                    },
+                                ],
+                            }}
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: '#fff',
+                                        color: '#000',
+                                        fontSize: '14px',
+                                        whiteSpace: 'nowrap',
+                                        maxWidth: 'none',
+                                        padding: '10px 12px',
+                                        boxShadow: 3,
+                                        border: '1px solid #ccc',
+                                    },
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: '#fff', // arrow matches tooltip background
+                                    },
+                                },
+                            }}
+                        >
+                            <HelpOutlineIcon sx={{ color: "#1C214F", cursor: "pointer", fontSize: "18px" }} />
+                        </Tooltip>
+                    </Box>
                     <Slider
                         aria-label="Custom marks"
                         value={sliderValue}
@@ -278,7 +364,7 @@ const TrackerSetupView: React.FC = () => {
                     </FormHelperText>
                   )}
                 </FormControl> */}
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", my:1 }}>
                         <Typography
                             variant="h6"
                             sx={{ color: "#1C214F", fontWeight: "bold", marginRight: 10 }}
@@ -315,8 +401,51 @@ const TrackerSetupView: React.FC = () => {
                             )}
                         </>
                     </Box>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            Camera Identifier
+                        </Typography>
+                        <Tooltip
+                            title={
+                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace:"nowrap" }}>
+                                   Unique name for this camera.e.g., 'North block'.
+                                </Typography>
+                            }
+                            arrow
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'offset',
+                                        options: {
+                                            offset: [0, 8],
+                                        },
+                                    },
+                                ],
+                            }}
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: '#fff',
+                                        color: '#000',
+                                        fontSize: '14px',
+                                        whiteSpace: 'nowrap',
+                                        maxWidth: 'none',
+                                        padding: '10px 12px',
+                                        boxShadow: 3,
+                                        border: '1px solid #ccc',
+                                    },
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: '#fff', // arrow matches tooltip background
+                                    },
+                                },
+                            }}
+                        >
+                            <HelpOutlineIcon sx={{ color: "#1C214F", cursor: "pointer", fontSize: "18px" }} />
+                        </Tooltip>
+                    </Box>
                     <TextField
-                        label="Camera Identifier"
                         variant="outlined"
                         value={cameraSetups[currentCameraIndex].entranceName}
                         onChange={handleChangeTextField(
@@ -328,7 +457,10 @@ const TrackerSetupView: React.FC = () => {
                         helperText={errors[`entranceName${currentCameraIndex}`]}
                         required
                     />
-                    <FormControl variant="outlined" fullWidth required>
+                    <FormControl variant="outlined" fullWidth required sx={{mt:3, mb:1}}>
+                        {/* <Typography sx={{ color: "#1C214F", fontWeight: "Normal", mb: 2 }}>
+                            Camera Position
+                        </Typography> */}
                         <InputLabel id="camera-position-label">
                             Camera Position
                         </InputLabel>
@@ -367,8 +499,51 @@ const TrackerSetupView: React.FC = () => {
                             </MenuItem>
                         </Select>
                     </FormControl>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            URL of the video source
+                        </Typography>
+                        <Tooltip
+                            title={
+                                <Typography sx={{ fontSize: '14px', p: 1, whiteSpace:"nowrap" }}>
+                                    Provide the URL that streams video from this camera.
+                                </Typography>
+                            }
+                            arrow
+                            PopperProps={{
+                                modifiers: [
+                                    {
+                                        name: 'offset',
+                                        options: {
+                                            offset: [0, 8],
+                                        },
+                                    },
+                                ],
+                            }}
+                            componentsProps={{
+                                tooltip: {
+                                    sx: {
+                                        backgroundColor: '#fff',
+                                        color: '#000',
+                                        fontSize: '14px',
+                                        whiteSpace: 'nowrap',
+                                        maxWidth: 'none',
+                                        padding: '10px 12px',
+                                        boxShadow: 3,
+                                        border: '1px solid #ccc',
+                                    },
+                                },
+                                arrow: {
+                                    sx: {
+                                        color: '#fff', // arrow matches tooltip background
+                                    },
+                                },
+                            }}
+                        >
+                            <HelpOutlineIcon sx={{ color: "#1C214F", cursor: "pointer", fontSize: "18px" }} />
+                        </Tooltip>
+                    </Box>
                     <TextField
-                        label="URL of the video source"
                         variant="outlined"
                         value={cameraSetups[currentCameraIndex].videoSource}
                         onChange={handleChangeTextField(
@@ -388,6 +563,7 @@ const TrackerSetupView: React.FC = () => {
                             border: "2px dashed #00D1A3",
                             width: "250px",
                             "&:hover": { borderColor: "#00A685" },
+                            mt:2
                         }}
                         onClick={handleAddCameraClick}
                     >

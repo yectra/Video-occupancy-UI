@@ -10,6 +10,8 @@ import {
   IconButton,
   Backdrop,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { VideoPlayer } from "@/pages/dashboard/components/liveoccupancytracker/VideoPlayer";
@@ -41,6 +43,9 @@ const TrackerVideoView: React.FC = () => {
   const [capacityOfPeople, setCapacityOfPeople] = useState<number>(50);
   const [alertMessage, setAlertMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -120,6 +125,9 @@ const TrackerVideoView: React.FC = () => {
       };
 
       occupancyTracker.addSetupDetails(payload).then((response) => {
+        setSnackbarMessage('Setup Details added successfully!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
         if (response)
           navigate("/dashboard/occupancy-tracker/overview", {
             state: {
@@ -129,7 +137,12 @@ const TrackerVideoView: React.FC = () => {
               coordinates,
             },
           });
-      }).finally(() => setLoading(false));
+      }).catch((error) => {
+        setSnackbarMessage(error.response.data.warn);
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      })
+        .finally(() => setLoading(false));
     } else if (location.state && location.state.cameraResponse) {
       const payload: BackendPayload = {
         capacityOfPeople: location.state.cameraResponse.capacityOfPeople,
@@ -159,6 +172,16 @@ const TrackerVideoView: React.FC = () => {
         step: 1
       }
     });
+  };
+
+  const handleCloseSnackbar = (
+    _event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   return (
@@ -269,6 +292,16 @@ const TrackerVideoView: React.FC = () => {
           </Box>
         </Modal>
       )}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Grid>
   );
 };

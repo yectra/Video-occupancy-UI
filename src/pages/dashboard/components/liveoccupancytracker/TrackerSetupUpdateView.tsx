@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Backdrop, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, Slider, styled, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Alert, Backdrop, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, Slider, Snackbar, styled, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, TextField, Typography } from "@mui/material";
 
 //Icons
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -66,6 +66,9 @@ const TrackerSetupUpdateView: React.FC = () => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [isDisableSave, setIsDisableSave] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
+    const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
     const marks = [
         {
             value: 0,
@@ -131,16 +134,32 @@ const TrackerSetupUpdateView: React.FC = () => {
         occupancyTracker
             .updateCameraDetails(updatedData)
             .then(() => {
+                setSnackbarMessage('Occupancy Details updated successfully!');
+                setSnackbarSeverity('success');
+                setSnackbarOpen(true);
+
                 getCameraDetails();
             })
-            .catch((error) =>
-                console.error("Error updating employee details:", error)
-            )
+            .catch((error) => {
+                setSnackbarMessage(error.response.data.warn);
+                setSnackbarSeverity('error');
+                setSnackbarOpen(true);
+            })
             .finally(() => setLoading(false));
         setRowIndex(0)
         // setVideoSource(new CameraDetailsModel());
 
     }
+
+    const handleCloseSnackbar = (
+        _event?: React.SyntheticEvent | Event,
+        reason?: string
+    ) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setSnackbarOpen(false);
+    };
 
     const handleEditClick = (index: any) => {
         setRowIndex(index);
@@ -487,6 +506,16 @@ const TrackerSetupUpdateView: React.FC = () => {
                     </DialogActions>
                 </Dialog>
             </Grid>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     )
 }
