@@ -108,7 +108,11 @@ export class OrganizationSetup {
   organizationName: string;
   phoneNumber: string;
   websiteUrl: string;
-  address: string;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zipCode: number | null;
   workTiming: number | null;
 }
 export class CameraurlSetup {

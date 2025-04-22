@@ -68,22 +68,26 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
     setCalendarOpen((prev) => !prev);
   };
 
-  const getAttendance=(id: string, date: string)=>{
+  const getAttendance = (id: string, dateValue: string) => {
     setLoading(true)
-      attendanceDetails
-        .getAllEmployeeAttendanceDetails(id, date)
-        .then((response: any) => {
-          let attendanceResponse: AttendanceDataResponseModel[] = response.data;
-          setNoRecordsMessage(attendanceResponse.length ? null : "No records found.");
-          const attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
-            employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
-          })) : [];
-          setAttendance(attendance);
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => setLoading(false));
+    const value = {
+      employeeId: id,
+      date: dateValue
+    }
+    attendanceDetails
+      .getAllEmployeeAttendanceDetails(value)
+      .then((response: any) => {
+        let attendanceResponse: AttendanceDataResponseModel[] = response.data;
+        setNoRecordsMessage(attendanceResponse.length ? null : "No records found.");
+        const attendance = attendanceResponse.length ? attendanceResponse.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+          employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+        })) : [];
+        setAttendance(attendance);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => setLoading(false));
   }
 
   const handleDateChange: CalendarProps['onChange'] = (currentDate: any) => {
@@ -94,15 +98,15 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
     }
     setLoading(true);
     if (id) {
-      getAttendance(id, moment(currentDate).format('YYYY-MM-DD'));      
-    } 
+      getAttendance(id, moment(currentDate).format('YYYY-MM-DD'));
+    }
     else if (attendanceList) {
-      attendanceDetails.getAttendance(moment(currentDate).format('YYYY-MM-DD')).then((response: any) => {        
+      attendanceDetails.getAttendance(moment(currentDate).format('YYYY-MM-DD')).then((response: any) => {
         let employeeAttendance: AttendanceDataResponseModel[] = response;
         setNoRecordsMessage(employeeAttendance.length ? null : "No records found.");
-              let attendance = employeeAttendance.length ? employeeAttendance.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
-                employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
-              })) : [];
+        let attendance = employeeAttendance.length ? employeeAttendance.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+          employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+        })) : [];
         setAttendance(attendance)
       }).finally(() => setLoading(false));
     }

@@ -90,7 +90,10 @@ const AttendanceSetupUpdateView: React.FC = () => {
             !organizationResponse?.organizationData?.phoneNumber ||
             !organizationResponse?.organizationData?.websiteUrl ||
             !organizationResponse?.organizationData?.workTiming ||
-            errors?.email || errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming)
+            !organizationResponse?.organizationData?.street || !organizationResponse?.organizationData?.city ||
+            !organizationResponse?.organizationData?.state || !organizationResponse?.organizationData?.zipCode ||
+            errors?.email || errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming ||
+            errors?.street || errors?.city || errors?.state || errors?.zipCode)
             setIsDisable(true);
         else
             setIsDisable(false);
@@ -128,6 +131,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                 getCameraDetails();
             })
             .catch((error) => {
+                console.log('testtt',error)
                 setSnackbarMessage(error.response.data.warn);
                 setSnackbarSeverity('error');
                 setSnackbarOpen(true);
@@ -166,6 +170,20 @@ const AttendanceSetupUpdateView: React.FC = () => {
         return hoursRegex.test(value);
     };
 
+    const validateStreet = (value: string) => {
+        const streetRegex = /^[a-zA-Z0-9\s,'-]{3,}$/;
+        return streetRegex.test(value);
+    };
+    const validateCityState = (value: string) => {
+        const cityRegex = /^[a-zA-Z\s]{2,}$/;
+        return cityRegex.test(value);
+    };
+
+    const validateZipCode = (value: string) => {
+        const zipRegex = /^[1-9][0-9]{5}$/;
+        return zipRegex.test(value);
+    };
+
     const handleEditClick = (index: any) => {
         setRowIndex(index);
         setCameraData(cameraDetails[index]);
@@ -188,7 +206,10 @@ const AttendanceSetupUpdateView: React.FC = () => {
         if ((name === "email" && !validateEmail(value)) ||
             (name === "phoneNumber" && !validatePhoneNumber(value)) ||
             (name === "websiteUrl" && !validateWebsiteURL(value)) ||
-            (name === "workTiming" && !validateWorkingHours(value))
+            (name === "workTiming" && !validateWorkingHours(value)) ||
+            (name === "street" && !validateStreet(value)) ||
+            ((name === "city" || name === "state") && !validateCityState(value)) ||
+            (name === "zipCode" && !validateZipCode(value))
         )
             setErrors((prevErrors) => ({
                 ...prevErrors,
@@ -416,20 +437,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             helperText={errors[`workTiming`]}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
-                            Address
-                        </Typography>
-                        <TextField
-                            variant="outlined"
-                            value={organizationResponse?.organizationData?.address}
-                            name="address"
-                            onChange={handleOrganizationInputChange}
-                            sx={{ width: "80%" }}
-                            multiline
-                            rows={2}
-                        />
-                    </Grid>
+
                     <Grid item xs={12} sm={6}>
                         <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
                             Email *
@@ -445,8 +453,84 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             helperText={errors[`email`]}
                         />
                     </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            Street *
+                        </Typography>
+                        <TextField
+                            variant="outlined"
+                            value={organizationResponse?.organizationData?.street}
+                            name="street"
+                            onChange={handleOrganizationInputChange}
+                            sx={{ width: "80%" }}
+                            required
+                            error={!!errors[`street`]}
+                            helperText={errors[`street`]}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            City *
+                        </Typography>
+                        <TextField
+                            variant="outlined"
+                            value={organizationResponse?.organizationData?.city}
+                            name="city"
+                            onChange={handleOrganizationInputChange}
+                            sx={{ width: "80%" }}
+                            required
+                            error={!!errors[`city`]}
+                            helperText={errors[`city`]}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            State *
+                        </Typography>
+                        <TextField
+                            variant="outlined"
+                            value={organizationResponse?.organizationData?.state}
+                            name="state"
+                            onChange={handleOrganizationInputChange}
+                            sx={{ width: "80%" }}
+                            required
+                            error={!!errors[`state`]}
+                            helperText={errors[`state`]}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            Country *
+                        </Typography>
+                        <TextField
+                            variant="outlined"
+                            value={organizationResponse?.organizationData?.country}
+                            name="country"
+                            sx={{ width: "80%" }}
+                            disabled
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Typography sx={{ color: "#1C214F", fontWeight: "Normal" }}>
+                            Zip Code *
+                        </Typography>
+                        <TextField
+                            variant="outlined"
+                            value={organizationResponse?.organizationData?.zipCode}
+                            name="zipCode"
+                            onChange={handleOrganizationInputChange}
+                            sx={{ width: "80%" }}
+                            required
+                            error={!!errors[`zipCode`]}
+                            helperText={errors[`zipCode`]}
+                        />
+                    </Grid>
                 </Grid>
-                {/* </Box> */}
+
                 <Box>
                     <Box component="div" display="flex" flexDirection="row" justifyContent="space-between" sx={{ my: 2 }}>
                         <Typography

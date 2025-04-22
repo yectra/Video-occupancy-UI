@@ -1,14 +1,17 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import { Table, TableBody, TableCell, TableHead, TableRow, Box, Typography, InputAdornment, IconButton, Popper, tableCellClasses, InputBase, Backdrop, CircularProgress } from "@mui/material";
-import { Search as SearchIcon, Clear as ClearIcon, Today as TodayIcon } from "@mui/icons-material";
-import Calendar from "react-calendar";
+import { Table, TableBody, TableCell, TableHead, TableRow, Box, Typography, InputAdornment, IconButton, tableCellClasses, InputBase, Backdrop, CircularProgress, Popover, Button, Select, MenuItem } from "@mui/material";
+import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import "react-calendar/dist/Calendar.css";
-import "@/styles/core/components/CalendarStyles.css";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import { debounce } from "lodash";
 import { useSearchParams } from 'react-router-dom';
+import { DateRange } from "react-date-range";
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from 'date-fns';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -31,17 +34,18 @@ interface IProps {
   date: string;
 }
 
-
 const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const [rows, setRows] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState<string>('');
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
+  const [filterOption, setFilterOption] = useState("Today");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const customButtonRef = React.useRef<HTMLDivElement | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const urlDate = searchParams.get('date');
@@ -50,17 +54,22 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
-    let currentDate: string = ''
+    let currentDate: string = '';
     setLoading(true);
     if (urlDate) {
-      setCurrentDate(urlDate)
+      setCurrentDate(urlDate);
       currentDate = urlDate;
     } else if (date) {
-      setCurrentDate(date)
+      setCurrentDate(date);
       currentDate = date;
     }
 
-    attendanceDetails.getAllEmployeeAttendanceDetails('', currentDate)
+    const value = {
+      employeeId: '',
+      date: currentDate
+    }
+
+    attendanceDetails.getAllEmployeeAttendanceDetails(value)
       .then((response: any) => {
         if (Array.isArray(response.data)) {
           const filteredRows = response.data;
@@ -76,36 +85,16 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
       })
       .catch(() => setError("Failed to fetch data."))
       .finally(() => setLoading(false));
-  }, []);
-
-
-  // useEffect(() => {
-  //   if (date) {
-  //     setLoading(true);
-  //     attendanceDetails.getAllEmployeeAttendanceDetails('',date)
-  //       .then((response:any) => {
-  //         if (Array.isArray(response)) {
-  //           const filteredRows = response.filter(record => record.date === date);
-  //           setRows(filteredRows);
-  //           setNoRecordsMessage(filteredRows.length ? null : "No records found.");
-  //           console.log('useEffect')
-  //         } else if (response?.message) {
-  //           setRows([]);
-  //           setNoRecordsMessage(response.message);
-  //         } else {
-  //           setRows([]);
-  //           setNoRecordsMessage("Unexpected response format.");
-  //         }
-  //       })
-  //       .catch(() => setError("Failed to fetch data."))
-  //       .finally(() => setLoading(false));
-  //   }
-  // }, [date]);
+  }, [urlDate, date]);
 
   const fetchAttendanceRecords = useCallback(() => {
     if (currentDate) {
+      const value = {
+        employeeId: '',
+        date: currentDate
+      }
       setLoading(true);
-      attendanceDetails.getAllEmployeeAttendanceDetails('', currentDate)
+      attendanceDetails.getAllEmployeeAttendanceDetails(value)
         .then((response: any) => {
           if (Array.isArray(response.data)) {
             const filteredRows = response.data;
@@ -130,10 +119,9 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
         attendanceDetails.searchEmployeeDetails(currentDate || "", value)
           .then(setRows)
           .catch(err => {
-            console.log(err)
+            console.log(err);
             setRows([]);
             setNoRecordsMessage("No user found");
-
           });
       } else {
         fetchAttendanceRecords();
@@ -152,30 +140,55 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
     navigate(`/dashboard/attendance/attendance-details?date=${row.date}&id=${row.employeeId}`);
   };
 
-  const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-    setCalendarOpen(prev => !prev);
+  const handleFilterChange = (e: any) => {
+    const value = e.target.value;
+    setFilterOption(value);
+
+    if (value === "Custom") {
+      setAnchorEl(customButtonRef.current);
+      setPopoverOpen(true);
+    } else if(value === "Yesterday" || value === "Week" || value === "Month" || value === "Today"){
+      setPopoverOpen(false);
+      setAnchorEl(null);
+      const data = {
+        period : value.toLowerCase()       
+      }
+      handleDateChange(data)
+    }
+    customButtonRef.current = null;
   };
 
-  const handleDateChange = (date: any) => {
+  const handleClosePopover = () => {
+    setPopoverOpen(false);
+    setAnchorEl(null);
+  };
+
+  const handleCustomChange = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete("date");
     setSearchParams(newParams);
 
-    const formattedDate = new Date(date).toLocaleDateString("en-CA");
-    setSelectedDate(date);
-    setCurrentDate(formattedDate);
-    setLoading(true);
+    handleClosePopover();
 
-    attendanceDetails.getAllEmployeeAttendanceDetails('', formattedDate)
+    if (dateRange[0] && dateRange[1] && dateRange[0] !== dateRange[1]) {
+      const value =
+      {
+        start_date: format(dateRange[0], 'yyyy-MM-dd'),
+        end_date: format(dateRange[1], 'yyyy-MM-dd')
+      }
+
+      handleDateChange(value)
+    }
+  };
+
+  const handleDateChange = (value: any) => {
+    setLoading(true);
+    attendanceDetails.getAllEmployeeAttendanceDetails(value)
       .then((response: any) => {
         if (Array.isArray(response.data)) {
           const filteredRows = response.data;
           setRows(filteredRows);
           setNoRecordsMessage(filteredRows.length ? null : "No records found.");
-        } else if (response?.message) {
-          setRows([]);
-          setNoRecordsMessage(response.message);
         } else {
           setRows([]);
           setNoRecordsMessage("Unexpected response format.");
@@ -183,8 +196,7 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
       })
       .catch(() => setError("Failed to fetch data."))
       .finally(() => setLoading(false));
-    setCalendarOpen(false);
-  };
+  }
 
   if (error) return <Typography>{error}</Typography>;
 
@@ -194,34 +206,80 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
         <CircularProgress color={"primary"} />
       </Backdrop>
 
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
         <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">
           Attendance List
         </Typography>
-        <Box sx={{ width: "350px" }}>
-          <InputBase
-            placeholder="Search"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            startAdornment={
-              <InputAdornment position="start"><SearchIcon /></InputAdornment>
-            }
-            endAdornment={searchTerm && (
-              <InputAdornment position="end">
-                <IconButton edge="end" size="large" onClick={() => setSearchTerm("")}>
-                  <ClearIcon />
-                </IconButton>
-              </InputAdornment>
-            )}
-            sx={{
-              borderRadius: "4px",
-              border: "2px solid #ccc",
-              padding: "6px 10px",
-              width: "100%",
-              "&:hover": { borderColor: "#888" },
-              "&:focus": { borderColor: "#1C214F", boxShadow: "1px #1C214F" },
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box ref={customButtonRef}>
+            <Select
+              value={filterOption}
+              onChange={handleFilterChange}
+              size="small"
+            >
+              <MenuItem value="Today">Today</MenuItem>
+              <MenuItem value="Yesterday">Yesterday</MenuItem>
+              <MenuItem value="Week">This Week</MenuItem>
+              <MenuItem value="Month">This Month</MenuItem>
+              <MenuItem value="Custom">Custom</MenuItem>
+            </Select>
+          </Box>
+
+          <Popover
+            open={popoverOpen}  // Control the visibility of the Popover
+            anchorEl={anchorEl}  // Anchor for the Popover
+            onClose={handleClosePopover}  // Close popover
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
             }}
-          />
+          >
+            <Box p={2}>
+              <DateRange
+                editableDateInputs={true}
+                onChange={(item: any) => setDateRange([item.selection.startDate, item.selection.endDate])}
+                moveRangeOnFirstSelection={false}
+                ranges={[{
+                  startDate: dateRange[0] || new Date(),
+                  endDate: dateRange[1] || new Date(),
+                  key: "selection",
+                }]}
+                maxDate={new Date()}
+              />
+              <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Button variant="contained" onClick={handleCustomChange}>
+                  Apply
+                </Button>
+              </Box>
+            </Box>
+          </Popover>
+
+          <Box sx={{ width: "300px" }}>
+            <InputBase
+              placeholder="Search"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              startAdornment={
+                <InputAdornment position="start"><SearchIcon /></InputAdornment>
+              }
+              endAdornment={searchTerm && (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={() => setSearchTerm("")}>
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              )}
+              sx={{
+                borderRadius: "4px",
+                border: "2px solid #ccc",
+                padding: "6px 10px",
+                width: "100%",
+                "&:hover": { borderColor: "#888" },
+                "&:focus": { borderColor: "#1C214F", boxShadow: "1px #1C214F" },
+              }}
+            />
+          </Box>
         </Box>
       </Box>
 
@@ -231,17 +289,7 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
             <StyledTableCell align="center">Employee Id</StyledTableCell>
             <StyledTableCell align="center">Name</StyledTableCell>
             <StyledTableCell align="center">Email</StyledTableCell>
-            <StyledTableCell align="center">
-              Date
-              <IconButton onClick={handleIconClick}>
-                <TodayIcon style={{ color: "white" }} />
-              </IconButton>
-              <Popper open={calendarOpen} anchorEl={anchorEl} placement="bottom">
-                <div style={{ border: "1px solid #ccc", borderRadius: "8px", padding: "10px", backgroundColor: "white" }}>
-                  <Calendar onChange={handleDateChange} value={selectedDate || new Date()} className="custom-calendar" maxDate={new Date()} />
-                </div>
-              </Popper>
-            </StyledTableCell>
+            <StyledTableCell align="center">Date</StyledTableCell>
             <StyledTableCell align="center">Punch In</StyledTableCell>
             <StyledTableCell align="center">Punch Out</StyledTableCell>
             <StyledTableCell align="center">Break</StyledTableCell>

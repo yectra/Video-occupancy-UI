@@ -9,6 +9,7 @@ import {
   Alert,
   Backdrop,
   CircularProgress,
+  Grid,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
@@ -28,7 +29,11 @@ const OrganizationView: React.FC = () => {
     organizationName: '',
     phoneNumber: '',
     websiteUrl: '',
-    address: '',
+    street: '',
+    city: '',
+    state: '',
+    country: 'India',
+    zipCode: null,
     workTiming: null
   });
 
@@ -47,7 +52,9 @@ const OrganizationView: React.FC = () => {
       !formData.phoneNumber ||
       !formData.websiteUrl ||
       !formData.workTiming ||
-      errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming)
+      !formData.street || !formData.city || !formData.state || !formData.zipCode ||
+      errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming ||
+      errors?.street || errors?.city || errors?.state || errors?.zipCode)
       setIsDisable(true);
     else
       setIsDisable(false);
@@ -59,7 +66,7 @@ const OrganizationView: React.FC = () => {
   };
 
   const validateWebsiteURL = (value: string) => {
-    const urlRegex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+)(\/[^\s]*)?$/;
+    const urlRegex = /^(https?:\/\/)?((www)\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(\/[^\s]*)?$/;
     return urlRegex.test(value);
   };
 
@@ -68,13 +75,30 @@ const OrganizationView: React.FC = () => {
     return hoursRegex.test(value);
   };
 
+  const validateStreet = (value: string) => {
+    const streetRegex = /^[a-zA-Z0-9\s,'-]{3,}$/;
+    return streetRegex.test(value);
+  };
+  const validateCityState = (value: string) => {
+    const cityRegex = /^[a-zA-Z\s]{2,}$/;
+    return cityRegex.test(value);
+  };
+
+  const validateZipCode = (value: string) => {
+    const zipRegex = /^[1-9][0-9]{5}$/;
+    return zipRegex.test(value);
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     if ((name === "phoneNumber" && !validatePhoneNumber(value)) ||
       (name === "websiteUrl" && !validateWebsiteURL(value)) ||
-      (name === "workTiming" && !validateWorkingHours(value))
+      (name === "workTiming" && !validateWorkingHours(value)) ||
+      (name === "street" && !validateStreet(value)) ||
+      ((name === "city" || name === "state") && !validateCityState(value)) ||
+      (name === "zipCode" && !validateZipCode(value))
     )
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -237,34 +261,101 @@ const OrganizationView: React.FC = () => {
             style: { color: 'black', fontWeight: 'bold' },
           }}
         />
-        <TextField
-          label="Address"
-          variant="outlined"
-          fullWidth
-          multiline
-          rows={2}
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment
-                position="start"
-                sx={{ alignItems: 'flex-start', marginTop: '8px' }}
-              >
-                <HomeIcon sx={{ color: 'black' }} />
-              </InputAdornment>
-            ),
-          }}
-          InputLabelProps={{
-            style: { color: 'black', fontWeight: 'bold' },
-          }}
-          sx={{
-            '.MuiOutlinedInput-root': {
-              alignItems: 'flex-start',
-            },
-          }}
-        />
+
+        <Box sx={{ px: 2, pb: 3, mt: 0, borderRadius: 2, boxShadow: 1, backgroundColor: '#fff' }}>
+          <Box display="flex" alignItems="center" mb={2}>
+            <HomeIcon sx={{ color: 'black', mr: 1 }} />
+            <Typography variant="subtitle1">Address Details</Typography>
+          </Box>
+          <Grid container spacing={3} >
+            <Grid item xs={12} sm={12}>
+              <TextField
+                label="Street"
+                variant="outlined"
+                required
+                fullWidth
+                name="street"
+                value={formData.street}
+                onChange={handleChange}
+                error={!!errors[`street`]}
+                helperText={errors[`street`]}
+                InputLabelProps={{
+                  style: { color: 'black', fontWeight: 'Normal' },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="City"
+                variant="outlined"
+                required
+                fullWidth
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                error={!!errors[`city`]}
+                helperText={errors[`city`]}
+                InputLabelProps={{
+                  style: { color: 'black', fontWeight: 'Normal' },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="State"
+                variant="outlined"
+                required
+                fullWidth
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+                error={!!errors[`state`]}
+                helperText={errors[`state`]}
+                InputLabelProps={{
+                  style: { color: 'black', fontWeight: 'Normal' },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Country"
+                variant="outlined"
+                required
+                fullWidth
+                name="country"
+                disabled
+                value={formData.country}
+                error={!!errors[`country`]}
+                helperText={errors[`country`]}
+                InputLabelProps={{
+                  style: { color: 'black', fontWeight: 'Normal' },
+                }}
+              />
+            </Grid>
+
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="ZipCode"
+                variant="outlined"
+                required
+                fullWidth
+                name="zipCode"
+                value={formData.zipCode}
+                onChange={handleChange}
+                error={!!errors[`zipCode`]}
+                helperText={errors[`zipCode`]}
+                InputLabelProps={{
+                  style: { color: 'black', fontWeight: 'Normal' },
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+
         <Box
           sx={{
             display: 'flex',

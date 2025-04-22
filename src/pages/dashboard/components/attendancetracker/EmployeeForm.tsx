@@ -265,7 +265,6 @@ const EmployeeForm: React.FC = () => {
                 </Typography>
                 <TextField
                   id="name"
-                  label="Name"
                   variant="outlined"
                   fullWidth
                   value={name}

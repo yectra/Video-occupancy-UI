@@ -6,7 +6,7 @@ const { httpGet, httpPost, httpPut, httpDelete } = apiClient();
 
 interface IAttendanceDetails {
     addEmployeeDetails(employeeDetails: AddEmployeeDetails): Promise<any>;
-    getAllEmployeeAttendanceDetails(employeeId?: string, date?: string): Promise<AttendanceDataResponseModel[]>;
+    getAllEmployeeAttendanceDetails(value:any): Promise<AttendanceDataResponseModel[]>;
     getIndividualEmployeeDetails(employeeId: string): Promise<any>;
     getManageEmployeeDetails(): Promise<any>;
     updateEmployeeDetails(employeeDetails: ManageEmployeeDetails): Promise<any>;
@@ -30,16 +30,14 @@ export class AttendanceDetails implements IAttendanceDetails {
             .then((response) => response)
     }
 
-    getAllEmployeeAttendanceDetails(employeeId?: string, date?: string): Promise<AttendanceDataResponseModel[]> {
+    getAllEmployeeAttendanceDetails(value: any): Promise<AttendanceDataResponseModel[]> {
+        // employeeId?: string, date?: string, period?:string, start_date?:string, end_date?:string
         let url = `/attendance/all`;
 
-        if (employeeId && date) {
-            url += `?employeeId=${employeeId}&date=${date}`;
-        } else if (employeeId) {
-            url += `?employeeId=${employeeId}`;
-        } else if (date) {
-            url += `?date=${date}`;
-        }
+        if (value && Object.keys(value).length > 0) {
+            const queryParams = new URLSearchParams(value).toString();
+            url += `?${queryParams}`;
+          }
 
         return httpGet<AttendanceDataResponseModel[]>(url)
             .then((response) => response)
