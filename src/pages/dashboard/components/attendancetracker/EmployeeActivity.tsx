@@ -3,19 +3,24 @@ import { useEffect, useState } from 'react';
 import { IndividualTimesheet } from '@/pages/dashboard/models/attendancetracker';
 import { AttendanceDetails } from '@/pages/dashboard/services/attendancetracker';
 import { useSearchParams } from 'react-router-dom';
+import moment from 'moment';
 
 const EmployeeActivity: React.FC = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
   const date = searchParams.get('date');
-  
+
   const [employeeActivity, setEmployeeActivity] = useState<IndividualTimesheet>()
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
     if (id) {
+      const value = {
+        employeeId: id,
+        date: moment(date).format('YYYY-MM-DD')
+      }
       attendanceDetails
-        .getIndividualEmployeeDetails(id)
+        .getAllEmployeeAttendanceDetails(value)
         .then((response: any) => {
           let employeeActivity = response.data.find((employee: IndividualTimesheet) => employee.date === date)
           setEmployeeActivity(employeeActivity)

@@ -39,10 +39,9 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentDate, setCurrentDate] = useState<string>('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
-  const [filterOption, setFilterOption] = useState("Today");
+  const [filterOption, setFilterOption] = useState<string>("today");
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const customButtonRef = React.useRef<HTMLDivElement | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -54,21 +53,14 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
-    let currentDate: string = '';
-    setLoading(true);
-    if (urlDate) {
-      setCurrentDate(urlDate);
-      currentDate = urlDate;
-    } else if (date) {
-      setCurrentDate(date);
-      currentDate = date;
-    }
-
     const value = {
-      employeeId: '',
-      date: currentDate
+      date: urlDate ? urlDate : date
     }
+    fetchAttendanceRecords(value);
+  }, [urlDate, date]);
 
+  const fetchAttendanceRecords = (value: any) => {
+    setLoading(true);
     attendanceDetails.getAllEmployeeAttendanceDetails(value)
       .then((response: any) => {
         if (Array.isArray(response.data)) {
@@ -85,46 +77,41 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
       })
       .catch(() => setError("Failed to fetch data."))
       .finally(() => setLoading(false));
-  }, [urlDate, date]);
-
-  const fetchAttendanceRecords = useCallback(() => {
-    if (currentDate) {
-      const value = {
-        employeeId: '',
-        date: currentDate
-      }
-      setLoading(true);
-      attendanceDetails.getAllEmployeeAttendanceDetails(value)
-        .then((response: any) => {
-          if (Array.isArray(response.data)) {
-            const filteredRows = response.data;
-            setRows(filteredRows);
-            setNoRecordsMessage(filteredRows.length ? null : "No records found.");
-          } else if (response?.message) {
-            setRows([]);
-            setNoRecordsMessage(response.message);
-          } else {
-            setRows([]);
-            setNoRecordsMessage("Unexpected response format.");
-          }
-        })
-        .catch(() => setError("Failed to fetch data."))
-        .finally(() => setLoading(false));
-    }
-  }, [currentDate]);
+  };
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
+      let request: any;
+      if (filterOption === 'custom') {
+        request = {
+          start_date: dateRange[0] ? format(dateRange[0], 'yyyy-MM-dd') : '',
+          end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : ''
+        }
+      } else {
+        request = {
+          period: filterOption
+        }
+      }
       if (value) {
-        attendanceDetails.searchEmployeeDetails(currentDate || "", value)
-          .then(setRows)
+        const data = {
+          ...request,
+          search: value
+        }
+        attendanceDetails.searchEmployeeDetails(data)
+          .then((response: any) => {
+            if (Array.isArray(response.data)) {
+              const filteredRows = response.data;
+              setRows(filteredRows);
+              setNoRecordsMessage(filteredRows.length ? null : "No records found.");
+            }
+          })
           .catch(err => {
             console.log(err);
             setRows([]);
             setNoRecordsMessage("No user found");
           });
       } else {
-        fetchAttendanceRecords();
+        fetchAttendanceRecords(request);
       }
     }, 100),
     [fetchAttendanceRecords]
@@ -144,18 +131,17 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
     const value = e.target.value;
     setFilterOption(value);
 
-    if (value === "Custom") {
+    if (value === "custom") {
       setAnchorEl(customButtonRef.current);
       setPopoverOpen(true);
-    } else if(value === "Yesterday" || value === "Week" || value === "Month" || value === "Today"){
+    } else {
       setPopoverOpen(false);
       setAnchorEl(null);
       const data = {
-        period : value.toLowerCase()       
+        period: value
       }
       handleDateChange(data)
     }
-    customButtonRef.current = null;
   };
 
   const handleClosePopover = () => {
@@ -216,20 +202,35 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
             <Select
               value={filterOption}
               onChange={handleFilterChange}
-              size="small"
+              sx={{
+                height: 40,
+                minWidth: 150,
+                fontSize: '1rem',
+                paddingX: 2,
+              }}
             >
-              <MenuItem value="Today">Today</MenuItem>
-              <MenuItem value="Yesterday">Yesterday</MenuItem>
-              <MenuItem value="Week">This Week</MenuItem>
-              <MenuItem value="Month">This Month</MenuItem>
-              <MenuItem value="Custom">Custom</MenuItem>
+              <MenuItem value="today">Today</MenuItem>
+              <MenuItem value="yesterday">Yesterday</MenuItem>
+              <MenuItem value="week">This Week</MenuItem>
+              <MenuItem value="month">This Month</MenuItem>
+              <MenuItem
+                value="custom"
+                onClick={() => {
+                  if (filterOption === "custom") {
+                    setDateRange([null, null]);
+                    setAnchorEl(customButtonRef.current);
+                    setPopoverOpen(true);
+                  }
+                }}
+              >
+                Custom
+              </MenuItem>
             </Select>
           </Box>
-
           <Popover
-            open={popoverOpen}  // Control the visibility of the Popover
-            anchorEl={anchorEl}  // Anchor for the Popover
-            onClose={handleClosePopover}  // Close popover
+            open={popoverOpen}
+            anchorEl={anchorEl}
+            onClose={handleClosePopover}
             anchorOrigin={{
               vertical: 'bottom',
               horizontal: 'left',
@@ -255,7 +256,7 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
             </Box>
           </Popover>
 
-          <Box sx={{ width: "300px" }}>
+          <Box sx={{ width: 170 }}>
             <InputBase
               placeholder="Search"
               value={searchTerm}
@@ -265,7 +266,23 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
               }
               endAdornment={searchTerm && (
                 <InputAdornment position="end">
-                  <IconButton size="small" onClick={() => setSearchTerm("")}>
+                  <IconButton size="small"
+                    onClick={() => {
+                      setSearchTerm("");
+                      let request: any;
+                      if (filterOption === 'custom') {
+                        request = {
+                          start_date: dateRange[0] ? format(dateRange[0], 'yyyy-MM-dd') : '',
+                          end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : ''
+                        }
+                      } else {
+                        request = {
+                          period: filterOption
+                        }
+                      }
+                      fetchAttendanceRecords(request);
+                    }}
+                  >
                     <ClearIcon />
                   </IconButton>
                 </InputAdornment>

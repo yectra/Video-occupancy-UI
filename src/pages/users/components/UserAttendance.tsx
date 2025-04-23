@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,10 +7,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Box, TextField, Typography, InputAdornment, Popper, IconButton, CircularProgress, Backdrop } from '@mui/material';
-import TodayIcon from '@mui/icons-material/Today';
-import Calendar, { CalendarProps } from 'react-calendar';
+import { Box, Typography, CircularProgress, Backdrop, Button, Popover, MenuItem, Select } from '@mui/material';
+
 import moment from 'moment';
+import { DateRange } from "react-date-range";
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from 'date-fns';
 import 'react-calendar/dist/Calendar.css';
 import '@/styles/core/components/CalendarStyles.css';
 
@@ -49,12 +53,14 @@ interface IProps {
 }
 
 const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [filterOption, setFilterOption] = useState("today");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const customButtonRef = React.useRef<HTMLDivElement | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const attendanceDetails = new AttendanceDetails();
 
@@ -63,16 +69,11 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
   const id = searchParams.get("id");
   const date = searchParams.get("date");
 
-  const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-    setCalendarOpen((prev) => !prev);
-  };
-
-  const getAttendance = (id: string, dateValue: string) => {
+  const getAttendance = (id: string, dateValue: any) => {
     setLoading(true)
     const value = {
-      employeeId: id,
-      date: dateValue
+      ...dateValue,
+      employeeId: id
     }
     attendanceDetails
       .getAllEmployeeAttendanceDetails(value)
@@ -90,36 +91,68 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
       .finally(() => setLoading(false));
   }
 
-  const handleDateChange: CalendarProps['onChange'] = (currentDate: any) => {
-    if (Array.isArray(currentDate)) {
-      setSelectedDate(currentDate.length > 0 ? currentDate[0] : null);
-    } else {
-      setSelectedDate(currentDate);
-    }
-    setLoading(true);
-    if (id) {
-      getAttendance(id, moment(currentDate).format('YYYY-MM-DD'));
-    }
-    else if (attendanceList) {
-      attendanceDetails.getAttendance(moment(currentDate).format('YYYY-MM-DD')).then((response: any) => {
-        let employeeAttendance: AttendanceDataResponseModel[] = response;
-        setNoRecordsMessage(employeeAttendance.length ? null : "No records found.");
-        let attendance = employeeAttendance.length ? employeeAttendance.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
-          employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
-        })) : [];
-        setAttendance(attendance)
-      }).finally(() => setLoading(false));
-    }
+  const handleFilterChange = (e: any) => {
+    const value = e.target.value;
+    setFilterOption(value);
 
-    setCalendarOpen(false);
+    if (value === "custom") {
+      setAnchorEl(customButtonRef.current);
+      setPopoverOpen(true);
+    } else {
+      setPopoverOpen(false);
+      setAnchorEl(null);
+      const data = {
+        period: value
+      }
+      if (id) {
+        getAttendance(id, data);
+      }
+      else if (attendanceList) {
+        handleDateChange(data);
+      }
+    }
   };
+
+  const handleClosePopover = () => {
+    setPopoverOpen(false);
+    setAnchorEl(null);
+  };
+
+  const handleCustomChange = () => {
+    handleClosePopover();
+
+    if (dateRange[0] && dateRange[1] && dateRange[0] !== dateRange[1]) {
+      const value =
+      {
+        start_date: format(dateRange[0], 'yyyy-MM-dd'),
+        end_date: format(dateRange[1], 'yyyy-MM-dd')
+      }
+
+      if (id) {
+        getAttendance(id, value);
+      }
+      else if (attendanceList) {
+        handleDateChange(value)
+      }
+    }
+  };
+
+  const handleDateChange = (value: any) => {
+    setLoading(true);
+
+    attendanceDetails.getAttendance(value).then((response: any) => {
+      let employeeAttendance: AttendanceDataResponseModel[] = response;
+      setNoRecordsMessage(employeeAttendance.length ? null : "No records found.");
+      let attendance = employeeAttendance.length ? employeeAttendance.map(({ employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime }) => ({
+        employeeId, date, firstPunchIn, lastPunchOut, break: breakTime, overTime
+      })) : [];
+      setAttendance(attendance)
+    }).finally(() => setLoading(false));
+  }
 
   useEffect(() => {
     if (id) {
-      let requestId = id;
-      let requestDate = moment(date).format('YYYY-MM-DD');
-      getAttendance(requestId, requestDate);
-      setSelectedDate(new Date(date ?? ""));
+      getAttendance(id, { date: moment(date).format('YYYY-MM-DD') });
     } else if (attendanceList) {
       setNoRecordsMessage(attendanceList.length ? null : "No records found.");
       setAttendance(attendanceList);
@@ -133,32 +166,63 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
       </Backdrop>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography sx={{ fontWeight: "bold", color: "#252C58", p: 2 }} variant='h6'>Attendance List</Typography>
-        <TextField
-          variant="outlined"
-          label="Date"
-          value={selectedDate ? selectedDate.toLocaleDateString() : "Select Date"}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <span>
-                  <IconButton onClick={handleIconClick}>
-                    <TodayIcon />
-                  </IconButton>
-                </span>
-              </InputAdornment>
-            ),
+        <Box ref={customButtonRef}>
+          <Select
+            value={filterOption}
+            onChange={handleFilterChange}
+            sx={{
+              height: 40,
+              minWidth: 150,
+              fontSize: '1rem',
+              paddingX: 2,
+            }}
+          >
+            <MenuItem value="today">Today</MenuItem>
+            <MenuItem value="yesterday">Yesterday</MenuItem>
+            <MenuItem value="week">This Week</MenuItem>
+            <MenuItem value="month">This Month</MenuItem>
+            <MenuItem
+              value="custom"
+              onClick={() => {
+                if (filterOption === "custom") {
+                  setDateRange([null, null]);
+                  setAnchorEl(customButtonRef.current);
+                  setPopoverOpen(true);
+                }
+              }}
+            >
+              Custom
+            </MenuItem>
+          </Select>
+        </Box>
+        <Popover
+          open={popoverOpen}
+          anchorEl={anchorEl}
+          onClose={handleClosePopover}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
           }}
-        />
-        <Popper open={calendarOpen} anchorEl={anchorEl} placement="bottom">
-          <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px', backgroundColor: 'white' }}>
-            <Calendar
-              onChange={handleDateChange}
-              value={selectedDate || new Date()}
-              className="custom-calendar"
+        >
+          <Box p={2}>
+            <DateRange
+              editableDateInputs={true}
+              onChange={(item: any) => setDateRange([item.selection.startDate, item.selection.endDate])}
+              moveRangeOnFirstSelection={false}
+              ranges={[{
+                startDate: dateRange[0] || new Date(),
+                endDate: dateRange[1] || new Date(),
+                key: "selection",
+              }]}
               maxDate={new Date()}
             />
-          </div>
-        </Popper>
+            <Box display="flex" justifyContent="flex-end" mt={2}>
+              <Button variant="contained" onClick={handleCustomChange}>
+                Apply
+              </Button>
+            </Box>
+          </Box>
+        </Popover>
       </Box>
       <TableContainer component={Paper} sx={{ mt: '10px' }}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">

@@ -5,6 +5,7 @@ import { ArrowBack } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import { IndividualTimesheet } from "@/pages/dashboard/models/attendancetracker";
+import moment from "moment";
 
 const GaugeChart = styled("div")<{
   angle: number;
@@ -32,8 +33,12 @@ const EmployeeTimesheet: React.FC = () => {
 
   useEffect(() => {
     if (id) {
+      const value = {
+        employeeId: id,
+        date: moment(date).format('YYYY-MM-DD')
+      }
       attendanceDetails
-        .getIndividualEmployeeDetails(id)
+        .getAllEmployeeAttendanceDetails(value)
         .then((response: any) => {
           let currentTimeSheet = response.data.find((employee: IndividualTimesheet) => employee.date === date)
           setEmployeeTimesheet(currentTimeSheet)

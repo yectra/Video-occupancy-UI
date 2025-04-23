@@ -6,18 +6,17 @@ const { httpGet, httpPost, httpPut, httpDelete } = apiClient();
 
 interface IAttendanceDetails {
     addEmployeeDetails(employeeDetails: AddEmployeeDetails): Promise<any>;
-    getAllEmployeeAttendanceDetails(value:any): Promise<AttendanceDataResponseModel[]>;
-    getIndividualEmployeeDetails(employeeId: string): Promise<any>;
+    getAllEmployeeAttendanceDetails(value: any): Promise<AttendanceDataResponseModel[]>;
     getManageEmployeeDetails(): Promise<any>;
     updateEmployeeDetails(employeeDetails: ManageEmployeeDetails): Promise<any>;
-    searchEmployeeDetails(date: string, employeeName: string): Promise<any>;
+    searchEmployeeDetails(value: any): Promise<any>;
     searchAllEmployeeDetails(searchTerm: string): Promise<any>;
     deleteEmployeeDetails(employeeId: string): Promise<any>;
     organizationDetails(organizationDetails: OrganizationSetup): Promise<any>;
     cameraurlDetails(cameraurlDetails: CameraurlSetup): Promise<any>;
     getAttendanceTrackerDetails(): Promise<AttendanceTrackerDetailsModel>;
     updateAttendanceTrackerDetails(organizationDetails: AttendanceTrackerDetailsModel): Promise<any>;
-    getAttendance(date?: string): Promise<IndividualTimesheet[]>;
+    getAttendance(value?: any): Promise<IndividualTimesheet[]>;
 }
 
 export class AttendanceDetails implements IAttendanceDetails {
@@ -31,20 +30,14 @@ export class AttendanceDetails implements IAttendanceDetails {
     }
 
     getAllEmployeeAttendanceDetails(value: any): Promise<AttendanceDataResponseModel[]> {
-        // employeeId?: string, date?: string, period?:string, start_date?:string, end_date?:string
         let url = `/attendance/all`;
 
         if (value && Object.keys(value).length > 0) {
             const queryParams = new URLSearchParams(value).toString();
             url += `?${queryParams}`;
-          }
+        }
 
         return httpGet<AttendanceDataResponseModel[]>(url)
-            .then((response) => response)
-    }
-
-    getIndividualEmployeeDetails(employeeId: string): Promise<any> {
-        return httpGet(`/attendance/all?employeeId=${employeeId}`)
             .then((response) => response)
     }
 
@@ -58,9 +51,14 @@ export class AttendanceDetails implements IAttendanceDetails {
             .then((response) => response)
     }
 
-    searchEmployeeDetails(date: string, employeeName: string): Promise<any> {
-        return httpGet(`/attendance/search?date=${date}&employeeName=${employeeName}`)
-            .then((response) => response)
+    searchEmployeeDetails(value: any): Promise<any> {
+        let url = `/attendance/search`;
+
+        if (value && Object.keys(value).length > 0) {
+            const queryParams = new URLSearchParams(value).toString();
+            url += `?${queryParams}`;
+        }
+        return httpGet(url).then((response) => response)
     }
 
     searchAllEmployeeDetails(searchTerm: string): Promise<any> {
@@ -93,7 +91,14 @@ export class AttendanceDetails implements IAttendanceDetails {
             .then((response) => response)
     }
 
-    getAttendance(date?: string): Promise<IndividualTimesheet[]> {
-        return httpGet<IndividualTimesheet[]>(date ? `/api/attendance?date=${date}` : `/api/attendance`).then((response) => response)
+    getAttendance(value?: any): Promise<IndividualTimesheet[]> {
+        console.log('calll')
+        let url = `/api/attendance`;
+
+        if (value && Object.keys(value).length > 0) {
+            const queryParams = new URLSearchParams(value).toString();
+            url += `?${queryParams}`;
+        }
+        return httpGet<IndividualTimesheet[]>(url).then((response) => response)
     }
 }

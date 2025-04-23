@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,12 +7,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Box, TextField, Typography, InputAdornment, Popper, IconButton, CircularProgress, Backdrop } from '@mui/material';
-import TodayIcon from '@mui/icons-material/Today';
-import Calendar, { CalendarProps } from 'react-calendar';
-import moment from 'moment';
+import { Box, Typography, CircularProgress, Backdrop, Select, MenuItem, Popover, Button } from '@mui/material';
+
+import { format } from 'date-fns';
+import { DateRange } from "react-date-range";
 import 'react-calendar/dist/Calendar.css';
 import '@/styles/core/components/CalendarStyles.css';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import "react-datepicker/dist/react-datepicker.css";
 
 // Services
 import { OccupancyTracker } from "../../services/liveoccupancytracker";
@@ -40,39 +43,66 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const OccupancyList: React.FC = () => {
     const [occupancyResponse, setOccupancyResponse] = useState<any>({});
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [calendarOpen, setCalendarOpen] = useState<boolean>(false);
     const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [loading, setLoading] = useState(true);
+    const [filterOption, setFilterOption] = useState("today");
+    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+    const customButtonRef = React.useRef<HTMLDivElement | null>(null);
+    const [popoverOpen, setPopoverOpen] = useState(false);
+
     const attendanceTracker = new OccupancyTracker();
 
+    const handleFilterChange = (e: any) => {
+        const value = e.target.value;
+        setFilterOption(value);
 
-    const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-        setCalendarOpen((prev) => !prev);
+        if (value === "custom") {
+            setAnchorEl(customButtonRef.current);
+            setPopoverOpen(true);
+        } else {
+            setPopoverOpen(false);
+            setAnchorEl(null);
+            const data = {
+                period: value
+            }
+            handleDateChange(data)
+        }
     };
 
-    const handleDateChange: CalendarProps['onChange'] = (currentDate: any) => {
-        if (Array.isArray(currentDate)) {
-            setSelectedDate(currentDate.length > 0 ? currentDate[0] : null);
-        } else {
-            setSelectedDate(currentDate);
+    const handleClosePopover = () => {
+        setPopoverOpen(false);
+        setAnchorEl(null);
+    };
+
+    const handleCustomChange = () => {
+        handleClosePopover();
+
+        if (dateRange[0] && dateRange[1] && dateRange[0] !== dateRange[1]) {
+            const value =
+            {
+                start_date: format(dateRange[0], 'yyyy-MM-dd'),
+                end_date: format(dateRange[1], 'yyyy-MM-dd')
+            }
+            handleDateChange(value)
         }
+    };
+
+    const handleDateChange = (value: any) => {
         setLoading(true);
-        attendanceTracker.getPersonCountByDate(moment(currentDate).format('YYYY-MM-DD')).then((response) => {
+        attendanceTracker.getPersonCountByDate(value).then((response) => {
             let occupancyResponse = response.data;
             setNoRecordsMessage(occupancyResponse.camera_data.length ? null : "No records found.");
             setOccupancyResponse(occupancyResponse);
         }).finally(() => setLoading(false));
-        setCalendarOpen(false);
-    };
-
+    }
 
     useEffect(() => {
-        let date = new Date().toLocaleDateString("en-CA")
+        const value = {
+            date: new Date().toLocaleDateString("en-CA")
+        }
         setLoading(true)
-        attendanceTracker.getPersonCountByDate(date).then((response) => {
+        attendanceTracker.getPersonCountByDate(value).then((response) => {
             let occupancyResponse = response.data;
             setNoRecordsMessage(occupancyResponse.camera_data.length ? null : "No records found.");
             setOccupancyResponse(occupancyResponse)
@@ -87,32 +117,65 @@ const OccupancyList: React.FC = () => {
             </Backdrop>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", my: 4 }}>
                 <Typography sx={{ fontWeight: "bold", color: "#252C58", p: 2 }} variant='h6'>Occupancy List</Typography>
-                <TextField
-                    variant="outlined"
-                    label="Date"
-                    value={selectedDate ? selectedDate.toLocaleDateString() : 'Select Date'}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <span>
-                                    <IconButton onClick={handleIconClick}>
-                                        <TodayIcon />
-                                    </IconButton>
-                                </span>
-                            </InputAdornment>
-                        ),
+                <Box ref={customButtonRef}>
+                    <Select
+                        value={filterOption}
+                        onChange={handleFilterChange}
+                        sx={{
+                            height: 40,
+                            minWidth: 150,
+                            fontSize: '1rem',
+                            paddingX: 2,
+                        }}
+                    >
+                        <MenuItem value="today">Today</MenuItem>
+                        <MenuItem value="yesterday">Yesterday</MenuItem>
+                        <MenuItem value="week">This Week</MenuItem>
+                        <MenuItem value="month">This Month</MenuItem>
+                        <MenuItem
+                            value="custom"
+                            onClick={() => {
+                                if (filterOption === "custom") {
+                                    setDateRange([null, null]);
+                                    setAnchorEl(customButtonRef.current);
+                                    setPopoverOpen(true);
+                                }
+                            }}
+                        >
+                            Custom
+                        </MenuItem>
+                    </Select>
+                </Box>
+                <Popover
+                    open={popoverOpen}
+                    anchorEl={anchorEl}
+                    onClose={handleClosePopover}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
                     }}
-                />
-                <Popper open={calendarOpen} anchorEl={anchorEl} placement="bottom">
-                    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px', backgroundColor: 'white' }}>
-                        <Calendar
-                            onChange={handleDateChange}
-                            value={selectedDate || new Date()}
-                            className="custom-calendar"
+                >
+                    <Box p={2} sx={{ maxWidth: 320 }}>
+                        <DateRange
+                            direction="vertical"
+                            editableDateInputs={true}
+                            onChange={(item: any) => setDateRange([item.selection.startDate, item.selection.endDate])}
+                            moveRangeOnFirstSelection={false}
+                            ranges={[{
+                                startDate: dateRange[0] || new Date(),
+                                endDate: dateRange[1] || new Date(),
+                                key: "selection",
+                            }]}
                             maxDate={new Date()}
                         />
-                    </div>
-                </Popper>
+
+                        <Box display="flex" justifyContent="flex-end" mt={2}>
+                            <Button variant="contained" onClick={handleCustomChange}>
+                                Apply
+                            </Button>
+                        </Box>
+                    </Box>
+                </Popover>
             </Box>
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
