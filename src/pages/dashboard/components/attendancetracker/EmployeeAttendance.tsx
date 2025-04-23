@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { Table, TableBody, TableCell, TableHead, TableRow, Box, Typography, InputAdornment, IconButton, tableCellClasses, InputBase, Backdrop, CircularProgress, Popover, Button, Select, MenuItem } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
-import "react-calendar/dist/Calendar.css";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import { debounce } from "lodash";
-import { useSearchParams } from 'react-router-dom';
 import { DateRange } from "react-date-range";
+import { format } from 'date-fns';
+import "react-calendar/dist/Calendar.css";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import "react-datepicker/dist/react-datepicker.css";
-import { format } from 'date-fns';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -30,11 +29,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-interface IProps {
-  date: string;
-}
+const EmployeeAttendance: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const [rows, setRows] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,18 +44,17 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   const customButtonRef = React.useRef<HTMLDivElement | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const urlDate = searchParams.get('date');
-
-  const navigate = useNavigate();
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
+    if (location.state && location.state.filterOption)
+      setFilterOption(location.state.filterOption);
+    
     const value = {
-      date: urlDate ? urlDate : date
+      period: (location.state && location.state.filterOption) ? location.state.filterOption : 'today'
     }
     fetchAttendanceRecords(value);
-  }, [urlDate, date]);
+  }, [location.state]);
 
   const fetchAttendanceRecords = (value: any) => {
     setLoading(true);
@@ -124,7 +121,11 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   };
 
   const handleRowClick = (row: any) => {
-    navigate(`/dashboard/attendance/attendance-details?date=${row.date}&id=${row.employeeId}`);
+    navigate(`/dashboard/attendance/attendance-details?date=${row.date}&id=${row.employeeId}`, {
+      state: {
+        filterOption
+      },
+    });
   };
 
   const handleFilterChange = (e: any) => {
@@ -150,10 +151,6 @@ const EmployeeAttendance: React.FC<IProps> = ({ date }) => {
   };
 
   const handleCustomChange = () => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.delete("date");
-    setSearchParams(newParams);
-
     handleClosePopover();
 
     if (dateRange[0] && dateRange[1] && dateRange[0] !== dateRange[1]) {

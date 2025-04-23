@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { Box, Typography, IconButton, Divider, Avatar } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { styled } from "@mui/system";
@@ -25,6 +25,7 @@ const GaugeChart = styled("div")<{
 const EmployeeTimesheet: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const id = searchParams.get("id");
   const date = searchParams.get("date");
@@ -53,7 +54,13 @@ const EmployeeTimesheet: React.FC = () => {
   const angle = (time / 24) * 200;
 
   const handleBackClick = () => {
-    navigate(`/dashboard/attendance/emp-attendance?date=${date}`);
+    let filterOption: any = location.state.filterOption;
+
+    navigate(`/dashboard/attendance/emp-attendance`, {
+      state: {
+        filterOption
+      },
+    });
   };
 
   return (

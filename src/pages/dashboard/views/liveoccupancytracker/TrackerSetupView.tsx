@@ -334,36 +334,6 @@ const TrackerSetupView: React.FC = () => {
                         valueLabelFormat={(value) => `${value}%`}
                         marks={marks}
                     />
-                    {/* <FormControl
-                  variant="outlined"
-                  fullWidth
-                  error={!!errors.alertMessage}
-                  required
-                >
-                  <InputLabel id="alert-message-label">
-                    Alert When Capacity Reaches
-                  </InputLabel>
-                  <Select
-                    labelId="alert-message-label"
-                    label="Alert When Capacity Reaches"
-                    value={alertMessage}
-                    onChange={(e: SelectChangeEvent<string>) => {
-                      setAlertMessage(e.target.value);
-                      setErrors((prev) => ({ ...prev, alertMessage: "" }));
-                    }}
-                  >
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <MenuItem key={i} value={`${i * 20}-${i * 20 + 20}`}>
-                        {`${i * 20}-${i * 20 + 20}`}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {errors.alertMessage && (
-                    <FormHelperText sx={{ fontSize: "12px" }}>
-                      {errors.alertMessage}
-                    </FormHelperText>
-                  )}
-                </FormControl> */}
                     <Box sx={{ display: "flex", alignItems: "center", my: 1 }}>
                         <Typography
                             variant="h6"
