@@ -77,31 +77,45 @@ const TrackerSetupView: React.FC = () => {
             Math.min(Math.max(prev + delta, 0), cameraSetups.length - 1)
         );
 
+    const validateEntranceName = (value: string) => {
+        const streetRegex = /^[a-zA-Z0-9\s-]+$/;
+        return streetRegex.test(value);
+    };
+
     const handleChangeTextField =
         (index: number, field: any) =>
             (event: React.ChangeEvent<HTMLInputElement>) => {
                 const newValue = event.target.value;
+
                 setCameraSetups((prev) => {
+                    const updated = [...prev];
+                    updated[index][field] = newValue;
+
                     const isDuplicate = prev.some(
                         (setup, i) => i !== index && setup[field] === newValue
                     );
+
+                    let errorMessage = "";
+
                     if (isDuplicate) {
-                        setErrors((prevErrors) => ({
-                            ...prevErrors,
-                            [`${field}${index}`]: `${field.replace(/([A-Z])/g, ' $1').replace(/^./, (str: any) => str.toUpperCase())} Already Exist`,
-                        }));
-                        return prev;
+                        errorMessage = `${field.replace(/([A-Z])/g, ' $1').replace(/^./, (str: any) => str.toUpperCase())} Already Exist`;
+                    } else if (
+                        field === "entranceName" &&
+                        newValue.trim() !== "" &&
+                        !validateEntranceName(newValue)
+                    ) {
+                        errorMessage = `Enter Valid ${field.replace(/([A-Z])/g, ' $1').replace(/^./, (str: any) => str.toUpperCase())}`;
                     }
+
                     setErrors((prevErrors) => ({
                         ...prevErrors,
-                        [`${field}${index}`]: "",
+                        [`${field}${index}`]: errorMessage,
                     }));
 
-                    const updated = [...prev];
-                    updated[index][field] = event.target.value;
                     return updated;
                 });
             };
+
 
     const handleChangeSelectField =
         (index: number, field: any) => (event: SelectChangeEvent<string>) => {

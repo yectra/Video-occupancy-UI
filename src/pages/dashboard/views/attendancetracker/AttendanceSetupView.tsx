@@ -67,7 +67,41 @@ const AttendanceSetupView = () => {
     return regex.test(email);
   };
 
-  const handleInputChange = (index: number, field: CameraDetailKeys, value: string) => {
+  const validateCamera = (value: string) => {
+    const streetRegex = /^[a-zA-Z0-9\s-]+$/;
+    return streetRegex.test(value);
+  };
+
+  const handleCameraChange = (index: number, field: CameraDetailKeys, value: string) => {
+    setCameraurlData(prevState => {
+      const updatedCameraDetails = [...(prevState.cameraDetails || [])];
+      if (!updatedCameraDetails[index]) return prevState;
+
+      updatedCameraDetails[index] = {
+        ...updatedCameraDetails[index],
+        [field]: value
+      };
+
+      return {
+        ...prevState,
+        cameraDetails: updatedCameraDetails
+      };
+    });
+
+    if (!validateCamera(value)) {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [`${field}${index}`]: `Enter Valid ${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}`,
+      }));
+    } else {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [`${field}${index}`]: "",
+      }));
+    }
+
+  }
+  const handleUrlChange = (index: number, field: CameraDetailKeys, value: string) => {
     setCameraurlData(prevState => {
       const updatedCameraDetails = [...(prevState.cameraDetails || [])];
       if (!updatedCameraDetails[index]) return prevState;
@@ -285,7 +319,7 @@ const AttendanceSetupView = () => {
             // label="Punchin Camera"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchinCamera}
-            onChange={(e) => handleInputChange(currentCameraIndex, 'punchinCamera', e.target.value)}
+            onChange={(e) => handleCameraChange(currentCameraIndex, 'punchinCamera', e.target.value)}
             error={!!errors[`punchinCamera${currentCameraIndex}`]}
             helperText={errors[`punchinCamera${currentCameraIndex}`]}
             required
@@ -342,7 +376,7 @@ const AttendanceSetupView = () => {
             // label="Punch-In URL"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchinUrl}
-            onChange={(e) => handleInputChange(currentCameraIndex, 'punchinUrl', e.target.value)}
+            onChange={(e) => handleUrlChange(currentCameraIndex, 'punchinUrl', e.target.value)}
             error={!!errors[`punchinUrl${currentCameraIndex}`]}
             helperText={errors[`punchinUrl${currentCameraIndex}`]}
           />
@@ -397,7 +431,7 @@ const AttendanceSetupView = () => {
             // label="Punchout Camera"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchoutCamera}
-            onChange={(e) => handleInputChange(currentCameraIndex, 'punchoutCamera', e.target.value)}
+            onChange={(e) => handleCameraChange(currentCameraIndex, 'punchoutCamera', e.target.value)}
             error={!!errors[`punchoutCamera${currentCameraIndex}`]}
             helperText={errors[`punchoutCamera${currentCameraIndex}`]}
           />
@@ -452,7 +486,7 @@ const AttendanceSetupView = () => {
             // label="Punch-Out URL"
             variant="outlined"
             value={cameraurlData.cameraDetails[currentCameraIndex].punchoutUrl}
-            onChange={(e) => handleInputChange(currentCameraIndex, 'punchoutUrl', e.target.value)}
+            onChange={(e) => handleUrlChange(currentCameraIndex, 'punchoutUrl', e.target.value)}
             error={!!errors[`punchoutUrl${currentCameraIndex}`]}
             helperText={errors[`punchoutUrl${currentCameraIndex}`]}
           />
