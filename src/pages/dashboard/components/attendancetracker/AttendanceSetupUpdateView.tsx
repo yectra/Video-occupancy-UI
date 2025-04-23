@@ -89,11 +89,11 @@ const AttendanceSetupUpdateView: React.FC = () => {
         if (!organizationResponse?.organizationData?.organizationName ||
             !organizationResponse?.organizationData?.phoneNumber ||
             !organizationResponse?.organizationData?.websiteUrl ||
-            !organizationResponse?.organizationData?.workTiming ||
+            !organizationResponse?.organizationData?.workTiming || organizationResponse?.organizationData?.country ||
             !organizationResponse?.organizationData?.street || !organizationResponse?.organizationData?.city ||
             !organizationResponse?.organizationData?.state || !organizationResponse?.organizationData?.zipCode ||
             errors?.email || errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming ||
-            errors?.street || errors?.city || errors?.state || errors?.zipCode)
+            errors?.street || errors?.city || errors?.state || errors?.country ||errors?.zipCode)
             setIsDisable(true);
         else
             setIsDisable(false);
@@ -131,7 +131,6 @@ const AttendanceSetupUpdateView: React.FC = () => {
                 getCameraDetails();
             })
             .catch((error) => {
-                console.log('testtt',error)
                 setSnackbarMessage(error.response.data.warn);
                 setSnackbarSeverity('error');
                 setSnackbarOpen(true);
@@ -208,7 +207,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
             (name === "websiteUrl" && !validateWebsiteURL(value)) ||
             (name === "workTiming" && !validateWorkingHours(value)) ||
             (name === "street" && !validateStreet(value)) ||
-            ((name === "city" || name === "state") && !validateCityState(value)) ||
+            ((name === "city" || name === "state" || name === "country") && !validateCityState(value)) ||
             (name === "zipCode" && !validateZipCode(value))
         )
             setErrors((prevErrors) => ({
@@ -510,8 +509,11 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             variant="outlined"
                             value={organizationResponse?.organizationData?.country}
                             name="country"
+                            onChange={handleOrganizationInputChange}
                             sx={{ width: "80%" }}
-                            disabled
+                            required
+                            error={!!errors[`country`]}
+                            helperText={errors[`country`]}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
