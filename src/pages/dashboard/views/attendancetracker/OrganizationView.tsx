@@ -32,7 +32,7 @@ const OrganizationView: React.FC = () => {
     street: '',
     city: '',
     state: '',
-    country: 'India',
+    country: '',
     zipCode: null,
     workTiming: null
   });
@@ -52,9 +52,9 @@ const OrganizationView: React.FC = () => {
       !formData.phoneNumber ||
       !formData.websiteUrl ||
       !formData.workTiming ||
-      !formData.street || !formData.city || !formData.state || !formData.zipCode ||
+      !formData.street || !formData.city || !formData.state || !formData.zipCode ||!formData.country ||
       errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming ||
-      errors?.street || errors?.city || errors?.state || errors?.zipCode)
+      errors?.street || errors?.city || errors?.state || errors?.zipCode|| errors?.country)
       setIsDisable(true);
     else
       setIsDisable(false);
@@ -97,7 +97,7 @@ const OrganizationView: React.FC = () => {
       (name === "websiteUrl" && !validateWebsiteURL(value)) ||
       (name === "workTiming" && !validateWorkingHours(value)) ||
       (name === "street" && !validateStreet(value)) ||
-      ((name === "city" || name === "state") && !validateCityState(value)) ||
+      ((name === "city" || name === "state" || name === "country") && !validateCityState(value)) ||
       (name === "zipCode" && !validateZipCode(value))
     )
       setErrors((prevErrors) => ({
@@ -325,9 +325,9 @@ const OrganizationView: React.FC = () => {
                 variant="outlined"
                 required
                 fullWidth
-                name="country"
-                disabled
+                name="country"             
                 value={formData.country}
+                onChange={handleChange}
                 error={!!errors[`country`]}
                 helperText={errors[`country`]}
                 InputLabelProps={{
