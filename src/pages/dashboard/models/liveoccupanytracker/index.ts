@@ -34,10 +34,13 @@ export class GraphDataModel {
 
 export class ManageUserDetails {
   organization_id: string;
-  pagination: any;
   users: userDetails[];
+  count: number;
+  page_no: number;
+  page_size: number;
+  total_count: number;
+  total_pages: number;
 }
-
 export class userDetails {
   created_at: string;
   id: string;

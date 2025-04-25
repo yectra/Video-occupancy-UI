@@ -1,13 +1,13 @@
 import { apiClient } from "@/common/hooks/useApiClient";
 
-import { AddEmployeeDetails, AttendanceDataResponseModel, CameraurlSetup, ManageEmployeeDetails, OrganizationSetup, AttendanceTrackerDetailsModel, IndividualTimesheet } from "@/pages/dashboard/models/attendancetracker"
+import { AddEmployeeDetails, AttendanceDataResponseModel, CameraurlSetup, ManageEmployeeDetails, OrganizationSetup, AttendanceTrackerDetailsModel, IndividualTimesheet, employeeResponse } from "@/pages/dashboard/models/attendancetracker"
 
 const { httpGet, httpPost, httpPut, httpDelete } = apiClient();
 
 interface IAttendanceDetails {
     addEmployeeDetails(employeeDetails: AddEmployeeDetails): Promise<any>;
     getAllEmployeeAttendanceDetails(value: any): Promise<AttendanceDataResponseModel[]>;
-    getManageEmployeeDetails(): Promise<any>;
+    getManageEmployeeDetails(page_number: number, page_size: number): Promise<employeeResponse>;
     updateEmployeeDetails(employeeDetails: ManageEmployeeDetails): Promise<any>;
     searchEmployeeDetails(value: any): Promise<any>;
     searchAllEmployeeDetails(searchTerm: string): Promise<any>;
@@ -41,8 +41,8 @@ export class AttendanceDetails implements IAttendanceDetails {
             .then((response) => response)
     }
 
-    getManageEmployeeDetails(): Promise<any> {
-        return httpGet('/employees')
+    getManageEmployeeDetails(page_number: number, page_size: number): Promise<employeeResponse> {
+        return httpGet<employeeResponse>(`/employees?page_number=${page_number}&page_size=${page_size}`)
             .then((response) => response)
     }
 
@@ -92,7 +92,6 @@ export class AttendanceDetails implements IAttendanceDetails {
     }
 
     getAttendance(value?: any): Promise<IndividualTimesheet[]> {
-        console.log('calll')
         let url = `/api/attendance`;
 
         if (value && Object.keys(value).length > 0) {

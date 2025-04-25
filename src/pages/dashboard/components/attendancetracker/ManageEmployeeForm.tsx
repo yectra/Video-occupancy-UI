@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { debounce } from 'lodash';
-import { styled, Box, Typography, IconButton, InputAdornment, InputBase, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, MenuItem, Button, Avatar, CircularProgress, Backdrop, Snackbar, Alert } from "@mui/material";
+import { styled, Box, Typography, IconButton, InputAdornment, InputBase, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Table, TableBody, TableCell, tableCellClasses, TableHead, TableRow, MenuItem, Button, Avatar, CircularProgress, Backdrop, Snackbar, Alert, TablePagination, TableContainer } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -11,7 +11,7 @@ import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker"
 import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
 
 //Models
-import { ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
+import { employeeResponse, ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 import { ManageUserDetails, userDetails } from "../../models/liveoccupanytracker";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -56,11 +56,12 @@ const DialogTextField = ({
 );
 
 const ManageEmployeeForm: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  // const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const [employeeForm, setEmployeeForm] = useState<ManageEmployeeDetails[]>([]);
-  const [userForm, setUserForm] = useState<ManageUserDetails>();
+  const pageSize: number = 10;
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
+  const [employeeForm, setEmployeeForm] = useState<employeeResponse>(new employeeResponse());
+  const [userForm, setUserForm] = useState<ManageUserDetails>(new ManageUserDetails());
   const [selectedEmployee, setSelectedEmployee] = useState<ManageEmployeeDetails | null>(null);
   const [selectedUser, setSelectedUser] = useState<userDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -76,6 +77,8 @@ const ManageEmployeeForm: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(pageSize);
 
   const attendanceDetails = new AttendanceDetails();
   const occupancyTracker = new OccupancyTracker();
@@ -85,25 +88,43 @@ const ManageEmployeeForm: React.FC = () => {
 
   const pathName = location.pathname;
 
-  const fetchEmployeeDetails = useCallback(() => {
+  const handleChangePage = (event: unknown, newPage: number) => {
+    console.log('event', event)
+    setPage(newPage);
+    isEmployeePage ?
+      fetchEmployeeDetails(newPage + 1, rowsPerPage) :
+      fetchUserDetails(newPage + 1, rowsPerPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+    isEmployeePage ?
+      fetchEmployeeDetails(1, parseInt(event.target.value, 10)) :
+      fetchUserDetails(1, parseInt(event.target.value, 10));
+  };
+
+  const fetchEmployeeDetails = (page: number, size: number) => {
     setLoading(true);
     attendanceDetails
-      .getManageEmployeeDetails()
-      .then((response) => {
+      .getManageEmployeeDetails(page, size)
+      .then((response: employeeResponse) => {
         setEmployeeForm(response);
-        setNoUserFound(response.length === 0);
+        setNoUserFound(response.employees.length === 0);
       })
       .finally(() => setLoading(false));
-  }, []);
+  };
 
-  const fetchUserDetails = useCallback(() => {
+  const fetchUserDetails = (page: number, size: number) => {
     setLoading(true);
 
-    occupancyTracker.getUserDetails().then((response) => {
+    occupancyTracker.getUserDetails(page, size).then((response:any) => {
       setUserForm(response.data)
       setNoUserFound(response.data.users.length === 0);
     }).finally(() => setLoading(false));
-  }, []);
+  };
 
   const debouncedSearch = useCallback(
     debounce((searchValue: string) => {
@@ -113,13 +134,13 @@ const ManageEmployeeForm: React.FC = () => {
           attendanceDetails.searchAllEmployeeDetails(searchValue)
             .then((response) => {
               setEmployeeForm(response);
-              setNoUserFound(response.length === 0);
+              setNoUserFound(response.employees.length === 0);
             })
             .finally(() => setLoading(false));
         } else {
           setLoading(true);
           occupancyTracker.searchAllUserDetails(searchValue)
-            .then((response) => {
+            .then((response:any) => {
               setUserForm(response.data)
               setNoUserFound(response.data.users.length === 0);
             })
@@ -127,9 +148,9 @@ const ManageEmployeeForm: React.FC = () => {
         }
       } else {
         if (isEmployeePage)
-          fetchEmployeeDetails();
+          fetchEmployeeDetails(page + 1, rowsPerPage);
         else
-          fetchUserDetails();
+          fetchUserDetails(page + 1, rowsPerPage);
       }
     }, 300),
     []
@@ -172,7 +193,6 @@ const ManageEmployeeForm: React.FC = () => {
     openConfirmDialog();
   }
 
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     isEmployeePage ?
@@ -202,7 +222,7 @@ const ManageEmployeeForm: React.FC = () => {
           setSnackbarSeverity('success');
           setSnackbarOpen(true);
 
-          fetchEmployeeDetails();
+          fetchEmployeeDetails(page + 1, rowsPerPage);
           handleDialogClose();
         })
         .catch((error) => {
@@ -225,7 +245,7 @@ const ManageEmployeeForm: React.FC = () => {
           setSnackbarSeverity('success');
           setSnackbarOpen(true);
 
-          fetchUserDetails();
+          fetchUserDetails(page + 1, rowsPerPage);
           handleDialogClose();
         })
         .catch((error) => {
@@ -244,7 +264,7 @@ const ManageEmployeeForm: React.FC = () => {
       attendanceDetails
         .deleteEmployeeDetails(selectedEmployee.employeeId)
         .then(() => {
-          fetchEmployeeDetails();
+          fetchEmployeeDetails(page + 1, rowsPerPage);
           handleDialogClose();
         })
         .catch((error) => {
@@ -258,7 +278,7 @@ const ManageEmployeeForm: React.FC = () => {
         user_id: selectedUser.id
       }
       occupancyTracker.deleteEmployeeDetails(user).then(() => {
-        fetchUserDetails();
+        fetchUserDetails(page + 1, rowsPerPage);
         handleDialogClose();
       })
         .catch((error) => {
@@ -306,11 +326,11 @@ const ManageEmployeeForm: React.FC = () => {
   useEffect(() => {
     if (pathName && pathName === '/dashboard/attendance/emp-form') {
       setIsEmployeePage(true);
-      fetchEmployeeDetails();
+      fetchEmployeeDetails(page + 1, rowsPerPage);
     }
     else if (pathName && pathName === '/dashboard/occupancy-tracker/emp-form') {
       setIsEmployeePage(false);
-      fetchUserDetails();
+      fetchUserDetails(page + 1, rowsPerPage);
     }
   }, []);
 
@@ -352,7 +372,7 @@ const ManageEmployeeForm: React.FC = () => {
                 <InputAdornment position="end">
                   <IconButton edge="end" size="large" onClick={() => {
                     setSearchTerm("")
-                    isEmployeePage ? fetchEmployeeDetails() : fetchUserDetails()
+                    isEmployeePage ? fetchEmployeeDetails(page + 1, rowsPerPage) : fetchUserDetails(page + 1, rowsPerPage)
                   }}>
                     <ClearIcon />
                   </IconButton>
@@ -374,86 +394,101 @@ const ManageEmployeeForm: React.FC = () => {
         <Backdrop open={loading} style={{ zIndex: 9999, color: "#fff" }}>
           <CircularProgress color={"primary"} />
         </Backdrop>
-        <Table sx={{ minWidth: 700 }} >
-          <TableHead>
-            <TableRow>
-              {isEmployeePage &&
-                <><StyledTableCell align="center">ID</StyledTableCell>
-                  <StyledTableCell align="center">PROFILE</StyledTableCell></>}
-              <StyledTableCell align="center">NAME</StyledTableCell>
-              <StyledTableCell align="center">ROLE</StyledTableCell>
-              <StyledTableCell align="center">EMAIL</StyledTableCell>
-              <StyledTableCell align="center">ACTION</StyledTableCell>
-            </TableRow>
-            {noUserFound && (
+        <TableContainer>
+          <Table sx={{ minWidth: 700 }} >
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Typography variant="body2" color="error"> {isEmployeePage ? 'No Employee Found' : 'No User Found'}</Typography>
-                </TableCell>
+                {isEmployeePage &&
+                  <><StyledTableCell align="center">ID</StyledTableCell>
+                    <StyledTableCell align="center">PROFILE</StyledTableCell></>}
+                <StyledTableCell align="center">NAME</StyledTableCell>
+                <StyledTableCell align="center">ROLE</StyledTableCell>
+                <StyledTableCell align="center">EMAIL</StyledTableCell>
+                <StyledTableCell align="center">ACTION</StyledTableCell>
               </TableRow>
-            )}
-          </TableHead>
-          <TableBody>
-            {isEmployeePage ? employeeForm.map((row) => (
-              <StyledTableRow key={row.employeeId}>
-                <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
-                <StyledTableCell align="center">
-                  <Box sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }} >
-                    <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 50, height: 50 }} />
-                  </Box>
-                </StyledTableCell>
-                <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
-                <StyledTableCell align="center">{row.role}</StyledTableCell>
-                <StyledTableCell align="center">{row.email}</StyledTableCell>
-                <StyledTableCell align="center">
-                  <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-                    <IconButton
-                      sx={{ color: "#00D1A3" }}
-                      onClick={() => handleEditClick(row)}
-                    >
-                      <EditOutlinedIcon />
-                    </IconButton>
+              {noUserFound && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <Typography variant="body2" color="error"> {isEmployeePage ? 'No Employee Found' : 'No User Found'}</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableHead>
+            <TableBody>
+              {isEmployeePage ? Array.isArray(employeeForm.employees) && employeeForm.employees.map((row) => (
+                <StyledTableRow key={row.employeeId}>
+                  <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Box sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }} >
+                      <Avatar alt={row.employeeName} src={row.imageUrl} sx={{ width: 50, height: 50 }} />
+                    </Box>
+                  </StyledTableCell>
+                  <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
+                  <StyledTableCell align="center">{row.role}</StyledTableCell>
+                  <StyledTableCell align="center">{row.email}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                      <IconButton
+                        sx={{ color: "#00D1A3" }}
+                        onClick={() => handleEditClick(row)}
+                      >
+                        <EditOutlinedIcon />
+                      </IconButton>
 
-                    <IconButton
-                      sx={{ color: "#FF4D4D" }}
-                      onClick={() => handleDeleteClick(row)}
-                    >
-                      <DeleteOutlineIcon />
-                    </IconButton>
-                  </Box>
-                </StyledTableCell>
-              </StyledTableRow>
-            )) : userForm?.users.map((row) => (
-              <StyledTableRow key={row.id}>
-                <StyledTableCell align="center">{row.name}</StyledTableCell>
-                <StyledTableCell align="center">{row.role}</StyledTableCell>
-                <StyledTableCell align="center">{row.email}</StyledTableCell>
-                {/* <StyledTableCell align="center">
-                    <IconButton sx={{ bgcolor: "#00D1A3", color: "white", '&:hover': { bgcolor: "#00A387" } }} onClick={() => handleUserEditClick(row)}>
-                      <EditOutlinedIcon />
-                    </IconButton>
-                  </StyledTableCell> */}
-                <StyledTableCell align="center">
-                  <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-                    <IconButton
-                      sx={{ color: "#00D1A3" }}
-                      onClick={() => handleUserEditClick(row)}
-                    >
-                      <EditOutlinedIcon />
-                    </IconButton>
+                      <IconButton
+                        sx={{ color: "#FF4D4D" }}
+                        onClick={() => handleDeleteClick(row)}
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </Box>
+                  </StyledTableCell>
+                </StyledTableRow>
+              )) : Array.isArray(userForm.users) && userForm.users.map((row) => (
+                <StyledTableRow key={row.id}>
+                  <StyledTableCell align="center">{row.name}</StyledTableCell>
+                  <StyledTableCell align="center">{row.role}</StyledTableCell>
+                  <StyledTableCell align="center">{row.email}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                      <IconButton
+                        sx={{ color: "#00D1A3" }}
+                        onClick={() => handleUserEditClick(row)}
+                      >
+                        <EditOutlinedIcon />
+                      </IconButton>
 
-                    <IconButton
-                      sx={{ color: "#FF4D4D" }}
-                      onClick={() => handleUserDeleteClick(row)}
-                    >
-                      <DeleteOutlineIcon />
-                    </IconButton>
-                  </Box>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      <IconButton
+                        sx={{ color: "#FF4D4D" }}
+                        onClick={() => handleUserDeleteClick(row)}
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </Box>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {isEmployeePage ? (employeeForm.total_records ? <TablePagination
+          rowsPerPageOptions={[pageSize, pageSize * 2, pageSize * 3, pageSize * 4, pageSize * 5]}
+          component="div"
+          count={employeeForm.total_records || 0}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        /> : null) :
+          (userForm.total_count ? <TablePagination
+            rowsPerPageOptions={[pageSize, pageSize * 2, pageSize * 3, pageSize * 4, pageSize * 5]}
+            component="div"
+            count={userForm.total_count || 0}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          /> : null)}
       </Box>
 
       <Dialog open={editDialogOpen}>
@@ -537,9 +572,6 @@ const ManageEmployeeForm: React.FC = () => {
 
         </DialogContent>
         <DialogActions sx={{ my: 1 }}>
-          {/* <Button onClick={() => { openConfirmDialog(); }} color="error">
-            <Typography>Delete</Typography>
-          </Button> */}
           <Button
             sx={{
               bgcolor: "#00D1A3",

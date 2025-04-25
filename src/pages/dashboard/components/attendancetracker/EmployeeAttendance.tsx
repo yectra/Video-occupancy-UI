@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import { Table, TableBody, TableCell, TableHead, TableRow, Box, Typography, InputAdornment, IconButton, tableCellClasses, InputBase, Backdrop, CircularProgress, Popover, Button, Select, MenuItem } from "@mui/material";
+import { Table, TableBody, TableCell, TableHead, TableRow, Box, Typography, InputAdornment, IconButton, tableCellClasses, InputBase, Backdrop, CircularProgress, Popover, Button, Select, MenuItem, TableContainer, TablePagination } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
 import { debounce } from "lodash";
@@ -11,6 +11,7 @@ import "react-calendar/dist/Calendar.css";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import "react-datepicker/dist/react-datepicker.css";
+import { employeeAttendanceResponse } from "../../models/attendancetracker";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -32,8 +33,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const EmployeeAttendance: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [rows, setRows] = useState<any[]>([]);
+  const pageSize: number = 10;
+  const [rows, setRows] = useState<employeeAttendanceResponse>(new employeeAttendanceResponse());
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,32 +44,79 @@ const EmployeeAttendance: React.FC = () => {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const customButtonRef = React.useRef<HTMLDivElement | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(pageSize);
 
   const attendanceDetails = new AttendanceDetails();
 
   useEffect(() => {
     if (location.state && location.state.filterOption)
       setFilterOption(location.state.filterOption);
-    
+
     const value = {
-      period: (location.state && location.state.filterOption) ? location.state.filterOption : 'today'
+      period: (location.state && location.state.filterOption) ? location.state.filterOption : 'today',
+      page_number: 1,
+      page_size: rowsPerPage
     }
     fetchAttendanceRecords(value);
   }, [location.state]);
+
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    console.log('event', event)
+    setPage(newPage);
+    let value: any;
+    if (filterOption === 'custom') {
+      value = {
+        start_date: dateRange[0] ? format(dateRange[0], 'yyyy-MM-dd') : '',
+        end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : '',
+        page_number: newPage + 1,
+        page_size: rowsPerPage
+      }
+    } else {
+      value = {
+        period: filterOption,
+        page_number: newPage + 1,
+        page_size: rowsPerPage
+      }
+    }
+    fetchAttendanceRecords(value);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+    let value: any;
+    if (filterOption === 'custom') {
+      value = {
+        start_date: dateRange[0] ? format(dateRange[0], 'yyyy-MM-dd') : '',
+        end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : '',
+        page_number: 1,
+        page_size: parseInt(event.target.value, 10)
+      }
+    } else {
+      value = {
+        period: filterOption,
+        page_number: 1,
+        page_size: parseInt(event.target.value, 10)
+      }
+    }
+    fetchAttendanceRecords(value);
+  };
 
   const fetchAttendanceRecords = (value: any) => {
     setLoading(true);
     attendanceDetails.getAllEmployeeAttendanceDetails(value)
       .then((response: any) => {
         if (Array.isArray(response.data)) {
-          const filteredRows = response.data;
-          setRows(filteredRows);
-          setNoRecordsMessage(filteredRows.length ? null : "No records found.");
+          // const filteredRows = response.data;
+          setRows(response);
+          setNoRecordsMessage(response.data.length ? null : "No records found.");
         } else if (response?.message) {
-          setRows([]);
           setNoRecordsMessage(response.message);
         } else {
-          setRows([]);
           setNoRecordsMessage("Unexpected response format.");
         }
       })
@@ -82,11 +130,15 @@ const EmployeeAttendance: React.FC = () => {
       if (filterOption === 'custom') {
         request = {
           start_date: dateRange[0] ? format(dateRange[0], 'yyyy-MM-dd') : '',
-          end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : ''
+          end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : '',
+          page_number: page + 1,
+          page_size: rowsPerPage
         }
       } else {
         request = {
-          period: filterOption
+          period: filterOption,
+          page_number: page + 1,
+          page_size: rowsPerPage
         }
       }
       if (value) {
@@ -96,15 +148,12 @@ const EmployeeAttendance: React.FC = () => {
         }
         attendanceDetails.searchEmployeeDetails(data)
           .then((response: any) => {
-            if (Array.isArray(response.data)) {
-              const filteredRows = response.data;
-              setRows(filteredRows);
-              setNoRecordsMessage(filteredRows.length ? null : "No records found.");
-            }
+            // const filteredRows = response.data;
+            setRows(response);
+            setNoRecordsMessage(response.data.length ? null : "No records found.");
           })
           .catch(err => {
             console.log(err);
-            setRows([]);
             setNoRecordsMessage("No user found");
           });
       } else {
@@ -139,7 +188,9 @@ const EmployeeAttendance: React.FC = () => {
       setPopoverOpen(false);
       setAnchorEl(null);
       const data = {
-        period: value
+        period: value,
+        page_number: page + 1,
+        page_size: rowsPerPage
       }
       handleDateChange(data)
     }
@@ -157,7 +208,9 @@ const EmployeeAttendance: React.FC = () => {
       const value =
       {
         start_date: format(dateRange[0], 'yyyy-MM-dd'),
-        end_date: format(dateRange[1], 'yyyy-MM-dd')
+        end_date: format(dateRange[1], 'yyyy-MM-dd'),
+        page_number: page + 1,
+        page_size: rowsPerPage
       }
 
       handleDateChange(value)
@@ -169,11 +222,10 @@ const EmployeeAttendance: React.FC = () => {
     attendanceDetails.getAllEmployeeAttendanceDetails(value)
       .then((response: any) => {
         if (Array.isArray(response.data)) {
-          const filteredRows = response.data;
-          setRows(filteredRows);
-          setNoRecordsMessage(filteredRows.length ? null : "No records found.");
+          // const filteredRows = response.data;
+          setRows(response);
+          setNoRecordsMessage(response.data.length ? null : "No records found.");
         } else {
-          setRows([]);
           setNoRecordsMessage("Unexpected response format.");
         }
       })
@@ -270,11 +322,15 @@ const EmployeeAttendance: React.FC = () => {
                       if (filterOption === 'custom') {
                         request = {
                           start_date: dateRange[0] ? format(dateRange[0], 'yyyy-MM-dd') : '',
-                          end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : ''
+                          end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : '',
+                          page_number: page + 1,
+                          page_size: rowsPerPage
                         }
                       } else {
                         request = {
-                          period: filterOption
+                          period: filterOption,
+                          page_number: page + 1,
+                          page_size: rowsPerPage
                         }
                       }
                       fetchAttendanceRecords(request);
@@ -297,41 +353,52 @@ const EmployeeAttendance: React.FC = () => {
         </Box>
       </Box>
 
-      <Table sx={{ minWidth: 700, boxShadow: 3, border: "1px solid #ccc" }}>
-        <TableHead>
-          <TableRow>
-            <StyledTableCell align="center">Employee Id</StyledTableCell>
-            <StyledTableCell align="center">Name</StyledTableCell>
-            <StyledTableCell align="center">Email</StyledTableCell>
-            <StyledTableCell align="center">Date</StyledTableCell>
-            <StyledTableCell align="center">Punch In</StyledTableCell>
-            <StyledTableCell align="center">Punch Out</StyledTableCell>
-            <StyledTableCell align="center">Break</StyledTableCell>
-            <StyledTableCell align="center">Over time</StyledTableCell>
-          </TableRow>
-          {noRecordsMessage && rows.length == 0 && (
+      <TableContainer>
+        <Table sx={{ minWidth: 700, boxShadow: 3, border: "1px solid #ccc" }}>
+          <TableHead>
             <TableRow>
-              <TableCell colSpan={7} align="center">
-                <Typography variant="body2" color="error">{noRecordsMessage}</Typography>
-              </TableCell>
+              <StyledTableCell align="center">Employee Id</StyledTableCell>
+              <StyledTableCell align="center">Name</StyledTableCell>
+              <StyledTableCell align="center">Email</StyledTableCell>
+              <StyledTableCell align="center">Date</StyledTableCell>
+              <StyledTableCell align="center">Punch In</StyledTableCell>
+              <StyledTableCell align="center">Punch Out</StyledTableCell>
+              <StyledTableCell align="center">Break</StyledTableCell>
+              <StyledTableCell align="center">Over time</StyledTableCell>
             </TableRow>
-          )}
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.id} onClick={() => handleRowClick(row)} sx={{ cursor: "pointer" }}>
-              <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
-              <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
-              <StyledTableCell align="center">{row.email}</StyledTableCell>
-              <StyledTableCell align="center">{row.date}</StyledTableCell>
-              <StyledTableCell align="center">{row.firstPunchIn}</StyledTableCell>
-              <StyledTableCell align="center">{row.lastPunchOut}</StyledTableCell>
-              <StyledTableCell align="center">{row.break}</StyledTableCell>
-              <StyledTableCell align="center">{row.overTime}</StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
+            {noRecordsMessage && rows.data.length == 0 && (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  <Typography variant="body2" color="error">{noRecordsMessage}</Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableHead>
+          <TableBody>
+            {Array.isArray(rows?.data) && rows.data.map((row) => (
+              <StyledTableRow key={row.id} onClick={() => handleRowClick(row)} sx={{ cursor: "pointer" }}>
+                <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
+                <StyledTableCell align="center">{row.employeeName}</StyledTableCell>
+                <StyledTableCell align="center">{row.email}</StyledTableCell>
+                <StyledTableCell align="center">{row.date}</StyledTableCell>
+                <StyledTableCell align="center">{row.firstPunchIn}</StyledTableCell>
+                <StyledTableCell align="center">{row.lastPunchOut}</StyledTableCell>
+                <StyledTableCell align="center">{row.break}</StyledTableCell>
+                <StyledTableCell align="center">{row.overTime}</StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {rows.total_records ? <TablePagination
+        rowsPerPageOptions={[pageSize, pageSize * 2, pageSize * 3, pageSize * 4,pageSize * 5]}
+        component="div"
+        count={rows.total_records || 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      /> : null}
     </Box>
   );
 };

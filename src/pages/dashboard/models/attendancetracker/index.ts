@@ -104,6 +104,13 @@ export class ManageEmployeeDetails {
   imageUrl?: string;
   newImageBase64?: string;
 }
+
+export class employeeResponse {
+  employees: ManageEmployeeDetails[];
+  page_number: number;
+  page_size: number;
+  total_records: number;
+}
 export class OrganizationSetup {
   organizationName: string;
   phoneNumber: string;
@@ -119,7 +126,6 @@ export class CameraurlSetup {
   email: string;
   cameraDetails: AttendanceCameraDetailsModel[];
 }
-
 export class AttendanceCameraDetailsModel {
   cameraId: number | null;
   punchinCamera: string;
@@ -127,8 +133,13 @@ export class AttendanceCameraDetailsModel {
   punchoutCamera: string;
   punchoutUrl: string;
 }
-
 export class AttendanceTrackerDetailsModel {
-  cameraData : CameraurlSetup;
-  organizationData : OrganizationSetup;
+  cameraData: CameraurlSetup;
+  organizationData: OrganizationSetup;
+}
+export class employeeAttendanceResponse {
+  data: IndividualTimesheet[];
+  page_number: number;
+  page_size: number;
+  total_records: number;
 }

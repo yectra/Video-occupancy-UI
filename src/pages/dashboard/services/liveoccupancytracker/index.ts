@@ -12,7 +12,7 @@ interface IOccupancyTracker {
     updateCameraDetails(cameraDetails: BackendPayload): Promise<any>;
     checkUserExists(): Promise<any>;
     getPersonCountByDate(value: any): Promise<any>;
-    getUserDetails(): Promise<any>;
+    getUserDetails(page_no: number, page_size: number): Promise<any>;
     updateEmployeeDetails(userDetails: any): Promise<any>;
     deleteEmployeeDetails(user: any): Promise<any>;
     addUserDetails(useretails: AddUserDetails): Promise<any>;
@@ -57,8 +57,8 @@ export class OccupancyTracker implements IOccupancyTracker {
             .then((response) => response)
     }
 
-    getUserDetails(): Promise<any> {
-        return httpGet('api/getAllUsers')
+    getUserDetails(page_number: number, page_size: number): Promise<any> {
+        return httpGet(`api/getAllUsers?page_no=${page_number}&page_size=${page_size}`)
             .then((response) => response)
     }
 
