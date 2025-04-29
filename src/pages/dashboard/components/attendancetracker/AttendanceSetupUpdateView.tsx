@@ -123,8 +123,8 @@ const AttendanceSetupUpdateView: React.FC = () => {
         setLoading(true)
         attendanceTracker
             .updateAttendanceTrackerDetails(updatedData)
-            .then(() => {
-                setSnackbarMessage('User added successfully!');
+            .then((response: any) => {
+                setSnackbarMessage(response);
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
 

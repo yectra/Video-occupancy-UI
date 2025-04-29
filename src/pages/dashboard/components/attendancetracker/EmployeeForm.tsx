@@ -15,7 +15,6 @@ const EmployeeForm: React.FC = () => {
   const location = useLocation();
 
   const [name, setName] = useState<string>("");
-  const [employeeId, setEmployeeId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [nameError, setNameError] = useState<string>("");
@@ -99,7 +98,6 @@ const EmployeeForm: React.FC = () => {
       const request: AddEmployeeDetails = {
         role,
         email,
-        employeeId,
         employeeName: name,
         imageBase64,
       };
@@ -152,7 +150,6 @@ const EmployeeForm: React.FC = () => {
     return isEmployeePage ? !!(
       name.trim() &&
       !nameError &&
-      employeeId &&
       email.trim() &&
       !emailError &&
       role &&
@@ -192,7 +189,7 @@ const EmployeeForm: React.FC = () => {
           {isEmployeePage ? 'Add Employee' : 'Add User'}
         </Typography>
         <Grid container spacing={3}>
-          {isEmployeePage ? <>
+          {/* {isEmployeePage &&
             <Grid item xs={12} container justifyContent="center">
               <Avatar sx={{ width: 60, height: 60, my: 2 }} src={avatarSrc} />
               <Grid item xs={12} container justifyContent="center">
@@ -206,8 +203,8 @@ const EmployeeForm: React.FC = () => {
                   <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
                 </Button>
               </Grid>
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            </Grid>} */}
+          {/* <Grid item xs={12} sm={6}>
               <TextField
                 id="name"
                 label="Name"
@@ -256,9 +253,33 @@ const EmployeeForm: React.FC = () => {
                   <TextField {...params} label="Role *" variant="outlined" fullWidth />
                 )}
               />
-            </Grid>
-          </> : <>
-            <Grid container display="flex" direction="column" justifyContent="center" alignItems="center" spacing={3} sx={{ mt: 3 }}>
+            </Grid> */}
+          <Grid
+            container
+            direction="column"
+            alignItems="center"
+            spacing={3}
+            sx={{ mt: 3 }}
+          >
+            {isEmployeePage && (
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <Avatar sx={{ width: 60, height: 60, my: 2 }} src={avatarSrc} />
+                <Button
+                  variant="contained"
+                  component="label"
+                  sx={{
+                    bgcolor: "#00D1A3",
+                    '&:hover': { bgcolor: "#00A387" },
+                    mt: 1,
+                  }}
+                >
+                  <Typography>Upload Picture</Typography>
+                  <Typography component="span" sx={{ pl: 1 }}>*</Typography>
+                  <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
+                </Button>
+              </Box>
+            )}
+            <Grid item sx={{ width: '100%', maxWidth: 400 }}>
               <Box display="flex" alignItems="center" sx={{ width: "80%", mt: 2 }}>
                 <Typography variant="subtitle1" sx={{ minWidth: 120, mr: 2 }}>
                   Name *
@@ -311,7 +332,8 @@ const EmployeeForm: React.FC = () => {
                 />
               </Box>
             </Grid>
-          </>}
+          </Grid>
+
           <Grid item xs={12} container justifyContent="center">
             <Button
               sx={{

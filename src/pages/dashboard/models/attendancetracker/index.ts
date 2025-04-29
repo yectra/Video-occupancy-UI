@@ -90,7 +90,6 @@ export class IndividualTimesheet {
   organizationId: string;
 }
 export class AddEmployeeDetails {
-  employeeId: string;
   employeeName: string;
   role: string;
   email: string;
