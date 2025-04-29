@@ -7,7 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 // Services
-import { AttendanceDetails } from '../../services/attendancetracker';
+import { AttendanceTracker } from '../../services/attendancetracker';
 
 // Models
 import { CameraurlSetup } from '../../models/attendancetracker';
@@ -16,7 +16,7 @@ import { CameraurlSetup } from '../../models/attendancetracker';
 import { useNavigate } from "react-router-dom";
 
 const AttendanceSetupView = () => {
-  const attendanceDetails = new AttendanceDetails();
+  const attendanceDetails = new AttendanceTracker();
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -150,7 +150,7 @@ const AttendanceSetupView = () => {
         setSnackbarOpen(true);
         navigate("/dashboard/attendance/emp-attendance")
       })
-      .catch((error) => {
+      .catch((error: any) => {
         setSnackbarMessage(error.response.data.warn);
         setSnackbarSeverity('error');
         setSnackbarOpen(true);

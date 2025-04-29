@@ -9,7 +9,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CloseIcon from "@mui/icons-material/Close";
 
 // Services
-import { AttendanceDetails } from "../../services/attendancetracker";
+import { AttendanceTracker } from "../../services/attendancetracker";
 
 // Models
 import { AttendanceCameraDetailsModel, AttendanceTrackerDetailsModel } from "../../models/attendancetracker";
@@ -73,7 +73,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
     const openConfirmDialog = () => setConfirmDialogOpen(true);
     const closeConfirmDialog = () => setConfirmDialogOpen(false);
 
-    const attendanceTracker = new AttendanceDetails();
+    const attendanceTracker = new AttendanceTracker();
 
     useEffect(() => {
         getCameraDetails();
@@ -85,15 +85,14 @@ const AttendanceSetupUpdateView: React.FC = () => {
                 ...prevErrors,
                 ['organizationName']: 'Enter Organization Name',
             }));
-
         if (!organizationResponse?.organizationData?.organizationName ||
             !organizationResponse?.organizationData?.phoneNumber ||
-            !organizationResponse?.organizationData?.websiteUrl ||
-            !organizationResponse?.organizationData?.workTiming || organizationResponse?.organizationData?.country ||
+            !organizationResponse?.organizationData?.websiteUrl || !organizationResponse?.cameraData.email ||
+            !organizationResponse?.organizationData?.workTiming || !organizationResponse?.organizationData?.country ||
             !organizationResponse?.organizationData?.street || !organizationResponse?.organizationData?.city ||
             !organizationResponse?.organizationData?.state || !organizationResponse?.organizationData?.zipCode ||
             errors?.email || errors?.phoneNumber || errors?.websiteUrl || errors?.workTiming ||
-            errors?.street || errors?.city || errors?.state || errors?.country ||errors?.zipCode)
+            errors?.street || errors?.city || errors?.state || errors?.country || errors?.zipCode || errors?.organizationName)
             setIsDisable(true);
         else
             setIsDisable(false);
@@ -165,7 +164,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
     };
 
     const validateWorkingHours = (value: string) => {
-        const hoursRegex = /^(?:[1-9]|1[0-2])$/;
+        const hoursRegex = /^(?:[1-9]|1[0-9]|2[0-4])$/;
         return hoursRegex.test(value);
     };
 

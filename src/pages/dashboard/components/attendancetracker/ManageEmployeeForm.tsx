@@ -7,12 +7,10 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CloseIcon from "@mui/icons-material/Close";
 
 //Service
-import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
-import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
+import { AttendanceTracker } from "@/pages/dashboard/services/attendancetracker";
 
 //Models
 import { employeeResponse, ManageEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
-import { ManageUserDetails, userDetails } from "../../models/liveoccupanytracker";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -61,9 +59,7 @@ const ManageEmployeeForm: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [employeeForm, setEmployeeForm] = useState<employeeResponse>(new employeeResponse());
-  const [userForm, setUserForm] = useState<ManageUserDetails>(new ManageUserDetails());
   const [selectedEmployee, setSelectedEmployee] = useState<ManageEmployeeDetails | null>(null);
-  const [selectedUser, setSelectedUser] = useState<userDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
@@ -73,27 +69,21 @@ const ManageEmployeeForm: React.FC = () => {
   const [emailError, setEmailError] = useState<string>("");
   const [nameError, setNameError] = useState<string>("");
   const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
-  const [isEmployeePage, setIsEmployeePage] = useState<boolean>(false);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(pageSize);
 
-  const attendanceDetails = new AttendanceDetails();
-  const occupancyTracker = new OccupancyTracker();
+  const attendanceDetails = new AttendanceTracker();
 
   const openConfirmDialog = () => setConfirmDialogOpen(true);
   const closeConfirmDialog = () => setConfirmDialogOpen(false);
 
-  const pathName = location.pathname;
-
   const handleChangePage = (event: unknown, newPage: number) => {
     console.log('event', event)
     setPage(newPage);
-    isEmployeePage ?
-      fetchEmployeeDetails(newPage + 1, rowsPerPage) :
-      fetchUserDetails(newPage + 1, rowsPerPage);
+    fetchEmployeeDetails(newPage + 1, rowsPerPage)
   };
 
   const handleChangeRowsPerPage = (
@@ -101,9 +91,8 @@ const ManageEmployeeForm: React.FC = () => {
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    isEmployeePage ?
-      fetchEmployeeDetails(1, parseInt(event.target.value, 10)) :
-      fetchUserDetails(1, parseInt(event.target.value, 10));
+    fetchEmployeeDetails(1, parseInt(event.target.value, 10))
+
   };
 
   const fetchEmployeeDetails = (page: number, size: number) => {
@@ -117,40 +106,18 @@ const ManageEmployeeForm: React.FC = () => {
       .finally(() => setLoading(false));
   };
 
-  const fetchUserDetails = (page: number, size: number) => {
-    setLoading(true);
-
-    occupancyTracker.getUserDetails(page, size).then((response:any) => {
-      setUserForm(response.data)
-      setNoUserFound(response.data.users.length === 0);
-    }).finally(() => setLoading(false));
-  };
-
   const debouncedSearch = useCallback(
     debounce((searchValue: string) => {
       if (searchValue) {
-        if (isEmployeePage) {
-          setLoading(true);
-          attendanceDetails.searchAllEmployeeDetails(searchValue)
-            .then((response) => {
-              setEmployeeForm(response);
-              setNoUserFound(response.employees.length === 0);
-            })
-            .finally(() => setLoading(false));
-        } else {
-          setLoading(true);
-          occupancyTracker.searchAllUserDetails(searchValue)
-            .then((response:any) => {
-              setUserForm(response.data)
-              setNoUserFound(response.data.users.length === 0);
-            })
-            .finally(() => setLoading(false));
-        }
+        setLoading(true);
+        attendanceDetails.searchAllEmployeeDetails(searchValue)
+          .then((response) => {
+            setEmployeeForm(response);
+            setNoUserFound(response.employees.length === 0);
+          })
+          .finally(() => setLoading(false));
       } else {
-        if (isEmployeePage)
-          fetchEmployeeDetails(page + 1, rowsPerPage);
-        else
-          fetchUserDetails(page + 1, rowsPerPage);
+        fetchEmployeeDetails(page + 1, rowsPerPage);
       }
     }, 300),
     []
@@ -165,7 +132,6 @@ const ManageEmployeeForm: React.FC = () => {
   const handleDialogClose = () => {
     setEditDialogOpen(false);
     setSelectedEmployee(null);
-    setSelectedUser(null);
     setImageUrl(null);
     setNewImage(null);
     setImageBase64("");
@@ -183,21 +149,10 @@ const ManageEmployeeForm: React.FC = () => {
     openConfirmDialog();
   }
 
-  const handleUserEditClick = (user: userDetails) => {
-    setSelectedUser(user);
-    setEditDialogOpen(true);
-  };
-
-  const handleUserDeleteClick = (user: userDetails) => {
-    setSelectedUser(user);
-    openConfirmDialog();
-  }
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    isEmployeePage ?
-      setSelectedEmployee((prev) => (prev ? { ...prev, [name]: value } : null)) :
-      setSelectedUser((prev) => (prev ? { ...prev, [name]: value } : null));
+    setSelectedEmployee((prev) => (prev ? { ...prev, [name]: value } : null));
+
     if (name == 'email' && !validateEmail(value)) {
       setEmailError("Invalid email format");
     } else if ((name == 'name' || name === 'employeeName') && !validateName(value)) {
@@ -210,7 +165,7 @@ const ManageEmployeeForm: React.FC = () => {
   };
 
   const handleSave = () => {
-    if (isEmployeePage && selectedEmployee) {
+    if (selectedEmployee) {
       if (newImage && imageBase64)
         selectedEmployee.newImageBase64 = imageBase64;
 
@@ -231,56 +186,19 @@ const ManageEmployeeForm: React.FC = () => {
           setSnackbarOpen(true);
         })
         .finally(() => setLoading(false));
-    } else if (selectedUser) {
-      let user: any = {
-        user_id: selectedUser.id,
-        role: selectedUser.role,
-        name: selectedUser.name
-      }
-      setLoading(true);
-      occupancyTracker.
-        updateEmployeeDetails(user)
-        .then(() => {
-          setSnackbarMessage('User updated successfully!');
-          setSnackbarSeverity('success');
-          setSnackbarOpen(true);
-
-          fetchUserDetails(page + 1, rowsPerPage);
-          handleDialogClose();
-        })
-        .catch((error) => {
-          setSnackbarMessage(error.response.data.warn);
-          setSnackbarSeverity('error');
-          setSnackbarOpen(true);
-        })
-        .finally(() => setLoading(false));
     }
   };
 
   const handleDelete = () => {
     closeConfirmDialog();
     setLoading(true);
-    if (isEmployeePage && selectedEmployee) {
+    if (selectedEmployee) {
       attendanceDetails
         .deleteEmployeeDetails(selectedEmployee.employeeId)
         .then(() => {
           fetchEmployeeDetails(page + 1, rowsPerPage);
           handleDialogClose();
         })
-        .catch((error) => {
-          setSnackbarMessage(error.response.data.warn);
-          setSnackbarSeverity('error');
-          setSnackbarOpen(true);
-        })
-        .finally(() => setLoading(false));
-    } else if (selectedUser) {
-      let user: any = {
-        user_id: selectedUser.id
-      }
-      occupancyTracker.deleteEmployeeDetails(user).then(() => {
-        fetchUserDetails(page + 1, rowsPerPage);
-        handleDialogClose();
-      })
         .catch((error) => {
           setSnackbarMessage(error.response.data.warn);
           setSnackbarSeverity('error');
@@ -324,25 +242,15 @@ const ManageEmployeeForm: React.FC = () => {
   };
 
   useEffect(() => {
-    if (pathName && pathName === '/dashboard/attendance/emp-form') {
-      setIsEmployeePage(true);
-      fetchEmployeeDetails(page + 1, rowsPerPage);
-    }
-    else if (pathName && pathName === '/dashboard/occupancy-tracker/emp-form') {
-      setIsEmployeePage(false);
-      fetchUserDetails(page + 1, rowsPerPage);
-    }
+    fetchEmployeeDetails(page + 1, rowsPerPage);
   }, []);
 
   useEffect(() => {
-    if (isEmployeePage && (!selectedEmployee?.email || !selectedEmployee.employeeName || !selectedEmployee.role || emailError || nameError))
-      setIsDisable(true);
-    else if (!isEmployeePage && (!selectedUser?.email || !selectedUser.name || !selectedUser.role || emailError || nameError))
+    if (!selectedEmployee?.email || !selectedEmployee.employeeName || !selectedEmployee.role || emailError || nameError)
       setIsDisable(true);
     else
       setIsDisable(false);
   }, [handleInputChange]);
-
 
   return (
     <Box sx={{ padding: 2 }}>
@@ -355,7 +263,7 @@ const ManageEmployeeForm: React.FC = () => {
         }}
       >
         <Typography sx={{ fontWeight: "bold", color: "#1C214F" }} variant="h5">
-          {isEmployeePage ? 'Employee Registry' : 'User Registry'}
+          Employee Registry
         </Typography>
         <Box sx={{ position: "relative", width: "350px" }}>
           <InputBase
@@ -372,7 +280,7 @@ const ManageEmployeeForm: React.FC = () => {
                 <InputAdornment position="end">
                   <IconButton edge="end" size="large" onClick={() => {
                     setSearchTerm("")
-                    isEmployeePage ? fetchEmployeeDetails(page + 1, rowsPerPage) : fetchUserDetails(page + 1, rowsPerPage)
+                    fetchEmployeeDetails(page + 1, rowsPerPage)
                   }}>
                     <ClearIcon />
                   </IconButton>
@@ -398,9 +306,9 @@ const ManageEmployeeForm: React.FC = () => {
           <Table sx={{ minWidth: 700 }} >
             <TableHead>
               <TableRow>
-                {isEmployeePage &&
-                  <><StyledTableCell align="center">ID</StyledTableCell>
-                    <StyledTableCell align="center">PROFILE</StyledTableCell></>}
+
+                <StyledTableCell align="center">ID</StyledTableCell>
+                <StyledTableCell align="center">PROFILE</StyledTableCell>
                 <StyledTableCell align="center">NAME</StyledTableCell>
                 <StyledTableCell align="center">ROLE</StyledTableCell>
                 <StyledTableCell align="center">EMAIL</StyledTableCell>
@@ -409,13 +317,13 @@ const ManageEmployeeForm: React.FC = () => {
               {noUserFound && (
                 <TableRow>
                   <TableCell colSpan={7} align="center">
-                    <Typography variant="body2" color="error"> {isEmployeePage ? 'No Employee Found' : 'No User Found'}</Typography>
+                    <Typography variant="body2" color="error"> No Employee Found</Typography>
                   </TableCell>
                 </TableRow>
               )}
             </TableHead>
             <TableBody>
-              {isEmployeePage ? Array.isArray(employeeForm.employees) && employeeForm.employees.map((row) => (
+              {Array.isArray(employeeForm.employees) && employeeForm.employees.map((row) => (
                 <StyledTableRow key={row.employeeId}>
                   <StyledTableCell align="center">{row.employeeId}</StyledTableCell>
                   <StyledTableCell align="center">
@@ -444,34 +352,11 @@ const ManageEmployeeForm: React.FC = () => {
                     </Box>
                   </StyledTableCell>
                 </StyledTableRow>
-              )) : Array.isArray(userForm.users) && userForm.users.map((row) => (
-                <StyledTableRow key={row.id}>
-                  <StyledTableCell align="center">{row.name}</StyledTableCell>
-                  <StyledTableCell align="center">{row.role}</StyledTableCell>
-                  <StyledTableCell align="center">{row.email}</StyledTableCell>
-                  <StyledTableCell align="center">
-                    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-                      <IconButton
-                        sx={{ color: "#00D1A3" }}
-                        onClick={() => handleUserEditClick(row)}
-                      >
-                        <EditOutlinedIcon />
-                      </IconButton>
-
-                      <IconButton
-                        sx={{ color: "#FF4D4D" }}
-                        onClick={() => handleUserDeleteClick(row)}
-                      >
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </Box>
-                  </StyledTableCell>
-                </StyledTableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-        {isEmployeePage ? (employeeForm.total_records ? <TablePagination
+        {employeeForm.total_records ? <TablePagination
           rowsPerPageOptions={[pageSize, pageSize * 2, pageSize * 3, pageSize * 4, pageSize * 5]}
           component="div"
           count={employeeForm.total_records || 0}
@@ -479,21 +364,12 @@ const ManageEmployeeForm: React.FC = () => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-        /> : null) :
-          (userForm.total_count ? <TablePagination
-            rowsPerPageOptions={[pageSize, pageSize * 2, pageSize * 3, pageSize * 4, pageSize * 5]}
-            component="div"
-            count={userForm.total_count || 0}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          /> : null)}
+        /> : null}
       </Box>
 
       <Dialog open={editDialogOpen}>
         <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem', position: 'relative', textAlign: 'center' }}>
-          {isEmployeePage ? 'Edit Employee' : 'Edit User'}
+          Edit Employee
           <IconButton
             aria-label="close"
             onClick={handleDialogClose}
@@ -504,54 +380,42 @@ const ManageEmployeeForm: React.FC = () => {
         </DialogTitle>
 
         <DialogContent>
-          {isEmployeePage ?
-            <>
-              <DialogTitle sx={{ textAlign: 'center' }}>Profile Picture</DialogTitle>
-              <Box sx={{ textAlign: 'center', marginBottom: 1 }}>
-                <Avatar
-                  src={imageUrl || undefined}
-                  alt="Employee Image"
-                  sx={{ width: 100, height: 100, margin: '0 auto' }}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                <Button
-                  variant="contained"
-                  component="label"
-                  sx={{ fontSize: '0.75rem', padding: '5px 10px', minWidth: 'auto' }} // Reducing size
-                >
-                  Upload New Image
-                  <input type="file" hidden accept="image/*" onChange={handleFileChange} />
-                </Button>
-              </Box>
-              <DialogTextField
-                label="User ID *"
-                value={selectedEmployee?.employeeId || ""}
-                name="employeeId"
-                onChange={handleInputChange}
-                disabled
-              />
-              <DialogTextField
-                label="Name *"
-                value={selectedEmployee?.employeeName}
-                name="employeeName"
-                onChange={handleInputChange}
-                error={!!nameError}
-                helperText={nameError}
-              />
-            </> :
-            <DialogTextField
-              label="Name *"
-              value={selectedUser?.name}
-              name="name"
-              onChange={handleInputChange}
-              error={!!nameError}
-              helperText={nameError}
-            />}
-
+          <DialogTitle sx={{ textAlign: 'center' }}>Profile Picture</DialogTitle>
+          <Box sx={{ textAlign: 'center', marginBottom: 1 }}>
+            <Avatar
+              src={imageUrl || undefined}
+              alt="Employee Image"
+              sx={{ width: 100, height: 100, margin: '0 auto' }}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
+            <Button
+              variant="contained"
+              component="label"
+              sx={{ fontSize: '0.75rem', padding: '5px 10px', minWidth: 'auto' }} // Reducing size
+            >
+              Upload New Image
+              <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+            </Button>
+          </Box>
+          <DialogTextField
+            label="User ID *"
+            value={selectedEmployee?.employeeId || ""}
+            name="employeeId"
+            onChange={handleInputChange}
+            disabled
+          />
+          <DialogTextField
+            label="Name *"
+            value={selectedEmployee?.employeeName}
+            name="employeeName"
+            onChange={handleInputChange}
+            error={!!nameError}
+            helperText={nameError}
+          />
           <DialogTextField
             label="Email *"
-            value={isEmployeePage ? selectedEmployee?.email : selectedUser?.email}
+            value={selectedEmployee?.email}
             name="email"
             onChange={handleInputChange}
             error={!!emailError}
@@ -560,14 +424,13 @@ const ManageEmployeeForm: React.FC = () => {
           />
           <DialogTextField
             label="Role *"
-            value={isEmployeePage ? selectedEmployee?.role : selectedUser?.role}
+            value={selectedEmployee?.role}
             name="role"
             onChange={handleInputChange}
             select
           >
             <MenuItem value="Admin">Admin</MenuItem>
-            {isEmployeePage ? <MenuItem value="Employee">Employee</MenuItem> :
-              <MenuItem value="User">User</MenuItem>}
+            <MenuItem value="Employee">Employee</MenuItem>
           </DialogTextField>
 
         </DialogContent>
@@ -591,7 +454,7 @@ const ManageEmployeeForm: React.FC = () => {
         <DialogTitle sx={{ bgcolor: "green", color: "white" }}>Confirm</DialogTitle>
         <DialogContent>
           <Typography sx={{ pt: 2 }}>
-            Are you sure want to delete {isEmployeePage ? selectedEmployee?.employeeName : selectedUser?.name}?
+            Are you sure want to delete {selectedEmployee?.employeeName}?
           </Typography>
         </DialogContent>
         <DialogActions>

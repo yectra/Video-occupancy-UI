@@ -7,23 +7,8 @@ const UserLayout = React.lazy(() => import("@/common/UserLayout"));
 //MainLayout
 const MainLayout = React.lazy(() => import("@/pages/MainLayout"));
 
-//Dashboard
-const DashboardSetupView = React.lazy(() => import("@/pages/dashboard/views/DashboardSetupview"));
-
 //Admin
 const Dashboard = React.lazy(() => import("@/pages/dashboard/index"));
-
-//LiveOccupancyTracker
-const LiveOccupancyTrackerView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/LiveOccupancyTrackerView"));
-
-//Setup
-const TrackerSetupView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/TrackerSetupView"));
-
-//Preview
-const TrackerVideoView = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/TrackerVideoView"));
-
-//Overview
-const TrackerOverview = React.lazy(() => import("@/pages/dashboard/views/liveoccupancytracker/TrackerOverview"));
 
 //Add Employee
 const EmployeeForm = React.lazy(() => import("@/pages/dashboard/components/attendancetracker/EmployeeForm"));
@@ -50,11 +35,7 @@ const EmployeeDetailsView = React.lazy(() => import("@/pages/dashboard/views/att
 const UserTrackerView = React.lazy(() => import("@/pages/users/views/UserTrackerView"));
 
 //Setup List
-const TrackerSetupListView = React.lazy(() => import("@/pages/dashboard/components/liveoccupancytracker/TrackerSetupUpdateView"));
-const AttendanceSetupListView = React.lazy(()=> import("@/pages/dashboard/components/attendancetracker/AttendanceSetupUpdateView"));
-
-//Occupancy List
-const OccupancyList = React.lazy(() => import("@/pages/dashboard/components/liveoccupancytracker/OccupancyList"));
+const AttendanceSetupListView = React.lazy(() => import("@/pages/dashboard/components/attendancetracker/AttendanceSetupUpdateView"));
 
 const route = [
   {
@@ -65,51 +46,6 @@ const route = [
         path: "",
         element: <Dashboard />,
         children: [
-          {
-            path: "",
-            element: <DashboardSetupView />,
-          },
-          {
-            path: "dashboard/occupancy-tracker",
-            element: <LiveOccupancyTrackerView />,
-            children: [
-              {
-                path: "",
-                element: <TrackerSetupView />
-              },
-              {
-                path: "preview",
-                element: <TrackerVideoView />
-              },
-              {
-                path: "",
-                element: <Layout />,
-                children: [
-
-                  {
-                    path: "overview",
-                    element: <TrackerOverview />,
-                  },
-                  {
-                    path: "add-emp",
-                    element: <EmployeeForm />,
-                  },
-                  {
-                    path: "emp-form",
-                    element: <ManageEmployeeForm />,
-                  },
-                  {
-                    path: "tracker-setup",
-                    element: <TrackerSetupListView />,
-                  },
-                  {
-                    path: "occupancy",
-                    element: <OccupancyList />,
-                  }
-                ],
-              },
-            ],
-          },
           {
             path: "dashboard/attendance",
             element: <AttendanceTrackerView />,
@@ -123,14 +59,14 @@ const route = [
                 element: <AttendanceSetupView />,
               },
               {
-                path:"",
-                element:<UserLayout />,
-                children:[
+                path: "",
+                element: <UserLayout />,
+                children: [
                   {
                     path: "user-details",
                     element: <UserTrackerView />
                   }
-                ]                
+                ]
               },
               {
                 path: "",
@@ -153,15 +89,15 @@ const route = [
                     element: <ManageEmployeeForm />,
                   },
                   {
-                  path: "attendance-update",
-                  element: <AttendanceSetupListView />
-                },
+                    path: "attendance-update",
+                    element: <AttendanceSetupListView />
+                  },
                 ],
               },
             ],
           },
         ],
-      } 
+      }
     ],
   },
 ];

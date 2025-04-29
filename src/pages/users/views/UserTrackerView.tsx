@@ -5,7 +5,7 @@ import UserActivity from '@/pages/users/components/UserActivity';
 import UserAttendance from '../components/UserAttendance';
 
 // Services
-import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import { AttendanceTracker } from "@/pages/dashboard/services/attendancetracker";
 import { AttendanceDataResponseModel } from '@/pages/dashboard/models/attendancetracker';
 
 const UserTrackerView: React.FC = () => {
@@ -13,7 +13,7 @@ const UserTrackerView: React.FC = () => {
   const [todayPunchDetail, setTodayPunchDetail] = useState<AttendanceDataResponseModel>(new AttendanceDataResponseModel())
   const [attendanceList, setAttendanceList] = useState<any[]>([]);
 
-  const attendanceDetails = new AttendanceDetails();
+  const attendanceDetails = new AttendanceTracker();
 
   useEffect(() => {
     setLoading(true);

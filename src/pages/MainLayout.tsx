@@ -1,17 +1,29 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 
 //Router
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
+//Azure
 import { useMsal } from "@azure/msal-react";
 
 //Hooks
 import { useAuth } from "@/common/hooks/AuthContext";
 
+//Services
+import { AttendanceTracker } from "@/pages/dashboard/services/attendancetracker";
+
 const MainLayout = () => {
+  const [attendanceSetup, setattendanceSetup] = useState<boolean | undefined>(undefined);
+  const [isRoutingComplete, setIsRoutingComplete] = useState(false);
+
   const { isAuthenticated, signInUser, signOutUser } = useAuth();
   const { instance } = useMsal();
+  const { jobTitle } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const attendanceTracker = new AttendanceTracker();
 
   const decodeTokenManually = (token: string) => {
     try {
@@ -40,12 +52,18 @@ const MainLayout = () => {
     }
   };
 
+  const fetchUserRole = async () => {
+    attendanceTracker.checkUserExists().then((response) => {
+      setattendanceSetup(response.data.attendance);
+    })
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       signInUser();
       return;
     }
-    // fetchUserRole();
+    fetchUserRole();
   }, [isAuthenticated]);
 
 
@@ -77,9 +95,24 @@ const MainLayout = () => {
     handleRedirect();
   });
 
+  useEffect(() => {
+    if (!isAuthenticated || jobTitle === undefined || attendanceSetup === undefined) return;
+
+    if (location.pathname === "/dashboard" || location.pathname === "/") {
+      if (jobTitle === 'Employee') {
+        navigate("/dashboard/attendance/user-details", { replace: true });
+      } else if (jobTitle === "Admin" && attendanceSetup) {
+        navigate("/dashboard/attendance/emp-attendance");
+      } else {
+        navigate("/dashboard/attendance");
+      }
+    }
+    setIsRoutingComplete(true);
+  }, [jobTitle, attendanceSetup, isAuthenticated, location.pathname]);
+
   return (
     <Box>
-      {isAuthenticated && <Outlet />}
+      {isAuthenticated && isRoutingComplete && <Outlet />}
     </Box>
   );
 };

@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { IndividualTimesheet } from '@/pages/dashboard/models/attendancetracker';
-import { AttendanceDetails } from '@/pages/dashboard/services/attendancetracker';
+import { AttendanceTracker } from '@/pages/dashboard/services/attendancetracker';
 import { useSearchParams } from 'react-router-dom';
 import moment from 'moment';
 
@@ -11,7 +11,7 @@ const EmployeeActivity: React.FC = () => {
   const date = searchParams.get('date');
 
   const [employeeActivity, setEmployeeActivity] = useState<IndividualTimesheet>()
-  const attendanceDetails = new AttendanceDetails();
+  const attendanceDetails = new AttendanceTracker();
 
   useEffect(() => {
     if (id) {

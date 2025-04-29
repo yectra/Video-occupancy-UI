@@ -19,7 +19,7 @@ import 'react-calendar/dist/Calendar.css';
 import '@/styles/core/components/CalendarStyles.css';
 
 // Services
-import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import { AttendanceTracker } from "@/pages/dashboard/services/attendancetracker";
 
 // Models
 import { AttendanceDataResponseModel } from "@/pages/dashboard/models/attendancetracker";
@@ -62,7 +62,7 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
   const customButtonRef = React.useRef<HTMLDivElement | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const attendanceDetails = new AttendanceDetails();
+  const attendanceDetails = new AttendanceTracker();
 
   const [searchParams] = useSearchParams();
 

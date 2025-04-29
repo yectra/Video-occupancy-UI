@@ -17,12 +17,12 @@ import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LinkIcon from '@mui/icons-material/Link';
 import HomeIcon from '@mui/icons-material/Home';
-import { AttendanceDetails } from '@/pages/dashboard/services/attendancetracker';
+import { AttendanceTracker } from '@/pages/dashboard/services/attendancetracker';
 import { OrganizationSetup } from '@/pages/dashboard/models/attendancetracker';
 import orgBg from '@/assets/orgBg.jpg';
 
 const OrganizationView: React.FC = () => {
-  const attendanceService = new AttendanceDetails();
+  const attendanceService = new AttendanceTracker();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<OrganizationSetup>({

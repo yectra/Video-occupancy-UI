@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { Table, TableBody, TableCell, TableHead, TableRow, Box, Typography, InputAdornment, IconButton, tableCellClasses, InputBase, Backdrop, CircularProgress, Popover, Button, Select, MenuItem, TableContainer, TablePagination } from "@mui/material";
 import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
-import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import { AttendanceTracker } from "@/pages/dashboard/services/attendancetracker";
 import { debounce } from "lodash";
 import { DateRange } from "react-date-range";
 import { format } from 'date-fns';
@@ -47,7 +47,7 @@ const EmployeeAttendance: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(pageSize);
 
-  const attendanceDetails = new AttendanceDetails();
+  const attendanceDetails = new AttendanceTracker();
 
   useEffect(() => {
     if (location.state && location.state.filterOption)

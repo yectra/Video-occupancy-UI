@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { Box, Typography, IconButton, Divider, Avatar } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { styled } from "@mui/system";
-import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
+import { AttendanceTracker } from "@/pages/dashboard/services/attendancetracker";
 import { IndividualTimesheet } from "@/pages/dashboard/models/attendancetracker";
 import moment from "moment";
 
@@ -30,7 +30,7 @@ const EmployeeTimesheet: React.FC = () => {
   const id = searchParams.get("id");
   const date = searchParams.get("date");
   const [employeeTimesheet, setEmployeeTimesheet] = useState<IndividualTimesheet>()
-  const attendanceDetails = new AttendanceDetails();
+  const attendanceDetails = new AttendanceTracker();
 
   useEffect(() => {
     if (id) {

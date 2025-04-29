@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Typography, Autocomplete, Avatar, Button, Grid, Backdrop, CircularProgress, Snackbar, Alert } from "@mui/material";
 import { AddEmployeeDetails } from "@/pages/dashboard/models/attendancetracker";
 
 //Services
-import { AttendanceDetails } from "@/pages/dashboard/services/attendancetracker";
-import { OccupancyTracker } from "@/pages/dashboard/services/liveoccupancytracker";
-
-//Model
-import { AddUserDetails } from "../../models/liveoccupanytracker";
+import { AttendanceTracker } from "@/pages/dashboard/services/attendancetracker";
 
 const EmployeeForm: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -25,24 +20,9 @@ const EmployeeForm: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-  const [roleOptions, setRoleOptions] = useState<string[]>([]);
-  const [isEmployeePage, setIsEmployeePage] = useState<boolean>(false);
+  const roleOptions: string[] = ['Admin', 'Employee'];
 
-  const attendanceDetails = new AttendanceDetails();
-  const occupancyTracker = new OccupancyTracker();
-
-  const pathName = location.pathname;
-
-  useEffect(() => {
-    if (pathName && pathName === '/dashboard/attendance/add-emp') {
-      setIsEmployeePage(true);
-      setRoleOptions(['Admin', 'Employee']);
-    }
-    else if (pathName && pathName === '/dashboard/occupancy-tracker/add-emp') {
-      setIsEmployeePage(false);
-      setRoleOptions(['Admin', 'User']);
-    }
-  }, [pathName])
+  const attendanceTracker = new AttendanceTracker();
 
   const validateEmail = (email: string): boolean => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -94,46 +74,28 @@ const EmployeeForm: React.FC = () => {
 
   const handleSubmit = () => {
     setLoading(true);
-    if (isEmployeePage) {
-      const request: AddEmployeeDetails = {
-        role,
-        email,
-        employeeName: name,
-        imageBase64,
-      };
 
-      attendanceDetails
-        .addEmployeeDetails(request)
-        .then(() => {
-          setSnackbarMessage('Employee added successfully!');
-          setSnackbarSeverity('success');
-          setSnackbarOpen(true);
-          navigate('/dashboard/attendance/emp-form');
-        })
-        .catch((error) => {
-          setSnackbarMessage(error.response.data.warn);
-          setSnackbarSeverity('error');
-          setSnackbarOpen(true);
-        }).finally(() => setLoading(false));
-    } else {
-      const request: AddUserDetails = {
-        role,
-        email,
-        name
-      };
+    const request: AddEmployeeDetails = {
+      role,
+      email,
+      employeeName: name,
+      imageBase64,
+    };
 
-      occupancyTracker.addUserDetails(request).then(() => {
-        setSnackbarMessage('User added successfully!');
+    attendanceTracker
+      .addEmployeeDetails(request)
+      .then(() => {
+        setSnackbarMessage('Employee added successfully!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
-        navigate('/dashboard/occupancy-tracker/emp-form');
+        navigate('/dashboard/attendance/emp-form');
       })
-        .catch((error) => {
-          setSnackbarMessage(error.response.data.warn);
-          setSnackbarSeverity('error');
-          setSnackbarOpen(true);
-        }).finally(() => setLoading(false));;
-    }
+      .catch((error) => {
+        setSnackbarMessage(error.response.data.warn);
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      }).finally(() => setLoading(false));
+
   };
 
   const handleCloseSnackbar = (
@@ -147,20 +109,14 @@ const EmployeeForm: React.FC = () => {
   };
 
   const isFormValid = (): boolean => {
-    return isEmployeePage ? !!(
+    return !!(
       name.trim() &&
       !nameError &&
       email.trim() &&
       !emailError &&
       role &&
       imageBase64
-    ) : !!(
-      name.trim() &&
-      !nameError &&
-      email.trim() &&
-      !emailError &&
-      role
-    );
+    )
   };
 
   return (
@@ -186,74 +142,9 @@ const EmployeeForm: React.FC = () => {
         }}
       >
         <Typography sx={{ color: "#1C214F", fontWeight: "bold", textAlign: "center" }} variant="h6">
-          {isEmployeePage ? 'Add Employee' : 'Add User'}
+          Add Employee
         </Typography>
         <Grid container spacing={3}>
-          {/* {isEmployeePage &&
-            <Grid item xs={12} container justifyContent="center">
-              <Avatar sx={{ width: 60, height: 60, my: 2 }} src={avatarSrc} />
-              <Grid item xs={12} container justifyContent="center">
-                <Button
-                  variant="contained"
-                  component="label"
-                  sx={{ bgcolor: "#00D1A3", '&:hover': { bgcolor: "#00A387" } }}
-                >
-                  <Typography>Upload Picture</Typography>
-                  <Typography component="span" sx={{ pl: 1 }}>*</Typography>
-                  <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
-                </Button>
-              </Grid>
-            </Grid>} */}
-          {/* <Grid item xs={12} sm={6}>
-              <TextField
-                id="name"
-                label="Name"
-                variant="outlined"
-                fullWidth
-                value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                required
-                error={!!nameError}
-                helperText={nameError}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                id="employeeId"
-                label="Employee ID"
-                variant="outlined"
-                fullWidth
-                value={employeeId}
-                onChange={(e) => setEmployeeId(e.target.value)}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                id="email"
-                label="Email ID"
-                variant="outlined"
-                fullWidth
-                value={email}
-                onChange={handleEmailChange}
-                error={!!emailError}
-                helperText={emailError}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Autocomplete
-                id="role"
-                options={roleOptions}
-                value={role}
-                onChange={(_, newValue) => {
-                  setRole(newValue || "");
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Role *" variant="outlined" fullWidth />
-                )}
-              />
-            </Grid> */}
           <Grid
             container
             direction="column"
@@ -261,24 +152,22 @@ const EmployeeForm: React.FC = () => {
             spacing={3}
             sx={{ mt: 3 }}
           >
-            {isEmployeePage && (
-              <Box display="flex" flexDirection="column" alignItems="center">
-                <Avatar sx={{ width: 60, height: 60, my: 2 }} src={avatarSrc} />
-                <Button
-                  variant="contained"
-                  component="label"
-                  sx={{
-                    bgcolor: "#00D1A3",
-                    '&:hover': { bgcolor: "#00A387" },
-                    mt: 1,
-                  }}
-                >
-                  <Typography>Upload Picture</Typography>
-                  <Typography component="span" sx={{ pl: 1 }}>*</Typography>
-                  <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
-                </Button>
-              </Box>
-            )}
+            <Box display="flex" flexDirection="column" alignItems="center">
+              <Avatar sx={{ width: 60, height: 60, my: 2 }} src={avatarSrc} />
+              <Button
+                variant="contained"
+                component="label"
+                sx={{
+                  bgcolor: "#00D1A3",
+                  '&:hover': { bgcolor: "#00A387" },
+                  mt: 1,
+                }}
+              >
+                <Typography>Upload Picture</Typography>
+                <Typography component="span" sx={{ pl: 1 }}>*</Typography>
+                <input type="file" accept=".jpg" hidden onChange={handlePictureUpload} />
+              </Button>
+            </Box>
             <Grid item sx={{ width: '100%', maxWidth: 400 }}>
               <Box display="flex" alignItems="center" sx={{ width: "80%", mt: 2 }}>
                 <Typography variant="subtitle1" sx={{ minWidth: 120, mr: 2 }}>
@@ -347,7 +236,7 @@ const EmployeeForm: React.FC = () => {
               onClick={handleSubmit}
               disabled={!isFormValid()}
             >
-              <Typography>{isEmployeePage ? 'Add Employee' : 'Add User'}</Typography>
+              <Typography>Add Employee</Typography>
             </Button>
           </Grid>
         </Grid>

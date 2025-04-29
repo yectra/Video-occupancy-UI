@@ -4,7 +4,7 @@ import { AddEmployeeDetails, AttendanceDataResponseModel, CameraurlSetup, Manage
 
 const { httpGet, httpPost, httpPut, httpDelete } = apiClient();
 
-interface IAttendanceDetails {
+interface IAttendanceTracker {
     addEmployeeDetails(employeeDetails: AddEmployeeDetails): Promise<any>;
     getAllEmployeeAttendanceDetails(value: any): Promise<AttendanceDataResponseModel[]>;
     getManageEmployeeDetails(page_number: number, page_size: number): Promise<employeeResponse>;
@@ -17,9 +17,10 @@ interface IAttendanceDetails {
     getAttendanceTrackerDetails(): Promise<AttendanceTrackerDetailsModel>;
     updateAttendanceTrackerDetails(organizationDetails: AttendanceTrackerDetailsModel): Promise<any>;
     getAttendance(value?: any): Promise<IndividualTimesheet[]>;
+    checkUserExists(): Promise<any>; 
 }
 
-export class AttendanceDetails implements IAttendanceDetails {
+export class AttendanceTracker implements IAttendanceTracker {
     getEmployeeAttendanceByDate(_date: Date) {
         throw new Error("Method not implemented.");
     }
@@ -99,5 +100,9 @@ export class AttendanceDetails implements IAttendanceDetails {
             url += `?${queryParams}`;
         }
         return httpGet<IndividualTimesheet[]>(url).then((response) => response)
+    }
+
+    checkUserExists(): Promise<any> {
+        return httpGet(`/api/checkUserExists`).then((response) => response)
     }
 }
