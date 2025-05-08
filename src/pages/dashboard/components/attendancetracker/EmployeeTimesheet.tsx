@@ -56,11 +56,24 @@ const EmployeeTimesheet: React.FC = () => {
   const handleBackClick = () => {
     let filterOption: any = location.state.filterOption;
 
-    navigate(`/dashboard/attendance/emp-attendance`, {
-      state: {
-        filterOption
-      },
-    });
+    if (filterOption === 'custom') {
+      let start_date: any = location.state.start_date;
+      let end_date: any = location.state.end_date;
+      navigate(`/dashboard/attendance/emp-attendance`, {
+        state: {
+          filterOption,
+          start_date,
+          end_date
+        },
+      });
+    }
+    else {
+      navigate(`/dashboard/attendance/emp-attendance`, {
+        state: {
+          filterOption
+        },
+      });
+    }
   };
 
   return (
@@ -82,7 +95,7 @@ const EmployeeTimesheet: React.FC = () => {
           sx={{ color: "#1C214F", fontWeight: "bold", ml: 1 }}
           variant="h6"
         >
-          Timesheet
+          Timesheet on {date}
         </Typography>
       </Box>
       <Box
@@ -99,7 +112,8 @@ const EmployeeTimesheet: React.FC = () => {
             border: "2px solid  #7D7D7D",
             bxorderRadius: 3,
             mt: 4,
-            padding: 4,
+            py: 4,
+            px:2,
             gap: 3,
           }}
         >

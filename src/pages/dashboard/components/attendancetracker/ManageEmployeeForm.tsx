@@ -155,7 +155,7 @@ const ManageEmployeeForm: React.FC = () => {
 
     if (name == 'email' && !validateEmail(value)) {
       setEmailError("Invalid email format");
-    } else if ((name == 'name' || name === 'employeeName') && !validateName(value)) {
+    } else if (name === 'employeeName' && !validateName(value)) {
       setNameError("Only Alphabet Allowed");
     }
     else {
@@ -398,13 +398,6 @@ const ManageEmployeeForm: React.FC = () => {
               <input type="file" hidden accept="image/*" onChange={handleFileChange} />
             </Button>
           </Box>
-          <DialogTextField
-            label="User ID *"
-            value={selectedEmployee?.employeeId || ""}
-            name="employeeId"
-            onChange={handleInputChange}
-            disabled
-          />
           <DialogTextField
             label="Name *"
             value={selectedEmployee?.employeeName}

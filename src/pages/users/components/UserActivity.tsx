@@ -9,7 +9,7 @@ interface IProps {
 const UserActivity: React.FC<IProps> = ({ todayPunchDetail }) => {
   return (
     <Box sx={{ height: "305px", width: "45%", boxShadow: 3, borderRadius: 3, padding: 2, margin:2 }}>
-      <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant='h6'>Today activity</Typography>
+      <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant='h6'>Today activity on Today</Typography>
       <Box
         sx={{
           display: 'flex',

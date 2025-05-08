@@ -38,10 +38,10 @@ const Sidebar: React.FC = () => {
   return (
     <Drawer
       sx={{
-        width: "16%",
+        width: "17%",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: "16%",
+          width: "17%",
           bgcolor: "#1C214F",
           color: "white",
           overflow: "hidden",

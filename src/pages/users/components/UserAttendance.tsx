@@ -53,21 +53,21 @@ interface IProps {
 }
 
 const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
+  const [searchParams] = useSearchParams();
+
+  const id = searchParams.get("id");
+  const date = searchParams.get("date");
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [noRecordsMessage, setNoRecordsMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [filterOption, setFilterOption] = useState("today");
+  const [filterOption, setFilterOption] = useState<string>("");
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const customButtonRef = React.useRef<HTMLDivElement | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const attendanceDetails = new AttendanceTracker();
-
-  const [searchParams] = useSearchParams();
-
-  const id = searchParams.get("id");
-  const date = searchParams.get("date");
 
   const getAttendance = (id: string, dateValue: any) => {
     setLoading(true)
@@ -153,9 +153,11 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
   useEffect(() => {
     if (id) {
       getAttendance(id, { date: moment(date).format('YYYY-MM-DD') });
+      setFilterOption(`${date}`)
     } else if (attendanceList) {
       setNoRecordsMessage(attendanceList.length ? null : "No records found.");
       setAttendance(attendanceList);
+      setFilterOption('today')
     }
   }, [id, attendanceList]);
 
@@ -177,6 +179,9 @@ const UserAttendance: React.FC<IProps> = ({ attendanceList }) => {
               paddingX: 2,
             }}
           >
+            {date && <MenuItem value={`${date}`} disabled>
+              {date}
+            </MenuItem>}
             <MenuItem value="today">Today</MenuItem>
             <MenuItem value="yesterday">Yesterday</MenuItem>
             <MenuItem value="week">This Week</MenuItem>

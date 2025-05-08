@@ -53,7 +53,15 @@ const EmployeeAttendance: React.FC = () => {
     if (location.state && location.state.filterOption)
       setFilterOption(location.state.filterOption);
 
-    const value = {
+    let value: any;
+    if (location.state && location.state.filterOption === 'custom')
+      value = {
+        start_date: location.state.start_date,
+        end_date: location.state.end_date,
+        page_number: 1,
+        page_size: rowsPerPage
+      }
+    else value = {
       period: (location.state && location.state.filterOption) ? location.state.filterOption : 'today',
       page_number: 1,
       page_size: rowsPerPage
@@ -170,11 +178,22 @@ const EmployeeAttendance: React.FC = () => {
   };
 
   const handleRowClick = (row: any) => {
-    navigate(`/dashboard/attendance/attendance-details?date=${row.date}&id=${row.employeeId}`, {
-      state: {
-        filterOption
-      },
-    });
+    if (filterOption === 'custom') {
+      navigate(`/dashboard/attendance/attendance-details?date=${row.date}&id=${row.employeeId}`, {
+        state: {
+          filterOption,
+          start_date: dateRange[0] ? format(dateRange[0], 'yyyy-MM-dd') : '',
+          end_date: dateRange[1] ? format(dateRange[1], 'yyyy-MM-dd') : '',
+        },
+      });
+    }
+    else {
+      navigate(`/dashboard/attendance/attendance-details?date=${row.date}&id=${row.employeeId}`, {
+        state: {
+          filterOption,
+        },
+      });
+    }
   };
 
   const handleFilterChange = (e: any) => {
@@ -241,7 +260,7 @@ const EmployeeAttendance: React.FC = () => {
         <CircularProgress color={"primary"} />
       </Backdrop>
 
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", my: 2 }}>
         <Typography sx={{ fontWeight: "bold", color: "#1C214F", p: 2 }} variant="h5">
           Attendance List
         </Typography>
@@ -391,7 +410,7 @@ const EmployeeAttendance: React.FC = () => {
         </Table>
       </TableContainer>
       {rows.total_records ? <TablePagination
-        rowsPerPageOptions={[pageSize, pageSize * 2, pageSize * 3, pageSize * 4,pageSize * 5]}
+        rowsPerPageOptions={[pageSize, pageSize * 2, pageSize * 3, pageSize * 4, pageSize * 5]}
         component="div"
         count={rows.total_records || 0}
         rowsPerPage={rowsPerPage}

@@ -43,7 +43,7 @@ const UserTimesheet: React.FC<IProps> = ({ todayPunchDetail }) => {
   return (
     <Box sx={{ height: "30%", width: "45%", boxShadow: 3, padding: 2, margin:2, borderRadius: 3, position: 'relative' }}>
       <Box sx={{ display: 'flex', justifyContent: "flex-start", mb: 2 }}>
-        <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant='h6'>Timesheet </Typography>
+        <Typography sx={{ color: "#1C214F", fontWeight: "bold" }} variant='h6'>Timesheet on Today</Typography>
       </Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column" }}>

@@ -44,7 +44,7 @@ const EmployeeActivity: React.FC = () => {
       }}
     >
       <Typography sx={{ color: '#1C214F', fontWeight: 'bold' }} variant='h6'>
-        Activity
+        Activity on {date}
       </Typography>
       <Box
         sx={{

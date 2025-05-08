@@ -154,12 +154,12 @@ const AttendanceSetupUpdateView: React.FC = () => {
     };
 
     const validatePhoneNumber = (value: string) => {
-        const phoneRegex = /^[0-9]{7,15}$/;
+        const phoneRegex = /^(\+91[\-\s]?[6-9]\d{9}|0?[6-9]\d{9}|\+1[\-\s]?\(?[2-9]\d{2}\)?[\-\s]?[2-9]\d{2}[\-\s]?\d{4})$/;
         return phoneRegex.test(value);
     };
 
     const validateWebsiteURL = (value: string) => {
-        const urlRegex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+)(\/[^\s]*)?$/;
+        const urlRegex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+(com|net|org|gov|edu|in|co\.in|io|info|biz)(\/[^\s]*)?$/i;
         return urlRegex.test(value);
     };
 
@@ -178,9 +178,9 @@ const AttendanceSetupUpdateView: React.FC = () => {
     };
 
     const validateZipCode = (value: string) => {
-        const zipRegex = /^[1-9][0-9]{5}$/;
+        const zipRegex = /^([1-9][0-9]{5}|[0-9]{5})$/;
         return zipRegex.test(value);
-    };
+    }
 
     const handleEditClick = (index: any) => {
         setRowIndex(index);
