@@ -117,6 +117,13 @@ const OrganizationView: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const allowedKeys = /[0-9]/;
+    if (!allowedKeys.test(event.key) && !["Backspace", "ArrowLeft", "ArrowRight", "Delete"].includes(event.key)) {
+      event.preventDefault();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -210,6 +217,7 @@ const OrganizationView: React.FC = () => {
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
+          onKeyDown={handleKeyPress}
           error={!!errors[`phoneNumber`]}
           helperText={errors[`phoneNumber`]}
           InputProps={{
@@ -253,6 +261,7 @@ const OrganizationView: React.FC = () => {
           name="workTiming"
           value={formData.workTiming}
           onChange={handleChange}
+          onKeyDown={handleKeyPress}
           error={!!errors[`workTiming`]}
           helperText={errors[`workTiming`]}
           InputProps={{
@@ -351,6 +360,7 @@ const OrganizationView: React.FC = () => {
                 name="zipCode"
                 value={formData.zipCode}
                 onChange={handleChange}
+                onKeyDown={handleKeyPress}
                 error={!!errors[`zipCode`]}
                 helperText={errors[`zipCode`]}
                 InputLabelProps={{

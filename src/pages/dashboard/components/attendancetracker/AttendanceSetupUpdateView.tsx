@@ -182,6 +182,13 @@ const AttendanceSetupUpdateView: React.FC = () => {
         return zipRegex.test(value);
     }
 
+    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        const allowedKeys = /[0-9]/;
+        if (!allowedKeys.test(event.key) && !["Backspace", "ArrowLeft", "ArrowRight", "Delete"].includes(event.key)) {
+            event.preventDefault();
+        }
+    };
+
     const handleEditClick = (index: any) => {
         setRowIndex(index);
         setCameraData(cameraDetails[index]);
@@ -399,6 +406,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             value={organizationResponse?.organizationData?.phoneNumber}
                             name="phoneNumber"
                             onChange={handleOrganizationInputChange}
+                            onKeyDown={handleKeyPress}
                             sx={{ width: "80%" }}
                             required
                             error={!!errors[`phoneNumber`]}
@@ -429,6 +437,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             value={organizationResponse?.organizationData?.workTiming}
                             name="workTiming"
                             onChange={handleOrganizationInputChange}
+                            onKeyDown={handleKeyPress}
                             sx={{ width: "80%" }}
                             required
                             error={!!errors[`workTiming`]}
@@ -524,6 +533,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
                             value={organizationResponse?.organizationData?.zipCode}
                             name="zipCode"
                             onChange={handleOrganizationInputChange}
+                            onKeyDown={handleKeyPress}
                             sx={{ width: "80%" }}
                             required
                             error={!!errors[`zipCode`]}
