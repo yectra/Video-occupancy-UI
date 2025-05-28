@@ -142,3 +142,14 @@ export class employeeAttendanceResponse {
   page_size: number;
   total_records: number;
 }
+
+export class CameraStatusModel {
+  id: string;
+  user_id: string;
+  camera_id: string;
+  videoUrl: string;
+  status: string;
+  date: string;
+  time: string;
+  camera_type: string;
+}

@@ -18,6 +18,7 @@ interface IAttendanceTracker {
     updateAttendanceTrackerDetails(organizationDetails: AttendanceTrackerDetailsModel): Promise<any>;
     getAttendance(value?: any): Promise<IndividualTimesheet[]>;
     checkUserExists(): Promise<any>; 
+    getAllCameraStatus(): Promise<any>;
 }
 
 export class AttendanceTracker implements IAttendanceTracker {
@@ -104,5 +105,9 @@ export class AttendanceTracker implements IAttendanceTracker {
 
     checkUserExists(): Promise<any> {
         return httpGet(`/api/checkUserExists`).then((response) => response)
+    }
+    
+    getAllCameraStatus(): Promise<any> {
+        return httpGet(`/api/getFailedCameraStatusAttendance`).then((response) => response)
     }
 }

@@ -1,7 +1,7 @@
 // React Dependancies
 import React, { useState } from "react";
 
-import { Box, Grid, Toolbar, Hidden, Drawer } from "@mui/material";
+import { Box, Drawer, useMediaQuery, useTheme } from "@mui/material";
 
 // Router
 import { Outlet } from "react-router-dom";
@@ -10,45 +10,70 @@ import { Outlet } from "react-router-dom";
 import Appbar from "@/common/components/layout/Appbar";
 import Sidebar from "@/common/components/layout/Sidebar";
 
+const drawerWidth = 240;
+
 const Layout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box sx={{ display: "flex", height: "100vh" }}>
       <Appbar onMenuClick={handleDrawerToggle} />
-      <Toolbar />
 
-      <Grid container>
-        <Hidden mdUp>
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true, 
-            }}
-            sx={{
-              "& .MuiDrawer-paper": { boxSizing: "border-box", width: 220 },
-            }}
-          >
-            <Sidebar />
-          </Drawer>
-        </Hidden>
+      {!isDesktop && (
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          container={typeof window !== "undefined" ? () => window.document.body : undefined}
+          sx={{
+            [`& .MuiDrawer-paper`]: {
+              width: drawerWidth,
+              height: "calc(100% - 64px)",
+              boxSizing: "border-box",
+              top: "64px",
+              bgcolor: "#1C214F",
+            },
+          }}
+        >
+          <Sidebar onItemClick={handleDrawerToggle} />
+        </Drawer>
+      )}
+      {isDesktop && (
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: {
+              width: drawerWidth,
+              height: "calc(100% - 64px)",
+              boxSizing: "border-box",
+              top: "64px",
+              bgcolor: "#1C214F",
+              position: "fixed",
+            },
+          }}
+        >
+          <Sidebar />
+        </Drawer>
+      )}
 
-        <Hidden mdDown>
-          <Grid item md={4} lg={2}>
-            <Sidebar />
-          </Grid>
-        </Hidden>
-
-        <Grid item xs={12} md={8} lg={10}>
-            <Outlet />
-        </Grid>
-      </Grid>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 2,
+          marginTop: "64px",
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+        }}
+      >
+        <Outlet />
+      </Box>
     </Box>
   );
 };
