@@ -63,7 +63,7 @@ const AttendanceSetupView = () => {
   };
 
   const validateEmail = (email: string): boolean => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const regex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,3}$/;
     return regex.test(email);
   };
 
