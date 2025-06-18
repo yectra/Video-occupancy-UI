@@ -152,4 +152,5 @@ export class CameraStatusModel {
   date: string;
   time: string;
   camera_type: string;
+  camera_name: string;
 }

@@ -155,6 +155,7 @@ const AttendanceSetupUpdateView: React.FC = () => {
 
     const validatePhoneNumber = (value: string) => {
         const phoneRegex = /^(\+91[\-\s]?[6-9]\d{9}|0?[6-9]\d{9}|\+1[\-\s]?\(?[2-9]\d{2}\)?[\-\s]?[2-9]\d{2}[\-\s]?\d{4})$/;
+        // const phoneRegex = /^\+1 \(\d{3}\) \d{3}-\d{4}$|^\+91 \d{5}-\d{5}$/;
         return phoneRegex.test(value);
     };
 
@@ -183,8 +184,10 @@ const AttendanceSetupUpdateView: React.FC = () => {
     }
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        const allowedKeys = /[0-9]/;
-        if (!allowedKeys.test(event.key) && !["Backspace", "ArrowLeft", "ArrowRight", "Delete"].includes(event.key)) {
+        const allowedKeys = /[0-9()+\-\s]/;
+        const controlKeys = ["Backspace", "ArrowLeft", "ArrowRight", "Delete"];
+
+        if (!allowedKeys.test(event.key) && !controlKeys.includes(event.key)) {
             event.preventDefault();
         }
     };

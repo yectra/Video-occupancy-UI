@@ -170,7 +170,7 @@ const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
                 >
                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <Typography variant="body1" fontWeight="bold">
-                      Camera Id- {notif.camera_id} - Failed
+                      Camera Name- {notif.camera_name} - Failed
                     </Typography>
                     <IconButton
                       size="small"
@@ -185,7 +185,7 @@ const Appbar: React.FC<AppbarProps> = ({ onMenuClick }) => {
                   {expandedId === notif.id && (
                     <Box mt={1}>
                       <Typography variant="body2" color="text.secondary">
-                        {`Failure at Camera Id- ${notif.camera_id} (${notif.camera_type}) recorded on:`}
+                        {`Failure at Camera Name- ${notif.camera_name} (${notif.camera_type}) recorded on:`}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         {notif.date} - {notif.time}
