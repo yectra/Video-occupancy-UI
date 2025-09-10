@@ -96,7 +96,7 @@ const MainLayout = () => {
   });
 
   useEffect(() => {
-    if (!isAuthenticated || jobTitle === undefined || attendanceSetup === undefined) return;
+    if (!isAuthenticated || attendanceSetup === undefined) return;
 
     if (location.pathname === "/dashboard" || location.pathname === "/") {
       if (jobTitle === 'Employee') {
